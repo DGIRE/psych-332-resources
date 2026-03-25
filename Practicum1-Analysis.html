@@ -200,6 +200,24 @@
             border-radius: 4px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        .save-btn {
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: rgba(7, 121, 190, 0.15);
+            color: #0779be;
+            border: 1px solid #0779be;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .save-btn:hover {
+            background: rgba(7, 121, 190, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -224,6 +242,7 @@
                 <h2>Gene Expression Heatmap</h2>
                 <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">Z-score normalized expression levels across all brain regions and genes. Rows sorted by anatomical hierarchy.</p>
                 <div id="geneExpressionHeatmap" class="chart-container"></div>
+                <button onclick="savePlotlyAsPNG('geneExpressionHeatmap', 'gene_expression_heatmap')" class="save-btn">&#128190; Save as Image</button>
             </section>
 
             <!-- DTI Connectivity Heatmap -->
@@ -232,6 +251,7 @@
                 <h2>DTI Connectivity Matrix</h2>
                 <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">Diffusion Tensor Imaging connectivity between brain regions. Both axes sorted by anatomical hierarchy.</p>
                 <div id="dtiHeatmap" class="chart-container"></div>
+                <button onclick="savePlotlyAsPNG('dtiHeatmap', 'dti_connectivity_matrix')" class="save-btn">&#128190; Save as Image</button>
             </section>
 
             <!-- Dimensionality Reduction -->
@@ -248,6 +268,7 @@
                 </div>
                 <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">Principal Component Analysis with 2 components. Points colored by brain structure.</p>
                 <div id="dimredPlot" class="chart-container"></div>
+                <button onclick="savePlotlyAsPNG('dimredPlot', 'pca_dimred')" class="save-btn">&#128190; Save as Image</button>
             </section>
 
             <!-- Structure Selector -->
@@ -377,6 +398,7 @@
         let labeledBrainMap = null;
         let blankBrainImage = null;
         let regionIdMap = null;
+        let decodedBrainMap = null;  // cached decoded brain map
 
         // ========== UTILITY FUNCTIONS ==========
         function standardize(data) {
@@ -389,9 +411,11 @@
             const result = [];
             for (let i = 0; i < rleRows.length; i++) {
                 const row = [];
-                for (let j = 0; j < rleRows[i].length; j += 2) {
-                    const value = rleRows[i][j];
-                    const count = rleRows[i][j + 1];
+                // Format is [[value, count], [value, count], ...]
+                for (let j = 0; j < rleRows[i].length; j++) {
+                    const pair = rleRows[i][j];
+                    const value = pair[0];
+                    const count = pair[1];
                     for (let k = 0; k < count; k++) {
                         row.push(value);
                     }
@@ -811,9 +835,11 @@
 
             // Brain map
             html += `<canvas id="structureBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            html += `<br><button onclick="saveCanvasAsPNG('structureBrainMap', 'brain_${region.Name.replace(/\s+/g, '_')}')" class="save-btn">&#128190; Save Brain Map</button>`;
 
             // Gene expression bar plot
             html += `<div id="structureGeneBar" class="chart-container"></div>`;
+            html += `<button onclick="savePlotlyAsPNG('structureGeneBar', 'gene_bar_${region.Name.replace(/\s+/g, '_')}')" class="save-btn">&#128190; Save Gene Bar Chart</button>`;
 
             document.getElementById('structureContent').innerHTML = html;
 
@@ -891,10 +917,13 @@
                 yaxis: { title: 'Expression Level' }
             };
 
-            // Brain map
+            const safeName = geneName.replace(/\s+/g, '_');
             let html = `<div id="geneHistogram" class="chart-container"></div>`;
+            html += `<button onclick="savePlotlyAsPNG('geneHistogram', 'gene_histogram_${safeName}')" class="save-btn">&#128190; Save Histogram</button>`;
             html += `<div id="geneBarPlot" class="chart-container"></div>`;
+            html += `<button onclick="savePlotlyAsPNG('geneBarPlot', 'gene_barplot_${safeName}')" class="save-btn">&#128190; Save Bar Plot</button>`;
             html += `<canvas id="geneBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            html += `<br><button onclick="saveCanvasAsPNG('geneBrainMap', 'gene_brain_${safeName}')" class="save-btn">&#128190; Save Brain Map</button>`;
 
             document.getElementById('geneContent').innerHTML = html;
 
@@ -951,9 +980,13 @@
                 yaxis: { title: 'Connectivity Value' }
             };
 
+            const safeName = targetRegion.replace(/\s+/g, '_');
             let html = `<div id="dtiHistogram" class="chart-container"></div>`;
+            html += `<button onclick="savePlotlyAsPNG('dtiHistogram', 'dti_histogram_${safeName}')" class="save-btn">&#128190; Save Histogram</button>`;
             html += `<div id="dtiBarPlot" class="chart-container"></div>`;
+            html += `<button onclick="savePlotlyAsPNG('dtiBarPlot', 'dti_barplot_${safeName}')" class="save-btn">&#128190; Save Bar Plot</button>`;
             html += `<canvas id="dtiBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            html += `<br><button onclick="saveCanvasAsPNG('dtiBrainMap', 'dti_brain_${safeName}')" class="save-btn">&#128190; Save Brain Map</button>`;
 
             document.getElementById('dtiContent').innerHTML = html;
 
@@ -1011,9 +1044,13 @@
                 yaxis: { title: 'Function Value' }
             };
 
+            const safeName = funcName.replace(/\s+/g, '_');
             let html = `<div id="fmriHistogram" class="chart-container"></div>`;
+            html += `<button onclick="savePlotlyAsPNG('fmriHistogram', 'fmri_histogram_${safeName}')" class="save-btn">&#128190; Save Histogram</button>`;
             html += `<div id="fmriBarPlot" class="chart-container"></div>`;
+            html += `<button onclick="savePlotlyAsPNG('fmriBarPlot', 'fmri_barplot_${safeName}')" class="save-btn">&#128190; Save Bar Plot</button>`;
             html += `<canvas id="fmriBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            html += `<br><button onclick="saveCanvasAsPNG('fmriBrainMap', 'fmri_brain_${safeName}')" class="save-btn">&#128190; Save Brain Map</button>`;
 
             document.getElementById('fmriContent').innerHTML = html;
 
@@ -1031,89 +1068,88 @@
             canvas.width = labeledBrainMap.width;
             canvas.height = labeledBrainMap.height;
 
+            // White background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw brain outline image
             ctx.drawImage(blankBrainImage, 0, 0);
 
-            const decodedMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+            if (!decodedBrainMap) {
+                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+            }
+
             const idList = brainMapIds.split(',').map(id => parseInt(id.trim()));
 
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
+            const pixelData = imageData.data;
 
-            const margin = 75;
-
-            // Clear corner/border areas to background color
-            for (let y = 0; y < canvas.height; y++) {
-                for (let x = 0; x < canvas.width; x++) {
-                    if (y < margin || y >= canvas.height - margin || x < margin || x >= canvas.width - margin) {
-                        const idx = (y * canvas.width + x) * 4;
-                        data[idx] = 18;     // match page background ~#0f1d2d
-                        data[idx + 1] = 35;
-                        data[idx + 2] = 55;
-                        data[idx + 3] = 255;
-                    }
-                }
-            }
+            // White out corner boxes (small rectangles in each corner of the original image)
+            const cSize = 60;
+            whiteOutRect(pixelData, canvas.width, 0, 0, cSize, cSize);
+            whiteOutRect(pixelData, canvas.width, canvas.width - cSize, 0, cSize, cSize);
+            whiteOutRect(pixelData, canvas.width, 0, canvas.height - cSize, cSize, cSize);
+            whiteOutRect(pixelData, canvas.width, canvas.width - cSize, canvas.height - cSize, cSize, cSize);
 
             // Paint selected region in dark blue
-            for (let y = margin; y < canvas.height - margin; y++) {
-                for (let x = margin; x < canvas.width - margin; x++) {
-                    const regionId = decodedMap[y] && decodedMap[y][x];
-                    if (idList.includes(regionId)) {
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const regionId = decodedBrainMap[y] && decodedBrainMap[y][x];
+                    if (regionId !== undefined && idList.includes(regionId)) {
                         const idx = (y * canvas.width + x) * 4;
-                        data[idx] = 0;
-                        data[idx + 1] = 40;
-                        data[idx + 2] = 120;
-                        data[idx + 3] = 200;
+                        pixelData[idx] = 0;
+                        pixelData[idx + 1] = 30;
+                        pixelData[idx + 2] = 120;
+                        pixelData[idx + 3] = 220;
                     }
                 }
             }
 
             ctx.putImageData(imageData, 0, 0);
 
-            // Draw region name label
+            // Draw region name at top-left
             if (regionName) {
-                ctx.font = 'bold 28px Inter, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillStyle = '#e8eef5';
-                ctx.strokeStyle = 'rgba(15, 29, 45, 0.8)';
-                ctx.lineWidth = 4;
-                ctx.strokeText(regionName, canvas.width / 2, margin + 30);
-                ctx.fillText(regionName, canvas.width / 2, margin + 30);
+                const displayName = regionName.charAt(0).toUpperCase() + regionName.slice(1);
+                ctx.font = 'bold 30px Inter, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#000000';
+                ctx.fillText(displayName, 15, 35);
             }
-
-            // Add right-click download handler
-            canvas.oncontextmenu = function(e) {
-                e.preventDefault();
-                const link = document.createElement('a');
-                link.download = (regionName || 'brain_map') + '.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            };
         }
 
-        function clearBrainMapCorners(data, width, height, margin) {
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    if (y < margin || y >= height - margin || x < margin || x >= width - margin) {
-                        const idx = (y * width + x) * 4;
-                        data[idx] = 18;
-                        data[idx + 1] = 35;
-                        data[idx + 2] = 55;
-                        data[idx + 3] = 255;
-                    }
+        function whiteOutRect(pixelData, canvasWidth, rx, ry, rw, rh) {
+            for (let y = ry; y < ry + rh; y++) {
+                for (let x = rx; x < rx + rw; x++) {
+                    const idx = (y * canvasWidth + x) * 4;
+                    pixelData[idx] = 255;
+                    pixelData[idx + 1] = 255;
+                    pixelData[idx + 2] = 255;
+                    pixelData[idx + 3] = 255;
                 }
             }
         }
 
-        function addCanvasDownload(canvas, filename) {
-            canvas.oncontextmenu = function(e) {
-                e.preventDefault();
-                const link = document.createElement('a');
-                link.download = filename + '.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            };
+        // Save a Plotly chart as PNG with white background
+        function savePlotlyAsPNG(divId, filename) {
+            Plotly.downloadImage(divId, {
+                format: 'png',
+                width: 1200,
+                height: 800,
+                scale: 2,
+                filename: filename,
+                setBackground: function() { return 'white'; }
+            });
         }
+
+        // Save a canvas as PNG (already has white background)
+        function saveCanvasAsPNG(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
 
         function drawGeneOnBrainMap(canvasId, geneName) {
             const canvas = document.getElementById(canvasId);
@@ -1122,12 +1158,14 @@
             canvas.width = labeledBrainMap.width;
             canvas.height = labeledBrainMap.height;
 
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(blankBrainImage, 0, 0);
 
-            const decodedMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
-            const margin = 75;
+            if (!decodedBrainMap) {
+                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+            }
 
-            // Build value map by region ID
             const valueMap = {};
             for (const region of metadata.region_metadata) {
                 const geneRow = geneExpressionData.find(r => r.Name === region.Name);
@@ -1146,11 +1184,15 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            clearBrainMapCorners(data, canvas.width, canvas.height, margin);
+            const cSize = 60;
+            whiteOutRect(data, canvas.width, 0, 0, cSize, cSize);
+            whiteOutRect(data, canvas.width, canvas.width - cSize, 0, cSize, cSize);
+            whiteOutRect(data, canvas.width, 0, canvas.height - cSize, cSize, cSize);
+            whiteOutRect(data, canvas.width, canvas.width - cSize, canvas.height - cSize, cSize, cSize);
 
-            for (let y = margin; y < canvas.height - margin; y++) {
-                for (let x = margin; x < canvas.width - margin; x++) {
-                    const regionId = decodedMap[y] && decodedMap[y][x];
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const regionId = decodedBrainMap[y] && decodedBrainMap[y][x];
                     if (regionId !== -100 && regionId !== undefined && valueMap[regionId] !== undefined) {
                         const normalized = (valueMap[regionId] - minVal) / range;
                         const color = getBWRColor(normalized);
@@ -1164,7 +1206,6 @@
             }
 
             ctx.putImageData(imageData, 0, 0);
-            addCanvasDownload(canvas, 'gene_' + geneName);
         }
 
         function drawDTIOnBrainMap(canvasId, targetRegion) {
@@ -1174,12 +1215,14 @@
             canvas.width = labeledBrainMap.width;
             canvas.height = labeledBrainMap.height;
 
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(blankBrainImage, 0, 0);
 
-            const decodedMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
-            const margin = 75;
+            if (!decodedBrainMap) {
+                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+            }
 
-            // Build value map by region ID
             const valueMap = {};
             for (const region of metadata.region_metadata) {
                 const dtiRow = dtiData.find(r => r.Row === region.Name);
@@ -1198,11 +1241,15 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            clearBrainMapCorners(data, canvas.width, canvas.height, margin);
+            const cSize = 60;
+            whiteOutRect(data, canvas.width, 0, 0, cSize, cSize);
+            whiteOutRect(data, canvas.width, canvas.width - cSize, 0, cSize, cSize);
+            whiteOutRect(data, canvas.width, 0, canvas.height - cSize, cSize, cSize);
+            whiteOutRect(data, canvas.width, canvas.width - cSize, canvas.height - cSize, cSize, cSize);
 
-            for (let y = margin; y < canvas.height - margin; y++) {
-                for (let x = margin; x < canvas.width - margin; x++) {
-                    const regionId = decodedMap[y] && decodedMap[y][x];
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const regionId = decodedBrainMap[y] && decodedBrainMap[y][x];
                     if (regionId !== -100 && regionId !== undefined && valueMap[regionId] !== undefined) {
                         const normalized = (valueMap[regionId] - minVal) / range;
                         const color = getRedsColor(normalized);
@@ -1216,7 +1263,6 @@
             }
 
             ctx.putImageData(imageData, 0, 0);
-            addCanvasDownload(canvas, 'dti_' + targetRegion);
         }
 
         function drawFMRIOnBrainMap(canvasId, funcName) {
@@ -1226,12 +1272,14 @@
             canvas.width = labeledBrainMap.width;
             canvas.height = labeledBrainMap.height;
 
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(blankBrainImage, 0, 0);
 
-            const decodedMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
-            const margin = 75;
+            if (!decodedBrainMap) {
+                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+            }
 
-            // Build value map by region ID
             const valueMap = {};
             for (let i = 0; i < metadata.region_metadata.length; i++) {
                 const region = metadata.region_metadata[i];
@@ -1251,11 +1299,15 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            clearBrainMapCorners(data, canvas.width, canvas.height, margin);
+            const cSize = 60;
+            whiteOutRect(data, canvas.width, 0, 0, cSize, cSize);
+            whiteOutRect(data, canvas.width, canvas.width - cSize, 0, cSize, cSize);
+            whiteOutRect(data, canvas.width, 0, canvas.height - cSize, cSize, cSize);
+            whiteOutRect(data, canvas.width, canvas.width - cSize, canvas.height - cSize, cSize, cSize);
 
-            for (let y = margin; y < canvas.height - margin; y++) {
-                for (let x = margin; x < canvas.width - margin; x++) {
-                    const regionId = decodedMap[y] && decodedMap[y][x];
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const regionId = decodedBrainMap[y] && decodedBrainMap[y][x];
                     if (regionId !== -100 && regionId !== undefined && valueMap[regionId] !== undefined) {
                         const normalized = (valueMap[regionId] - minVal) / range;
                         const color = getBluesColor(normalized);
@@ -1269,7 +1321,6 @@
             }
 
             ctx.putImageData(imageData, 0, 0);
-            addCanvasDownload(canvas, 'fmri_' + funcName);
         }
 
         // ========== COLOR FUNCTIONS ==========
