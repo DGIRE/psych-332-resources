@@ -456,25 +456,58 @@
         }
 
         // ========== DATA LOADING ==========
+        // Parse JSON that may contain bare NaN/Infinity from Python exports
+        function safeParseJSON(text, label) {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                // Replace Python-style NaN/Infinity with null and retry
+                const cleaned = text
+                    .replace(/:\s*NaN\b/g, ': null')
+                    .replace(/:\s*Infinity\b/g, ': null')
+                    .replace(/:\s*-Infinity\b/g, ': null');
+                try {
+                    return JSON.parse(cleaned);
+                } catch (e2) {
+                    throw new Error(`Invalid JSON in ${label}: ${e2.message}`);
+                }
+            }
+        }
+
         async function loadAllData() {
             try {
+                // Cache-bust to avoid stale files
+                const cb = '?v=' + Date.now();
+
                 // Load CSV files
                 const [geneResp, dtiResp, fmriResp, metaResp, brainMapResp, regionMapResp] = await Promise.all([
-                    fetch('Data/gene_expression.csv'),
-                    fetch('Data/dti_connections.csv'),
-                    fetch('Data/fmri_functions.csv'),
-                    fetch('Data/metadata.json'),
-                    fetch('Data/labeled_brain_map.json'),
-                    fetch('Data/region_id_map.json')
+                    fetch('Data/gene_expression.csv' + cb),
+                    fetch('Data/dti_connections.csv' + cb),
+                    fetch('Data/fmri_functions.csv' + cb),
+                    fetch('Data/metadata.json' + cb),
+                    fetch('Data/labeled_brain_map.json' + cb),
+                    fetch('Data/region_id_map.json' + cb)
                 ]);
+
+                // Check all responses
+                for (const [resp, name] of [
+                    [geneResp, 'gene_expression.csv'],
+                    [dtiResp, 'dti_connections.csv'],
+                    [fmriResp, 'fmri_functions.csv'],
+                    [metaResp, 'metadata.json'],
+                    [brainMapResp, 'labeled_brain_map.json'],
+                    [regionMapResp, 'region_id_map.json']
+                ]) {
+                    if (!resp.ok) throw new Error(`Failed to load Data/${name} (HTTP ${resp.status})`);
+                }
 
                 const geneText = await geneResp.text();
                 const dtiText = await dtiResp.text();
                 const fmriText = await fmriResp.text();
 
-                metadata = await metaResp.json();
-                labeledBrainMap = await brainMapResp.json();
-                regionIdMap = await regionMapResp.json();
+                metadata = safeParseJSON(await metaResp.text(), 'metadata.json');
+                labeledBrainMap = safeParseJSON(await brainMapResp.text(), 'labeled_brain_map.json');
+                regionIdMap = safeParseJSON(await regionMapResp.text(), 'region_id_map.json');
 
                 // Parse CSVs
                 const geneParsed = Papa.parse(geneText, { header: true, dynamicTyping: true });
