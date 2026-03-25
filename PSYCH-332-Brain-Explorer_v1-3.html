@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PSYCH 332 Brain Explorer v1.3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: #b0c4de;
+      font-weight: 400;
+    }
+
+    /* Search Section */
+    .search-section {
+      margin-bottom: 30px;
+    }
+
+    .search-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 1rem;
+      border: 2px solid #0779be;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    #searchInput::placeholder {
+      color: #7a9ec4;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: #0779be;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(7, 121, 190, 0.1);
+    }
+
+    /* Filter Chips */
+    .filter-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .chip {
+      padding: 8px 16px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      color: #b0c4de;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .chip:hover {
+      border-color: #0779be;
+      background: rgba(7, 121, 190, 0.1);
+      color: #0779be;
+    }
+
+    .chip.active {
+      border-color: #0779be;
+      background: #0779be;
+      color: #ffffff;
+    }
+
+    /* Example Queries */
+    .examples-section {
+      margin-bottom: 25px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      border-left: 3px solid #0779be;
+    }
+
+    .examples-section p {
+      font-size: 0.9rem;
+      color: #b0c4de;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .example-queries {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .example-btn {
+      padding: 6px 12px;
+      background: rgba(7, 121, 190, 0.15);
+      border: 1px solid #0779be;
+      color: #0779be;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .example-btn:hover {
+      background: rgba(7, 121, 190, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* Results Section */
+    .results-section {
+      min-height: 300px;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+    }
+
+    .results-count {
+      font-size: 1rem;
+      color: #b0c4de;
+      font-weight: 500;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #b0c4de;
+    }
+
+    .no-results-title {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #7a9ec4;
+    }
+
+    /* Results Grid */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .result-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    .result-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .badge-function {
+      background: #0779BE;
+    }
+
+    .badge-region {
+      background: #27ae60;
+    }
+
+    .badge-disorder {
+      background: #e74c3c;
+    }
+
+    .badge-gene {
+      background: #9b59b6;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #ffffff;
+      flex: 1;
+    }
+
+    .match-score {
+      font-size: 0.8rem;
+      color: #0779be;
+      background: rgba(7, 121, 190, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .card-body {
+      font-size: 0.9rem;
+      color: #b0c4de;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .card-detail {
+      font-size: 0.85rem;
+      color: #7a9ec4;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #a8c5dd;
+      min-width: 80px;
+    }
+
+    .detail-value {
+      color: #b0c4de;
+      flex: 1;
+    }
+
+    .xref-section {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .xref-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0779be;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .xref-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .xref-item {
+      display: inline-block;
+      padding: 4px 8px;
+      background: rgba(7, 121, 190, 0.15);
+      color: #7ac4ff;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(7, 121, 190, 0.2);
+    }
+
+    .expand-btn {
+      background: none;
+      border: none;
+      color: #0779be;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: color 0.2s ease;
+    }
+
+    .expand-btn:hover {
+      color: #5eb3ff;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 50px;
+      padding: 30px 20px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #7a9ec4;
+      font-size: 0.85rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-chips {
+        justify-content: center;
+      }
+    }
+  
+    /* Gene Selection Highlighting */
+    .gene-selected {
+      background: #2E8B57 !important;
+      color: white !important;
+      padding: 4px 8px !important;
+      border-radius: 4px !important;
+      font-weight: 600 !important;
+      display: inline-block !important;
+      margin: 2px !important;
+    }
+
+    /* Matched search terms border */
+    .result-card.matched {
+      border: 2px solid #0779BE !important;
+    }
+
+    /* Clickable links styling */
+    a.gene-link,
+    a.function-link,
+    a.region-link,
+    a.disorder-link {
+      color: #7ac4ff;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    a.gene-link:hover,
+    a.function-link:hover,
+    a.region-link:hover,
+    a.disorder-link:hover {
+      background: rgba(7, 121, 190, 0.3);
+      color: #5eb3ff;
+    }
+
+    .matched-terms {
+      font-size: 0.75rem;
+      color: #0779BE;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(7, 121, 190, 0.2);
+      font-weight: 500;
+    }
+
+    .function-primary {
+      background: #2E8B57 !important;
+      color: white !important;
+      padding: 2px 6px !important;
+      border-radius: 4px !important;
+      font-weight: 600 !important;
+    }
+
+    a.function-link.function-primary {
+      color: white !important;
+    }
+
+    a.function-link.function-primary:hover {
+      background: #3AA76D !important;
+      color: white !important;
+    }
+
+    a.treatment-link {
+      color: #7ac4ff;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    a.treatment-link:hover {
+      background: rgba(7, 121, 190, 0.3);
+      color: #5eb3ff;
+    }
+
+    .xref-item.clickable {
+      cursor: pointer;
+    }
+
+    .xref-item.clickable:hover {
+      background: rgba(7, 121, 190, 0.3) !important;
+      border-color: #0779BE !important;
+    }
+
+    /* ---- v1.3: Layout with sidebar ---- */
+    .app-layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 20px;
+    }
+
+    .sidebar-panel {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .sidebar-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #0779BE;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .slot {
+      margin-bottom: 16px;
+    }
+
+    .slot:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .slot-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #7a9ec4;
+      margin-bottom: 6px;
+    }
+
+    .slot-row {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .slot-input {
+      flex: 1;
+      min-width: 0;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      color: #b0c4de;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .slot-input::placeholder {
+      color: #4a6a8a;
+      font-style: italic;
+      font-size: 0.78rem;
+    }
+
+    .slot-input:focus {
+      outline: none;
+      border-style: solid;
+      border-color: #0779BE;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .slot-input.filled {
+      border-style: solid;
+      color: #ffffff;
+      font-weight: 500;
+    }
+
+    .slot-input.filled[data-slottype="region"] {
+      border-color: rgba(39, 174, 96, 0.6);
+      background: rgba(39, 174, 96, 0.1);
+    }
+
+    .slot-input.filled[data-slottype="func"] {
+      border-color: rgba(7, 121, 190, 0.6);
+      background: rgba(7, 121, 190, 0.1);
+    }
+
+    .slot-input.filled[data-slottype="gene"] {
+      border-color: rgba(155, 89, 182, 0.6);
+      background: rgba(155, 89, 182, 0.1);
+    }
+
+    .slot-clear {
+      background: none;
+      border: none;
+      color: #e74c3c;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .slot-clear:hover {
+      background: rgba(231, 76, 60, 0.15);
+    }
+
+    .slot-clear.hidden {
+      display: none;
+    }
+
+    .export-section {
+      margin-top: 18px;
+    }
+
+    .export-btn {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #0779BE;
+      border-radius: 6px;
+      background: rgba(7, 121, 190, 0.15);
+      color: #0779BE;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .export-btn:hover:not(:disabled) {
+      background: #0779BE;
+      color: #ffffff;
+    }
+
+    .export-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: #5a7a9a;
+      color: #5a7a9a;
+    }
+
+    .main-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Save button next to search */
+    .search-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .search-row #searchInput {
+      flex: 1;
+    }
+
+    .save-btn {
+      padding: 0 20px;
+      border: 2px solid #27ae60;
+      border-radius: 8px;
+      background: rgba(39, 174, 96, 0.12);
+      color: #27ae60;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .save-btn:hover {
+      background: #27ae60;
+      color: #ffffff;
+    }
+
+    .back-btn {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: background 0.2s, opacity 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #545b62;
+    }
+
+    .back-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .back-btn:disabled:hover {
+      background: #6c757d;
+    }
+
+    /* Responsive: stack sidebar below on small screens */
+    @media (max-width: 900px) {
+      .app-layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        position: static;
+      }
+    }
+
+    /* ---- Drag-and-Drop ---- */
+    .result-card[draggable="true"] {
+      cursor: grab;
+    }
+
+    .result-card[draggable="true"]:active {
+      cursor: grabbing;
+    }
+
+    .result-card.dragging {
+      opacity: 0.45;
+      transform: scale(0.97);
+      box-shadow: 0 0 16px rgba(7, 121, 190, 0.35);
+    }
+
+    .slot-input.drag-over {
+      border-style: solid !important;
+      border-color: #0779BE !important;
+      background: rgba(7, 121, 190, 0.18) !important;
+      box-shadow: 0 0 0 3px rgba(7, 121, 190, 0.25), inset 0 0 8px rgba(7, 121, 190, 0.12);
+      transform: scale(1.03);
+      transition: all 0.15s ease;
+    }
+
+    .slot-input.drag-over-wrong {
+      border-style: solid !important;
+      border-color: #e74c3c !important;
+      background: rgba(231, 76, 60, 0.1) !important;
+    }
+
+    .slot-input.drag-accepted {
+      animation: slotFlash 0.4s ease-out;
+    }
+
+    @keyframes slotFlash {
+      0%   { box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.6); }
+      100% { box-shadow: none; }
+    }
+
+    .drag-hint {
+      font-size: 0.7rem;
+      color: #4a6a8a;
+      text-align: center;
+      margin-top: 12px;
+      font-style: italic;
+    }
+
+    /* Custom right-click context menu */
+    .ctx-menu {
+      position: fixed;
+      z-index: 9999;
+      background: #1a2d42;
+      border: 1px solid rgba(7, 121, 190, 0.5);
+      border-radius: 8px;
+      padding: 6px 0;
+      min-width: 210px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255,255,255,0.06);
+      animation: ctxFadeIn 0.12s ease-out;
+      font-family: 'Inter', sans-serif;
+    }
+
+    @keyframes ctxFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .ctx-menu-header {
+      padding: 8px 14px 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #7a9ec4;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+    }
+
+    .ctx-menu-item {
+      padding: 9px 14px;
+      font-size: 0.88rem;
+      color: #e8eef5;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .ctx-menu-item:hover {
+      background: rgba(7, 121, 190, 0.25);
+    }
+
+    .ctx-menu-item .ctx-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .ctx-icon-region { background: #27ae60; }
+    .ctx-icon-func   { background: #0779BE; }
+    .ctx-icon-gene   { background: #9b59b6; }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PSYCH 332 Brain Explorer</h1>
+      <p>Cross-Reference Tool for Functions, Regions, Disorders & Genes</p>
+    </header>
+
+    <div class="app-layout">
+      <!-- Left sidebar: selection slots -->
+      <aside class="sidebar">
+        <div class="sidebar-panel">
+          <div class="sidebar-title">My Selections</div>
+          <div class="slot">
+            <div class="slot-label">Brain Area</div>
+            <div class="slot-row">
+              <input type="text" class="slot-input" id="slotRegion" placeholder="Type or save a region" data-slottype="region">
+              <button class="slot-clear hidden" id="clearRegion" onclick="clearSlot('region')">✕</button>
+            </div>
+          </div>
+          <div class="slot">
+            <div class="slot-label">Function</div>
+            <div class="slot-row">
+              <input type="text" class="slot-input" id="slotFunction" placeholder="Type or save a function" data-slottype="func">
+              <button class="slot-clear hidden" id="clearFunction" onclick="clearSlot('func')">✕</button>
+            </div>
+          </div>
+          <div class="slot">
+            <div class="slot-label">Gene</div>
+            <div class="slot-row">
+              <input type="text" class="slot-input" id="slotGene" placeholder="Type or save a gene" data-slottype="gene">
+              <button class="slot-clear hidden" id="clearGene" onclick="clearSlot('gene')">✕</button>
+            </div>
+          </div>
+          <div class="export-section">
+            <button class="export-btn" id="exportBtn" disabled>Export Selection</button>
+          </div>
+          <div class="drag-hint">Drag cards here or right-click items to save</div>
+        </div>
+      </aside>
+
+      <!-- Main content area -->
+      <div class="main-content">
+        <div class="search-section">
+          <div class="search-container">
+            <div class="search-row">
+              <button class="back-btn" id="backBtn" disabled title="Go back to previous search" onclick="navigateBack()">&#8592; Back</button>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Try: 'What genes are expressed in the prefrontal cortex related to memory and depression?'"
+              >
+              <button class="save-btn" id="saveBtn" title="Save search terms into selection slots">Save</button>
+            </div>
+          </div>
+
+          <div class="filter-chips">
+            <div class="chip active" data-filter="all">All Categories</div>
+            <div class="chip" data-filter="function">Functions</div>
+            <div class="chip" data-filter="region">Brain Regions</div>
+            <div class="chip" data-filter="disorder">Disorders</div>
+            <div class="chip" data-filter="gene">Genes</div>
+          </div>
+
+          <div class="examples-section">
+            <p>Example Queries:</p>
+            <div class="example-queries">
+              <button class="example-btn">memory hippocampus Alzheimer's</button>
+              <button class="example-btn">dopamine reward addiction</button>
+              <button class="example-btn">language Broca's area aphasia</button>
+              <button class="example-btn">fear amygdala PTSD</button>
+              <button class="example-btn">visual cortex V1 motion</button>
+              <button class="example-btn">prefrontal COMT schizophrenia</button>
+              <button class="example-btn">serotonin depression sleep</button>
+              <button class="example-btn">basal ganglia Parkinson's dopamine</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-section">
+          <div id="resultsContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>PSYCH 332 — University of Washington — Brain Explorer v1.3<br>
+    Data sourced from Allen Human Brain Atlas, NeuroSynth, and curated course materials</p>
+  </footer>
+
+  <script>
+    
+    // ============================================================
+    // SELECTED GENES (96 genes from course neurogenetics reading list)
+    // ============================================================
+    const SELECTED_GENES = new Set([
+      "ADRA1A", "ADRA1B", "ADRA1D", "ADRA2A", "ADRA2B", "ADRA2C", "ADRB1", "ADRB2", "ADRB3",
+      "CACNA1A", "CACNA1B", "CACNA1C", "CACNA1D", "CACNA1E", "CACNA1F", "CACNA1H", "CACNA1I", "CACNA1S",
+      "CHRFAM7A", "CHRM1", "CHRM2", "CHRM4", "CHRM5", "CHRNA1", "CHRNA10", "CHRNA3", "CHRNA4", "CHRNA5", "CHRNA7", "CHRNA9",
+      "CHRNB1", "CHRNB2", "CHRNB3", "CHRNB4", "CHRNE", "CHRNG",
+      "DRD1", "DRD2", "DRD3", "DRD4", "DRD5",
+      "HCN1", "HCN2", "HCN3", "HCN4",
+      "HTR1A", "HTR1B", "HTR1D", "HTR1E", "HTR1F", "HTR2A", "HTR2B", "HTR2C", "HTR3B", "HTR3C", "HTR3D", "HTR3E", "HTR4", "HTR5A", "HTR6", "HTR7",
+      "KCNA1", "KCNA10", "KCNA2", "KCNA3", "KCNA4", "KCNA5", "KCNA6", "KCNA7", "KCNAB3", "KCNB1", "KCNB2", "KCNC3", "KCNC4", "KCND1", "KCND2", "KCND3",
+      "KCNH1", "KCNH2", "KCNH4", "KCNH6", "KCNH7", "KCNH8", "KCNQ1", "KCNQ1DN", "KCNQ1OT1", "KCNQ2", "KCNQ3", "KCNQ4", "KCNQ5",
+      "SCN1A", "SCN2A", "SCN3A", "SCN5A", "SCN8A", "SCN9A"
+    ]);
+
+    // ============================================================
+    // DISORDER URL MAPPINGS (NIMH & NINDS)
+    // ============================================================
+    const DISORDER_URLS = {
+      "ADHD": "https://www.nimh.nih.gov/health/topics/attention-deficit-hyperactivity-disorder-adhd",
+      "Alzheimer's Disease": "https://www.ninds.nih.gov/health-information/disorders/alzheimers-disease",
+      "ALS": "https://www.ninds.nih.gov/health-information/disorders/amyotrophic-lateral-sclerosis-als",
+      "Anxiety Disorders": "https://www.nimh.nih.gov/health/topics/anxiety-disorders",
+      "Autism": "https://www.nimh.nih.gov/health/topics/autism-spectrum-disorders-asd",
+      "Bipolar Disorder": "https://www.nimh.nih.gov/health/topics/bipolar-disorder",
+      "Brain Cancer": "https://www.ninds.nih.gov/health-information/disorders/brain-and-spinal-cord-tumors",
+      "Cerebral Palsy": "https://www.ninds.nih.gov/health-information/disorders/cerebral-palsy",
+      "Chronic Pain": "https://www.ninds.nih.gov/health-information/disorders/chronic-pain",
+      "Eating Disorders": "https://www.nimh.nih.gov/health/topics/eating-disorders",
+      "Epilepsy": "https://www.ninds.nih.gov/health-information/disorders/epilepsy-and-seizures",
+      "Huntington's Disease": "https://www.ninds.nih.gov/health-information/disorders/huntingtons-disease",
+      "Depression (MDD)": "https://www.nimh.nih.gov/health/topics/depression",
+      "Meningitis": "https://www.ninds.nih.gov/health-information/disorders/meningitis-and-encephalitis",
+      "Migraine": "https://www.ninds.nih.gov/health-information/disorders/migraine",
+      "MS": "https://www.ninds.nih.gov/health-information/disorders/multiple-sclerosis",
+      "OCD": "https://www.nimh.nih.gov/health/topics/obsessive-compulsive-disorder-ocd",
+      "Parkinson's Disease": "https://www.ninds.nih.gov/health-information/disorders/parkinsons-disease",
+      "PTSD": "https://www.nimh.nih.gov/health/topics/post-traumatic-stress-disorder-ptsd",
+      "Schizophrenia": "https://www.nimh.nih.gov/health/topics/schizophrenia",
+      "Sleep Disorders": "https://www.ninds.nih.gov/health-information/disorders/sleep-disorders",
+      "Spinal Cord Injury": "https://www.ninds.nih.gov/health-information/disorders/spinal-cord-injury",
+      "Stroke": "https://www.ninds.nih.gov/health-information/stroke/stroke-overview",
+      "Substance Use Disorders": "https://www.nimh.nih.gov/health/topics/substance-use-and-mental-health",
+      "Tourette's Syndrome": "https://www.ninds.nih.gov/health-information/disorders/tourette-syndrome",
+      "TBI": "https://www.ninds.nih.gov/health-information/disorders/traumatic-brain-injury"
+    };
+
+    // ============================================================
+    // TREATMENT URL MAPPINGS (Mayo Clinic & authoritative sources)
+    // ============================================================
+    const TREATMENT_URLS = {
+      "stimulants": "https://www.mayoclinic.org/drugs-supplements/dextroamphetamine-and-amphetamine-oral-route/description/drg-20071758",
+      "methylphenidate": "https://www.mayoclinic.org/drugs-supplements/methylphenidate-oral-route/description/drg-20068297",
+      "amphetamine": "https://www.mayoclinic.org/drugs-supplements/dextroamphetamine-and-amphetamine-oral-route/description/drg-20071758",
+      "atomoxetine": "https://www.mayoclinic.org/drugs-supplements/atomoxetine-oral-route/description/drg-20066539",
+      "behavioral therapy": "https://www.apa.org/topics/psychotherapy/understanding",
+      "cholinesterase inhibitors": "https://www.mayoclinic.org/diseases-conditions/alzheimers-disease/in-depth/alzheimers/art-20048103",
+      "memantine": "https://www.mayoclinic.org/drugs-supplements/memantine-oral-route/description/drg-20067012",
+      "cognitive training": "https://www.apa.org/monitor/2014/10/brain-training",
+      "supportive care": "https://www.mayoclinic.org/departments-centers/palliative-medicine/overview/ovc-20399438",
+      "riluzole": "https://www.mayoclinic.org/drugs-supplements/riluzole-oral-route/description/drg-20065869",
+      "edaravone": "https://www.mayoclinic.org/diseases-conditions/amyotrophic-lateral-sclerosis/diagnosis-treatment/drc-20354027",
+      "ventilation": "https://www.mayoclinic.org/diseases-conditions/amyotrophic-lateral-sclerosis/diagnosis-treatment/drc-20354027",
+      "SSRIs": "https://www.mayoclinic.org/diseases-conditions/depression/in-depth/ssris/art-20044825",
+      "SNRIs": "https://www.mayoclinic.org/diseases-conditions/depression/in-depth/antidepressants/art-20044970",
+      "benzodiazepines": "https://www.mayoclinic.org/diseases-conditions/insomnia/in-depth/sleeping-pills/art-20043959",
+      "cognitive behavioral therapy": "https://www.mayoclinic.org/tests-procedures/cognitive-behavioral-therapy/about/pac-20384610",
+      "social skills training": "https://www.mayoclinic.org/diseases-conditions/autism-spectrum-disorder/diagnosis-treatment/drc-20352934",
+      "medication for comorbidities": "https://www.mayoclinic.org/diseases-conditions/autism-spectrum-disorder/diagnosis-treatment/drc-20352934",
+      "mood stabilizers": "https://www.mayoclinic.org/diseases-conditions/bipolar-disorder/diagnosis-treatment/drc-20355961",
+      "lithium": "https://www.mayoclinic.org/drugs-supplements/lithium-oral-route/description/drg-20064603",
+      "antipsychotics": "https://www.mayoclinic.org/diseases-conditions/schizophrenia/diagnosis-treatment/drc-20354449",
+      "psychotherapy": "https://www.mayoclinic.org/tests-procedures/psychotherapy/about/pac-20384616",
+      "surgery": "https://www.mayoclinic.org/tests-procedures/brain-surgery/about/pac-20384763",
+      "chemotherapy": "https://www.mayoclinic.org/tests-procedures/chemotherapy/about/pac-20385033",
+      "radiation": "https://www.mayoclinic.org/tests-procedures/radiation-therapy/about/pac-20385162",
+      "targeted therapy": "https://www.mayoclinic.org/diseases-conditions/cancer/in-depth/targeted-therapy/art-20545457",
+      "physical therapy": "https://www.mayoclinic.org/tests-procedures/physical-therapy/about/pac-20384858",
+      "occupational therapy": "https://www.mayoclinic.org/tests-procedures/occupational-therapy/about/pac-20384848",
+      "medication": "https://www.mayoclinic.org/patient-visitor-guide/pharmacy",
+      "analgesics": "https://www.mayoclinic.org/diseases-conditions/chronic-pain/diagnosis-treatment/drc-20357449",
+      "antidepressants": "https://www.mayoclinic.org/diseases-conditions/depression/in-depth/antidepressants/art-20046273",
+      "therapy": "https://www.mayoclinic.org/tests-procedures/psychotherapy/about/pac-20384616",
+      "mindfulness": "https://www.mayoclinic.org/healthy-lifestyle/consumer-health/in-depth/mindfulness-exercises/art-20046356",
+      "nutritional counseling": "https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/nutrition-basics/hlv-20049477",
+      "antiepileptic drugs": "https://www.mayoclinic.org/diseases-conditions/epilepsy/diagnosis-treatment/drc-20350098",
+      "neurostimulation": "https://www.mayoclinic.org/tests-procedures/deep-brain-stimulation/about/pac-20384562",
+      "symptom management": "https://www.mayoclinic.org/departments-centers/palliative-medicine/overview/ovc-20399438",
+      "tetrabenazine": "https://www.mayoclinic.org/drugs-supplements/tetrabenazine-oral-route/description/drg-20073663",
+      "tricyclic antidepressants": "https://www.mayoclinic.org/diseases-conditions/depression/in-depth/antidepressants/art-20046983",
+      "antibiotics": "https://www.mayoclinic.org/diseases-conditions/meningitis/diagnosis-treatment/drc-20350514",
+      "antivirals": "https://www.mayoclinic.org/diseases-conditions/meningitis/diagnosis-treatment/drc-20350514",
+      "triptans": "https://www.mayoclinic.org/diseases-conditions/migraine-headache/diagnosis-treatment/drc-20360207",
+      "preventive agents": "https://www.mayoclinic.org/diseases-conditions/migraine-headache/diagnosis-treatment/drc-20360207",
+      "NSAIDs": "https://www.mayoclinic.org/diseases-conditions/migraine-headache/in-depth/migraines/art-20047242",
+      "lifestyle modification": "https://www.mayoclinic.org/diseases-conditions/migraine-headache/in-depth/migraines/art-20048064",
+      "disease-modifying therapies": "https://www.mayoclinic.org/diseases-conditions/multiple-sclerosis/diagnosis-treatment/drc-20350274",
+      "immunosuppressants": "https://www.mayoclinic.org/diseases-conditions/multiple-sclerosis/diagnosis-treatment/drc-20350274",
+      "exposure therapy": "https://www.apa.org/ptsd-guideline/patients-and-families/exposure-therapy",
+      "levodopa": "https://www.mayoclinic.org/drugs-supplements/carbidopa-and-levodopa-oral-route/description/drg-20067740",
+      "dopamine agonists": "https://www.mayoclinic.org/diseases-conditions/parkinsons-disease/diagnosis-treatment/drc-20376062",
+      "deep brain stimulation": "https://www.mayoclinic.org/tests-procedures/deep-brain-stimulation/about/pac-20384562",
+      "trauma-focused therapy": "https://www.apa.org/ptsd-guideline/treatments",
+      "prazosin": "https://www.mayoclinic.org/drugs-supplements/prazosin-oral-route/description/drg-20065617",
+      "EMDR": "https://www.apa.org/ptsd-guideline/treatments/eye-movement-reprocessing",
+      "psychosocial therapy": "https://www.mayoclinic.org/diseases-conditions/schizophrenia/diagnosis-treatment/drc-20354449",
+      "family support": "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health",
+      "sleep hygiene": "https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/sleep/art-20048379",
+      "CBT-I": "https://www.mayoclinic.org/diseases-conditions/insomnia/diagnosis-treatment/drc-20355173",
+      "PAP therapy": "https://www.mayoclinic.org/diseases-conditions/sleep-apnea/diagnosis-treatment/drc-20377636",
+      "rehabilitation": "https://www.mayoclinic.org/tests-procedures/stroke-rehabilitation/about/pac-20384898",
+      "pain management": "https://www.mayoclinic.org/departments-centers/pain-medicine/overview/ovc-20397099",
+      "mobility aids": "https://www.mayoclinic.org/diseases-conditions/spinal-cord-injury/diagnosis-treatment/drc-20377895",
+      "thrombolytics": "https://www.mayoclinic.org/diseases-conditions/stroke/diagnosis-treatment/drc-20350119",
+      "thrombectomy": "https://www.mayoclinic.org/diseases-conditions/stroke/diagnosis-treatment/drc-20350119",
+      "medication-assisted treatment": "https://www.samhsa.gov/medications-substance-use-disorders",
+      "support groups": "https://www.samhsa.gov/find-help/national-helpline",
+      "clonidine": "https://www.mayoclinic.org/drugs-supplements/clonidine-oral-route/description/drg-20063252",
+      "cognitive therapy": "https://www.mayoclinic.org/tests-procedures/cognitive-behavioral-therapy/about/pac-20384610"
+    };
+
+    function makeTreatmentLink(treatmentName) {
+      const url = TREATMENT_URLS[treatmentName]
+        || `https://www.mayoclinic.org/search/search-results?q=${encodeURIComponent(treatmentName)}`;
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="treatment-link">${treatmentName}</a>`;
+    }
+
+    // ============================================================
+    // HELPER FUNCTIONS FOR ENHANCED LINKS AND INTERACTIONS
+    // ============================================================
+    // Override Allen Brain Atlas search terms for genes with non-standard naming
+    const GENE_ALLEN_TERMS = { "ODZ4": "ODZ" };
+
+    function makeGeneLink(geneName) {
+      const searchTerm = GENE_ALLEN_TERMS[geneName] || geneName;
+      const url = `https://human.brain-map.org/microarray/search/show?search_type=gene&search_term=${searchTerm}`;
+      const isSelected = SELECTED_GENES.has(geneName);
+      const className = isSelected ? 'gene-selected gene-link' : 'gene-link';
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${className}" data-slot-type="gene" data-slot-value="${geneName}">${geneName}</a>`;
+    }
+
+    // Override NeuroSynth search terms for functions whose names don't match NeuroSynth's terms
+    const FUNCTION_NEUROSYNTH_TERMS = { "Theory of Mind": "theory mind" };
+
+    function makeFunctionLink(funcName, addPrimaryClass) {
+      const searchTerm = FUNCTION_NEUROSYNTH_TERMS[funcName] || funcName.toLowerCase();
+      const url = `https://neurosynth.org/analyses/terms/${encodeURIComponent(searchTerm)}/`;
+      const classes = addPrimaryClass ? 'function-link function-primary' : 'function-link';
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${classes}" data-slot-type="func" data-slot-value="${funcName.replace(/"/g, '&quot;')}">${funcName}</a>`;
+    }
+
+    // Mapping of brain region names to Radiopaedia article slugs
+    // Preferred PubMed search terms for brain regions
+    // Strips subdivision suffixes and uses canonical anatomical names for better review results
+    const REGION_PUBMED_TERMS = {
+      "Inferior Frontal Gyrus - Pars Opercularis": "inferior frontal gyrus pars opercularis",
+      "Inferior Frontal Gyrus - Pars Triangularis": "inferior frontal gyrus pars triangularis",
+      "Inferior Frontal Gyrus - Pars Orbitalis": "inferior frontal gyrus pars orbitalis",
+      "Orbitofrontal Cortex - Medial": "orbitofrontal cortex",
+      "Orbitofrontal Cortex - Lateral": "orbitofrontal cortex",
+      "Anterior Cingulate Cortex - Dorsal": "anterior cingulate cortex",
+      "Anterior Cingulate Cortex - Ventral": "anterior cingulate cortex",
+      "Anterior Cingulate Cortex - Subgenual": "subgenual anterior cingulate cortex",
+      "Hippocampus - CA1": "hippocampus CA1",
+      "Hippocampus - CA3": "hippocampus CA3",
+      "Hippocampus - Dentate Gyrus": "dentate gyrus",
+      "Hippocampus - Subiculum": "subiculum",
+      "Amygdala - Basolateral": "basolateral amygdala",
+      "Amygdala - Central": "central nucleus amygdala",
+      "Globus Pallidus - External": "globus pallidus external",
+      "Globus Pallidus - Internal": "globus pallidus internal",
+      "Thalamus - Anterior": "anterior thalamic nuclei",
+      "Thalamus - Mediodorsal": "mediodorsal thalamus",
+      "Thalamus - VL/VA": "ventrolateral thalamus",
+      "Thalamus - VPL": "ventral posterolateral thalamus",
+      "Thalamus - VPM": "ventral posteromedial thalamus",
+      "Thalamus - Pulvinar": "pulvinar thalamus",
+      "Thalamus - LGN": "lateral geniculate nucleus",
+      "Thalamus - MGN": "medial geniculate nucleus",
+      "Cerebellum - Vermis": "cerebellar vermis",
+      "Cerebellum - Dentate Nucleus": "cerebellar dentate nucleus",
+      "Bed Nucleus Stria Terminalis": "bed nucleus stria terminalis",
+      "Nucleus Tractus Solitarius": "nucleus tractus solitarius"
+    };
+
+    function makeRegionLink(regionName) {
+      // Use custom search term if available, otherwise use the region name directly
+      const searchTerm = REGION_PUBMED_TERMS[regionName] || regionName;
+      const query = encodeURIComponent(searchTerm + ' neuroanatomy');
+      const url = `https://pubmed.ncbi.nlm.nih.gov/?term=${query}&filter=pubt.review`;
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="region-link" data-slot-type="region" data-slot-value="${regionName.replace(/"/g, '&quot;')}">${regionName}</a>`;
+    }
+
+    function makeDisorderLink(disorderName) {
+      const url = DISORDER_URLS[disorderName] || `https://www.nimh.nih.gov/health/topics/${disorderName.toLowerCase().replace(/\s+/g, '-')}`;
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="disorder-link">${disorderName}</a>`;
+    }
+
+    function makeMNILink(mniString) {
+      const match = mniString.match(/[\(\−\-]?\s*(\d+)[,\s]+[\(\−\-]?\s*(\d+)[,\s]+[\(\−\-]?\s*(\d+)/);
+      if (match) {
+        let x = match[1], y = match[2], z = match[3];
+        const parts = mniString.split(',');
+        if (parts[0].includes('−') || parts[0].includes('-')) x = '-' + x;
+        if (parts[1] && (parts[1].includes('−') || parts[1].includes('-'))) y = '-' + y;
+        if (parts[2] && (parts[2].includes('−') || parts[2].includes('-'))) z = '-' + z;
+        const url = `https://neurosynth.org/locations/${x}_${y}_${z}/`;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${mniString}</a>`;
+      }
+      return mniString;
+    }
+
+    function fillSearchAndSearch(term) {
+      const searchInput = document.getElementById('searchInput');
+      if (typeof pushHistory === 'function') pushHistory();
+      searchInput.value = term;
+      if (typeof lastCommittedQuery !== 'undefined') lastCommittedQuery = term;
+      performSearch(false);
+    }
+
+    
+    // ============================================================
+    // DATA: FUNCTIONS (30 total)
+    // ============================================================
+    const FUNCTIONS = [
+      {
+        name: "Addiction",
+        synonyms: ["substance abuse", "substance use disorder", "drug dependence", "drug seeking", "compulsive drug use", "craving", "substance dependence", "addictive behavior", "drug reward", "substance misuse", "compulsive behavior", "incentive salience", "drug cue reactivity", "nicotine dependence", "alcohol use disorder", "opioid dependence"],
+        disorderTerms: ["substance use disorders", "alcohol use disorder", "behavioral addiction", "gambling disorder", "withdrawal", "tolerance", "relapse"],
+        keyRegions: ["NAc", "VTA", "OFC", "ACC", "ventral striatum", "PFC"],
+        relatedDisorders: ["Substance Use Disorders", "Bipolar Disorder", "ADHD"]
+      },
+      {
+        name: "Arithmetic",
+        synonyms: ["numerical cognition", "mathematical reasoning", "mental calculation", "number processing", "numerosity", "magnitude processing", "mathematical operations", "quantitative reasoning", "number sense", "mental arithmetic", "calculation", "numerical estimation", "approximate number system", "exact calculation", "dyscalculia", "acalculia"],
+        disorderTerms: ["dyscalculia", "acalculia", "mathematical learning disability", "Gerstmann syndrome"],
+        keyRegions: ["IPS", "angular gyrus", "prefrontal cortex", "HIPS"],
+        relatedDisorders: ["Epilepsy", "TBI", "Stroke"]
+      },
+      {
+        name: "Arousal",
+        synonyms: ["wakefulness", "alertness", "vigilance", "psychophysiological arousal", "autonomic arousal", "cortical arousal", "activation level", "tonic alertness", "phasic alertness", "arousal regulation", "sleep-wake cycle", "consciousness level", "orienting response", "startle response", "sympathetic activation", "skin conductance", "electrodermal activity"],
+        disorderTerms: ["disorders of consciousness", "coma", "insomnia", "hyperarousal", "hypoarousal", "narcolepsy", "somnolence"],
+        keyRegions: ["reticular formation", "locus coeruleus", "thalamus", "hypothalamus", "basal forebrain", "insula"],
+        relatedDisorders: ["Sleep Disorders", "PTSD", "TBI"]
+      },
+      {
+        name: "Attention",
+        synonyms: ["selective attention", "sustained attention", "divided attention", "attentional control", "executive attention", "endogenous attention", "exogenous attention", "top-down attention", "bottom-up attention", "visual attention", "auditory attention", "spatial attention", "attentional orienting", "attentional capture", "attentional set-shifting", "concentration", "cognitive control", "attentional bias", "attentional blink", "inhibition of return"],
+        disorderTerms: ["ADHD", "attention deficit", "neglect", "hemispatial neglect", "inattention", "distractibility"],
+        keyRegions: ["dorsal attention network", "ventral attention network", "FEF", "IPS", "TPJ", "ACC", "dlPFC"],
+        relatedDisorders: ["ADHD", "Schizophrenia", "TBI", "Autism"]
+      },
+      {
+        name: "Aversive",
+        synonyms: ["aversive processing", "aversive conditioning", "aversive stimuli", "negative valence", "threat processing", "punishment", "negative reinforcement", "avoidance learning", "aversive memory", "disgust", "revulsion", "unpleasantness", "negative affect", "defensive behavior", "harm avoidance", "loss aversion", "aversive prediction error"],
+        disorderTerms: ["anxiety disorders", "phobias", "PTSD", "panic", "aversion therapy"],
+        keyRegions: ["amygdala", "anterior insula", "ACC", "PAG", "hypothalamus", "BNST"],
+        relatedDisorders: ["PTSD", "Anxiety Disorders", "OCD"]
+      },
+      {
+        name: "Decision Making",
+        synonyms: ["choice behavior", "judgment", "executive function", "value-based decision", "risk assessment", "reward evaluation", "cost-benefit analysis", "decision under uncertainty", "probabilistic reasoning", "reinforcement learning", "expected utility", "preference", "neuroeconomics", "strategic thinking", "deliberation", "cognitive flexibility", "option evaluation"],
+        disorderTerms: ["impulsivity", "poor judgment", "abulia", "apathy", "executive dysfunction", "risk-taking behavior"],
+        keyRegions: ["vmPFC", "OFC", "dlPFC", "ACC", "ventral striatum", "insula", "posterior parietal"],
+        relatedDisorders: ["ADHD", "Substance Use Disorders", "Schizophrenia", "TBI"]
+      },
+      {
+        name: "Default Mode",
+        synonyms: ["default mode network", "DMN", "resting state", "task-negative network", "self-referential processing", "mind wandering", "spontaneous thought", "stimulus-independent thought", "daydreaming", "autobiographical memory", "introspection", "internal mentation", "self-reflection", "future thinking", "mental time travel", "mentalizing network"],
+        disorderTerms: ["DMN disruption", "rumination", "thought disorder", "dissociation", "mind wandering"],
+        keyRegions: ["mPFC", "PCC", "precuneus", "angular gyrus", "lateral temporal cortex", "hippocampal formation"],
+        relatedDisorders: ["Alzheimer's Disease", "Depression (MDD)", "Schizophrenia"]
+      },
+      {
+        name: "Emotions",
+        synonyms: ["affect", "emotional processing", "emotional regulation", "mood", "feeling states", "valence", "emotional reactivity", "emotion recognition", "facial emotion processing", "emotional memory", "emotional learning", "appraisal", "affective neuroscience", "emotional valence", "emotional arousal", "categorical emotions", "dimensional emotions", "interoceptive affect"],
+        disorderTerms: ["mood disorders", "affective disorders", "emotional dysregulation", "alexithymia", "anhedonia", "flat affect", "emotional lability", "emotional blunting"],
+        keyRegions: ["amygdala", "insula", "OFC", "ACC", "vmPFC", "ventral striatum", "PAG"],
+        relatedDisorders: ["Depression (MDD)", "Bipolar Disorder", "PTSD", "Anxiety Disorders"]
+      },
+      {
+        name: "Eye Movements",
+        synonyms: ["saccades", "smooth pursuit", "oculomotor control", "gaze", "fixation", "antisaccade", "prosaccade", "vergence", "vestibulo-ocular reflex", "optokinetic nystagmus", "eye tracking", "gaze direction", "visual scanning", "oculomotor planning", "microsaccades", "rapid eye movement", "gaze shift"],
+        disorderTerms: ["oculomotor apraxia", "nystagmus", "strabismus", "saccadic dysfunction", "smooth pursuit deficit", "gaze palsy"],
+        keyRegions: ["FEF", "SEF", "superior colliculus", "dlPFC", "parietal eye fields", "cerebellar vermis"],
+        relatedDisorders: ["Parkinson's Disease", "Huntington's Disease", "Schizophrenia", "MS"]
+      },
+      {
+        name: "Face",
+        synonyms: ["face perception", "face recognition", "facial processing", "face identification", "configural processing", "holistic face processing", "face detection", "face encoding", "familiar face recognition", "other-race effect", "face inversion effect", "facial identity", "person recognition", "face memory", "facial attractiveness", "social face perception"],
+        disorderTerms: ["prosopagnosia", "face blindness", "social cognition deficits", "capgras delusion", "facial recognition impairment"],
+        keyRegions: ["fusiform face area", "FFA", "OFA", "STS", "amygdala", "anterior temporal lobe"],
+        relatedDisorders: ["Autism", "Schizophrenia", "Stroke"]
+      },
+      
+      {
+        name: "Food",
+        synonyms: ["feeding behavior", "appetite", "hunger", "satiety", "food reward", "taste processing", "gustatory processing", "food craving", "caloric intake", "ingestive behavior", "food motivation", "hedonic eating", "homeostatic eating", "food cue reactivity", "flavor processing", "meal anticipation", "food preference", "dietary restraint", "energy homeostasis"],
+        disorderTerms: ["eating disorders", "anorexia", "bulimia", "binge eating", "obesity", "food addiction", "Prader-Willi syndrome", "ARFID"],
+        keyRegions: ["hypothalamus", "insula", "OFC", "amygdala", "NAc", "NTS", "ventral striatum"],
+        relatedDisorders: ["Eating Disorders", "Substance Use Disorders"]
+      },
+      {
+        name: "Hearing",
+        synonyms: ["auditory processing", "auditory perception", "auditory cortex", "tonotopic mapping", "frequency processing", "temporal processing", "spectral processing", "auditory scene analysis", "binaural processing", "sound localization", "dichotic listening", "pitch perception", "auditory discrimination", "central auditory processing", "auditory stream segregation"],
+        disorderTerms: ["hearing loss", "deafness", "auditory processing disorder", "tinnitus", "hyperacusis", "auditory neuropathy", "cortical deafness"],
+        keyRegions: ["Heschl's gyrus", "A1", "planum temporale", "superior temporal gyrus", "MGN", "inferior colliculus"],
+        relatedDisorders: ["TBI", "Stroke", "Brain Cancer", "Meningitis"]
+      },
+      {
+        name: "Heart Rate",
+        synonyms: ["cardiac function", "heart rate variability", "HRV", "autonomic regulation", "cardiovascular control", "cardiac interoception", "heartbeat detection", "heartbeat evoked potential", "cardiac awareness", "baroreceptor sensitivity", "vagal tone", "parasympathetic regulation", "sympathetic cardiac control", "interoceptive accuracy"],
+        disorderTerms: ["cardiac arrhythmia", "autonomic dysfunction", "panic disorder", "anxiety tachycardia", "vasovagal syncope", "POTS"],
+        keyRegions: ["insula", "ACC", "amygdala", "hypothalamus", "NTS", "ventrolateral medulla", "PAG"],
+        relatedDisorders: ["Anxiety Disorders", "PTSD", "Sleep Disorders"]
+      },
+      {
+        name: "Imagery",
+        synonyms: ["mental imagery", "visual imagery", "motor imagery", "mental simulation", "mental visualization", "imagination", "mental rehearsal", "mental rotation", "spatial imagery", "auditory imagery", "kinesthetic imagery", "image generation", "visual mental representation", "mind's eye", "mental practice", "internal simulation", "embodied simulation"],
+        disorderTerms: ["aphantasia", "hallucinations", "PTSD intrusive imagery", "flashbacks", "phantom limb", "Charles Bonnet syndrome"],
+        keyRegions: ["visual cortex", "V1", "V2", "V3", "precuneus", "SMA", "premotor", "hippocampus", "parietal cortex"],
+        relatedDisorders: ["PTSD", "Schizophrenia", "Depression (MDD)"]
+      },
+      {
+        name: "Language",
+        synonyms: ["speech processing", "linguistic processing", "syntax", "semantics", "phonology", "morphology", "pragmatics", "lexical processing", "sentence comprehension", "word production", "verbal fluency", "discourse processing", "narrative comprehension", "language production", "language comprehension", "bilingualism", "sign language", "speech perception", "word retrieval", "lexical access", "verbal working memory", "phonological processing", "syntactic parsing"],
+        disorderTerms: ["aphasia", "Broca's aphasia", "Wernicke's aphasia", "dysarthria", "dyslexia", "specific language impairment", "stuttering", "anomia", "agrammatism", "semantic dementia", "primary progressive aphasia"],
+        keyRegions: ["Broca's area", "BA 44", "BA 45", "Wernicke's area", "BA 22", "arcuate fasciculus", "angular gyrus", "STS", "temporal pole", "IFG"],
+        relatedDisorders: ["Stroke", "Brain Cancer", "TBI", "Epilepsy"]
+      },
+      {
+        name: "Memory",
+        synonyms: ["episodic memory", "semantic memory", "declarative memory", "working memory", "short-term memory", "long-term memory", "memory encoding", "memory retrieval", "memory consolidation", "recognition memory", "recall", "recollection", "familiarity", "source memory", "associative memory", "prospective memory", "autobiographical memory", "spatial memory", "relational memory", "memory reconsolidation", "mnemonic processing"],
+        disorderTerms: ["amnesia", "anterograde amnesia", "retrograde amnesia", "Alzheimer's disease", "mild cognitive impairment", "MCI", "confabulation", "false memories", "dissociative amnesia", "Korsakoff syndrome", "transient global amnesia"],
+        keyRegions: ["hippocampus", "entorhinal cortex", "parahippocampal gyrus", "PFC", "perirhinal cortex", "retrosplenial cortex", "fornix"],
+        relatedDisorders: ["Alzheimer's Disease", "TBI", "Epilepsy", "Stroke"]
+      },
+      {
+        name: "Movement",
+        synonyms: ["motor control", "motor execution", "motor planning", "voluntary movement", "motor cortex", "hand movement", "finger movement", "limb movement", "motor sequencing", "motor learning", "motor coordination", "motor programming", "skilled movement", "grasping", "reaching", "action execution", "force production", "sensorimotor integration", "praxis", "motor adaptation"],
+        disorderTerms: ["bradykinesia", "dystonia", "ataxia", "apraxia", "cerebral palsy", "hemiplegia", "motor neuron disease", "chorea", "tremor", "tic disorders", "catatonia"],
+        keyRegions: ["primary motor cortex", "M1", "BA 4", "premotor", "BA 6", "SMA", "cerebellum", "basal ganglia", "corticospinal tract"],
+        relatedDisorders: ["Parkinson's Disease", "Huntington's Disease", "Cerebral Palsy", "ALS", "MS"]
+      },
+      {
+        name: "Navigation",
+        synonyms: ["spatial navigation", "wayfinding", "path integration", "place cells", "grid cells", "head direction cells", "cognitive map", "spatial orientation", "route learning", "survey knowledge", "landmark recognition", "allocentric navigation", "egocentric navigation", "virtual navigation", "topographical memory", "environmental learning", "dead reckoning", "boundary vector cells"],
+        disorderTerms: ["topographical disorientation", "spatial disorientation", "developmental topographical disorientation", "getting lost"],
+        keyRegions: ["hippocampus", "entorhinal cortex", "parahippocampal place area", "retrosplenial cortex", "posterior parietal", "caudate nucleus"],
+        relatedDisorders: ["Alzheimer's Disease", "TBI", "Epilepsy"]
+      },
+      {
+        name: "Pain",
+        synonyms: ["nociception", "pain processing", "pain perception", "pain modulation", "chronic pain", "acute pain", "visceral pain", "somatic pain", "neuropathic pain", "pain matrix", "pain neuromatrix", "pain affect", "pain intensity", "thermal pain", "mechanical pain", "pain anticipation", "pain empathy", "placebo analgesia", "descending pain modulation", "central sensitization", "hyperalgesia", "allodynia", "pain catastrophizing"],
+        disorderTerms: ["chronic pain syndromes", "fibromyalgia", "CRPS", "phantom limb pain", "migraine", "central pain syndrome", "congenital insensitivity to pain"],
+        keyRegions: ["S1", "S2", "posterior insula", "ACC", "thalamus", "VPL", "PAG", "amygdala", "PFC"],
+        relatedDisorders: ["Chronic Pain", "Migraine", "MS", "Spinal Cord Injury"]
+      },
+      {
+        name: "Pleasant",
+        synonyms: ["hedonic processing", "positive affect", "pleasure", "positive valence", "hedonic value", "liking", "reward consumption", "consummatory reward", "positive emotion", "enjoyment", "happiness", "hedonic tone", "subjective well-being", "positive mood", "euphoria", "hedonic response", "aesthetic pleasure", "sensory pleasure"],
+        disorderTerms: ["anhedonia", "mania", "hypomania", "elevated mood", "hedonic deficit", "emotional blunting"],
+        keyRegions: ["NAc", "medial OFC", "vmPFC", "ventral pallidum", "VTA", "insula", "amygdala"],
+        relatedDisorders: ["Depression (MDD)", "Bipolar Disorder", "Schizophrenia"]
+      },
+      {
+        name: "Reading",
+        synonyms: ["visual word recognition", "orthographic processing", "reading comprehension", "word reading", "text processing", "lexical decision", "letter recognition", "print processing", "phonological decoding", "whole-word recognition", "visual word form", "sight word reading", "sublexical processing", "text comprehension", "reading fluency", "silent reading", "grapheme-phoneme conversion"],
+        disorderTerms: ["dyslexia", "alexia", "reading disability", "surface dyslexia", "phonological dyslexia", "deep dyslexia", "letter-by-letter reading"],
+        keyRegions: ["visual word form area", "VWFA", "fusiform", "Broca's area", "angular gyrus", "superior temporal", "occipitotemporal cortex"],
+        relatedDisorders: ["Stroke", "TBI", "Epilepsy"]
+      },
+      {
+        name: "Reward",
+        synonyms: ["reward processing", "reward prediction", "reward anticipation", "reward receipt", "reward prediction error", "incentive motivation", "reinforcement", "positive reinforcement", "reward learning", "reward value", "dopaminergic reward", "mesolimbic pathway", "wanting", "motivational salience", "incentive salience", "reward sensitivity", "monetary reward", "social reward", "intrinsic motivation"],
+        disorderTerms: ["reward deficiency syndrome", "addiction", "reward hijacking", "excessive reward seeking", "motivational deficit", "blunted reward response"],
+        keyRegions: ["VTA", "NAc", "ventral striatum", "OFC", "vmPFC", "ACC", "dopaminergic pathways"],
+        relatedDisorders: ["Substance Use Disorders", "Depression (MDD)", "Bipolar Disorder", "ADHD"]
+      },
+      {
+        name: "Sleep",
+        synonyms: ["sleep architecture", "NREM sleep", "REM sleep", "slow-wave sleep", "sleep stages", "sleep onset", "sleep maintenance", "circadian rhythm", "sleep-wake regulation", "sleep homeostasis", "sleep spindles", "K-complexes", "delta waves", "sleep pressure", "chronobiology", "sleep quality", "polysomnography", "sleep EEG", "sleep fragmentation", "sleep efficiency", "ultradian rhythm"],
+        disorderTerms: ["insomnia", "narcolepsy", "sleep apnea", "restless legs syndrome", "parasomnia", "REM sleep behavior disorder", "circadian rhythm disorders", "hypersomnia", "fatal familial insomnia"],
+        keyRegions: ["hypothalamus", "SCN", "VLPO", "basal forebrain", "brainstem", "raphe", "LC", "thalamus", "pineal gland"],
+        relatedDisorders: ["Sleep Disorders", "Depression (MDD)", "PTSD", "Bipolar Disorder"]
+      },
+      {
+        name: "Sound",
+        synonyms: ["acoustic processing", "auditory stimulus", "sound perception", "environmental sounds", "speech sounds", "non-speech sounds", "noise processing", "amplitude modulation", "frequency discrimination", "sound categorization", "auditory object recognition", "complex sounds", "natural sounds", "sound identification", "spectrotemporal processing", "auditory semantics", "musical sounds", "sound texture"],
+        disorderTerms: ["auditory agnosia", "phonagnosia", "amusia", "misophonia", "auditory hallucinations", "tinnitus"],
+        keyRegions: ["A1", "Heschl's gyrus", "belt regions", "parabelt", "STG", "STS", "planum temporale", "IFG"],
+        relatedDisorders: ["TBI", "Schizophrenia", "Epilepsy", "Autism"]
+      },
+      {
+        name: "Spatial",
+        synonyms: ["spatial processing", "spatial cognition", "spatial attention", "spatial working memory", "visuospatial processing", "mental rotation", "spatial reasoning", "spatial representation", "spatial perception", "spatial transformation", "spatial localization", "distance estimation", "retinotopic mapping", "spatial reference frames", "allocentric coding", "egocentric coding", "spatial awareness", "dorsal stream processing"],
+        disorderTerms: ["visuospatial neglect", "hemispatial neglect", "spatial disorientation", "Balint syndrome", "constructional apraxia"],
+        keyRegions: ["posterior parietal", "BA 7", "IPS", "precuneus", "FEF", "dorsal visual stream", "hippocampus", "dlPFC"],
+        relatedDisorders: ["Alzheimer's Disease", "Stroke", "TBI", "Epilepsy"]
+      },
+      {
+        name: "Tapping",
+        synonyms: ["finger tapping", "motor tapping", "rhythmic tapping", "sensorimotor timing", "motor timing", "temporal processing", "beat synchronization", "motor rhythm", "repetitive movement", "paced tapping", "self-paced tapping", "interval timing", "temporal reproduction", "rhythm production", "movement timing", "sequential finger movement", "timing control", "beat perception"],
+        disorderTerms: ["timing deficits", "motor sequencing deficit", "bradykinesia", "essential tremor", "coordination disorder", "DCD"],
+        keyRegions: ["M1", "SMA", "premotor cortex", "cerebellum", "basal ganglia", "thalamus", "inferior parietal"],
+        relatedDisorders: ["Parkinson's Disease", "Huntington's Disease", "Cerebellar Disorders"]
+      },
+      {
+        name: "Theory of Mind",
+        synonyms: ["mentalizing", "social cognition", "mind reading", "perspective taking", "mental state attribution", "intentionality", "belief reasoning", "false belief", "cognitive empathy", "social brain", "ToM", "understanding others minds", "social inference", "mental state understanding", "affective theory of mind", "cognitive theory of mind", "social perception", "person perception", "moral reasoning", "social judgment"],
+        disorderTerms: ["social cognition impairment", "psychopathy", "empathy deficit", "frontotemporal dementia", "autism social deficit"],
+        keyRegions: ["TPJ", "mPFC", "precuneus", "PCC", "temporal poles", "STS", "IFG", "amygdala"],
+        relatedDisorders: ["Autism", "Schizophrenia", "TBI", "Tourette's Syndrome"]
+      },
+      {
+        name: "Touch",
+        synonyms: ["somatosensory processing", "tactile perception", "haptic perception", "mechanoreception", "pressure sensation", "vibrotactile", "texture perception", "thermal sensation", "proprioception", "two-point discrimination", "tactile acuity", "tactile discrimination", "somatotopic mapping", "body schema", "tactile object recognition", "active touch", "passive touch", "light touch", "deep pressure", "cutaneous sensation", "somatic sensation"],
+        disorderTerms: ["somatosensory deficits", "peripheral neuropathy", "tactile agnosia", "astereognosis", "allodynia", "hypoesthesia", "paresthesia", "phantom sensation", "fibromyalgia"],
+        keyRegions: ["S1", "BA 1", "BA 2", "BA 3", "S2", "posterior insula", "thalamus", "VPL", "VPM", "posterior parietal"],
+        relatedDisorders: ["Spinal Cord Injury", "Chronic Pain", "MS", "Stroke"]
+      },
+      {
+        name: "Vision",
+        synonyms: ["visual processing", "visual perception", "visual cortex", "object recognition", "scene perception", "motion perception", "color perception", "contrast sensitivity", "visual acuity", "pattern recognition", "form perception", "depth perception", "stereopsis", "visual search", "feature detection", "ventral stream", "dorsal stream", "retinotopic organization", "visual field", "visual attention", "visual awareness"],
+        disorderTerms: ["cortical blindness", "hemianopia", "scotoma", "visual agnosia", "achromatopsia", "akinetopsia", "prosopagnosia", "simultanagnosia", "optic ataxia", "Charles Bonnet syndrome", "amblyopia"],
+        keyRegions: ["V1", "BA 17", "V2", "BA 18", "V3", "V4", "V5", "lateral occipital", "fusiform", "IPS", "FEF", "LGN"],
+        relatedDisorders: ["Stroke", "Brain Cancer", "MS", "TBI", "Migraine"]
+      }
+    ];
+
+    // ============================================================
+    // DATA: BRAIN REGIONS (~75 regions)
+    // ============================================================
+    const BRAIN_REGIONS = [
+      { name: "Superior Frontal Gyrus", aliases: ["SFG", "superior frontal", "dorsomedial PFC", "medial frontal"], brodmann: ["BA 6", "BA 8", "BA 9", "BA 10"], lobe: "Frontal", functions: ["Motor planning", "Executive function", "Working memory", "Self-referential processing"], mni: "(-14, 36, 42)", relatedFunctions: ["Attention", "Decision Making", "Default Mode", "Movement"], relatedDisorders: ["ADHD", "Depression (MDD)", "Schizophrenia", "OCD"] },
+      { name: "Middle Frontal Gyrus", aliases: ["MFG", "middle frontal"], brodmann: ["BA 8", "BA 9", "BA 10", "BA 46"], lobe: "Frontal", functions: ["Working memory", "Cognitive control", "Attention"], mni: "(-38, 28, 28)", relatedFunctions: ["Attention", "Decision Making", "Language"], relatedDisorders: ["ADHD", "Schizophrenia", "Depression (MDD)", "OCD"] },
+      { name: "Inferior Frontal Gyrus - Pars Opercularis", aliases: ["IFG", "Broca's area", "BA 44"], brodmann: ["BA 44"], lobe: "Frontal", functions: ["Speech production", "Language", "Motor execution"], mni: "(-47, 18, 14)", relatedFunctions: ["Language", "Movement", "Attention"], relatedDisorders: ["Schizophrenia", "Autism", "Stroke", "Epilepsy"] },
+      { name: "Inferior Frontal Gyrus - Pars Triangularis", aliases: ["IFG triangularis", "BA 45"], brodmann: ["BA 45"], lobe: "Frontal", functions: ["Language semantics", "Cognitive control"], mni: "(-44, 28, 4)", relatedFunctions: ["Language", "Decision Making"], relatedDisorders: ["Schizophrenia", "Autism", "ADHD"] },
+      { name: "Inferior Frontal Gyrus - Pars Orbitalis", aliases: ["IFG orbitalis", "BA 47"], brodmann: ["BA 47"], lobe: "Frontal", functions: ["Semantic processing", "Social cognition"], mni: "(-40, 32, -6)", relatedFunctions: ["Language", "Theory of Mind"], relatedDisorders: ["OCD", "Anxiety Disorders", "Depression (MDD)"] },
+      { name: "Precentral Gyrus", aliases: ["primary motor cortex", "M1", "BA 4"], brodmann: ["BA 4"], lobe: "Frontal", functions: ["Motor execution", "Motor planning"], mni: "(-32, -20, 48)", relatedFunctions: ["Movement", "Tapping", "Eye Movements"], relatedDisorders: ["Stroke", "Cerebral Palsy", "Parkinson's Disease", "ALS", "TBI"] },
+      { name: "Medial Frontal Gyrus", aliases: ["medial prefrontal", "medial PFC", "vmPFC"], brodmann: ["BA 11", "BA 12", "BA 25", "BA 32"], lobe: "Frontal", functions: ["Emotion regulation", "Self-referential processing", "Decision making"], mni: "(-4, 46, -8)", relatedFunctions: ["Emotions", "Decision Making", "Default Mode"], relatedDisorders: ["Depression (MDD)", "PTSD", "Anxiety Disorders", "OCD", "Substance Use Disorders"] },
+      { name: "Orbitofrontal Cortex - Medial", aliases: ["medial OFC", "mOFC"], brodmann: ["BA 11", "BA 12"], lobe: "Frontal", functions: ["Value processing", "Decision making", "Reward"], mni: "(-6, 42, -12)", relatedFunctions: ["Reward", "Decision Making", "Emotions"], relatedDisorders: ["OCD", "Depression (MDD)", "Substance Use Disorders", "Eating Disorders"] },
+      { name: "Orbitofrontal Cortex - Lateral", aliases: ["lateral OFC", "lOFC"], brodmann: ["BA 47"], lobe: "Frontal", functions: ["Value comparison", "Punishment processing"], mni: "(-32, 30, -12)", relatedFunctions: ["Aversive", "Decision Making"], relatedDisorders: ["OCD", "Anxiety Disorders", "Substance Use Disorders"] },
+      { name: "Frontal Pole", aliases: ["frontopolar cortex", "Fp"], brodmann: ["BA 10"], lobe: "Frontal", functions: ["Abstract reasoning", "Cognitive branching"], mni: "(-24, 56, 8)", relatedFunctions: ["Decision Making", "Attention"], relatedDisorders: ["Depression (MDD)", "ADHD", "Schizophrenia"] },
+      { name: "Anterior Cingulate Cortex - Dorsal", aliases: ["dACC", "dorsal ACC", "cingulate motor area"], brodmann: ["BA 24", "BA 32"], lobe: "Limbic", functions: ["Attention", "Error detection", "Conflict monitoring"], mni: "(-4, 14, 38)", relatedFunctions: ["Attention", "Emotions", "Decision Making"], relatedDisorders: ["Depression (MDD)", "ADHD", "OCD", "Anxiety Disorders", "Chronic Pain", "Schizophrenia"] },
+      { name: "Anterior Cingulate Cortex - Ventral", aliases: ["vACC", "ventral ACC"], brodmann: ["BA 24", "BA 25"], lobe: "Limbic", functions: ["Emotion regulation", "Reward processing"], mni: "(-2, 32, -6)", relatedFunctions: ["Emotions", "Reward", "Aversive"], relatedDisorders: ["Depression (MDD)", "PTSD", "Anxiety Disorders", "Bipolar Disorder"] },
+      { name: "Anterior Cingulate Cortex - Subgenual", aliases: ["sgACC", "subgenual cingulate"], brodmann: ["BA 25"], lobe: "Limbic", functions: ["Mood regulation", "Depression related"], mni: "(-6, 20, -16)", relatedFunctions: ["Emotions", "Default Mode"], relatedDisorders: ["Depression (MDD)", "Bipolar Disorder"] },
+      { name: "Supplementary Motor Area", aliases: ["SMA", "BA 6"], brodmann: ["BA 6"], lobe: "Frontal", functions: ["Movement planning", "Motor sequencing", "Bilateral coordination"], mni: "(-6, 8, 54)", relatedFunctions: ["Movement", "Tapping", "Attention"], relatedDisorders: ["Parkinson's Disease", "Stroke", "Epilepsy", "Tourette's Syndrome"] },
+      { name: "Postcentral Gyrus", aliases: ["primary somatosensory", "S1", "BA 1/2/3"], brodmann: ["BA 1", "BA 2", "BA 3"], lobe: "Parietal", functions: ["Somatosensory processing", "Touch", "Proprioception"], mni: "(-40, -24, 44)", relatedFunctions: ["Touch", "Pain", "Movement"], relatedDisorders: ["Stroke", "Chronic Pain", "Cerebral Palsy", "MS"] },
+      { name: "Superior Parietal Lobule", aliases: ["SPL", "superior parietal", "BA 5/7"], brodmann: ["BA 5", "BA 7"], lobe: "Parietal", functions: ["Spatial processing", "Visuomotor integration"], mni: "(-24, -54, 58)", relatedFunctions: ["Spatial", "Movement", "Vision"], relatedDisorders: ["Alzheimer's Disease", "Stroke", "Autism"] },
+      { name: "Inferior Parietal Lobule", aliases: ["IPL", "inferior parietal"], brodmann: ["BA 39", "BA 40"], lobe: "Parietal", functions: ["Language", "Spatial processing", "Integration"], mni: "(-54, -56, 36)", relatedFunctions: ["Language", "Spatial", "Reading"], relatedDisorders: ["Alzheimer's Disease", "Schizophrenia", "Stroke", "Autism"] },
+      { name: "Supramarginal Gyrus", aliases: ["SMG", "BA 40"], brodmann: ["BA 40"], lobe: "Parietal", functions: ["Phonological processing", "Language"], mni: "(-58, -44, 24)", relatedFunctions: ["Language", "Reading"], relatedDisorders: ["Stroke", "Autism", "Schizophrenia"] },
+      { name: "Angular Gyrus", aliases: ["AG", "BA 39"], brodmann: ["BA 39"], lobe: "Parietal", functions: ["Semantic processing", "Default mode"], mni: "(-48, -66, 32)", relatedFunctions: ["Language", "Reading", "Default Mode"], relatedDisorders: ["Alzheimer's Disease", "Stroke", "Schizophrenia"] },
+      { name: "Precuneus", aliases: ["medial parietal", "precuneal cortex"], brodmann: ["BA 7", "BA 31"], lobe: "Parietal", functions: ["Self-referential processing", "Episodic memory", "Spatial processing"], mni: "(-8, -58, 44)", relatedFunctions: ["Default Mode", "Memory", "Spatial"], relatedDisorders: ["Alzheimer's Disease", "Depression (MDD)", "Schizophrenia"] },
+      { name: "Posterior Cingulate Cortex", aliases: ["PCC", "medial parietal cortex"], brodmann: ["BA 23", "BA 31"], lobe: "Limbic", functions: ["Autobiographical memory", "Default mode"], mni: "(-4, -48, 30)", relatedFunctions: ["Default Mode", "Memory"], relatedDisorders: ["Alzheimer's Disease", "Depression (MDD)", "ADHD"] },
+      { name: "Superior Temporal Gyrus", aliases: ["STG", "superior temporal", "Wernicke's area", "wernickes area", "Wernicke area", "posterior STG"], brodmann: ["BA 21", "BA 22", "BA 38"], lobe: "Temporal", functions: ["Auditory processing", "Theory of mind", "Language", "Language comprehension"], mni: "(-58, -20, 8)", relatedFunctions: ["Hearing", "Sound", "Theory of Mind", "Language"], relatedDisorders: ["Schizophrenia", "Autism", "Stroke", "Epilepsy"] },
+      { name: "Middle Temporal Gyrus", aliases: ["MTG", "middle temporal"], brodmann: ["BA 20", "BA 21", "BA 37"], lobe: "Temporal", functions: ["Semantic processing", "Visual processing"], mni: "(-54, -46, -4)", relatedFunctions: ["Language", "Vision", "Emotions"], relatedDisorders: ["Alzheimer's Disease", "Schizophrenia", "Epilepsy"] },
+      { name: "Inferior Temporal Gyrus", aliases: ["ITG", "inferior temporal"], brodmann: ["BA 20"], lobe: "Temporal", functions: ["Visual object recognition", "Semantic memory"], mni: "(-54, -60, -16)", relatedFunctions: ["Vision", "Language", "Memory"], relatedDisorders: ["Alzheimer's Disease", "Epilepsy"] },
+      { name: "Fusiform Gyrus", aliases: ["fusiform face area", "FFA", "ventral temporal"], brodmann: ["BA 19", "BA 37"], lobe: "Temporal", functions: ["Face recognition", "Visual word form", "Object recognition"], mni: "(-40, -48, -20)", relatedFunctions: ["Face", "Reading", "Vision"], relatedDisorders: ["Autism", "Alzheimer's Disease"] },
+      { name: "Transverse Temporal Gyrus", aliases: ["Heschl's gyrus", "primary auditory", "A1", "BA 41"], brodmann: ["BA 41", "BA 42"], lobe: "Temporal", functions: ["Primary auditory cortex", "Frequency mapping"], mni: "(-46, -22, 10)", relatedFunctions: ["Hearing", "Sound"], relatedDisorders: ["Schizophrenia", "Autism"] },
+      { name: "Temporal Pole", aliases: ["anterior temporal lobe", "ATL"], brodmann: ["BA 38"], lobe: "Temporal", functions: ["Semantic processing", "Social cognition", "Theory of mind"], mni: "(-44, 12, -24)", relatedFunctions: ["Language", "Theory of Mind", "Emotions"], relatedDisorders: ["Alzheimer's Disease", "Autism", "Epilepsy"] },
+      { name: "Parahippocampal Gyrus", aliases: ["parahippocampal", "PHG"], brodmann: ["BA 28", "BA 34", "BA 35", "BA 36"], lobe: "Temporal", functions: ["Scene processing", "Memory encoding", "Place recognition"], mni: "(-20, -28, -12)", relatedFunctions: ["Memory", "Navigation", "Vision"], relatedDisorders: ["Alzheimer's Disease", "PTSD", "Epilepsy", "Schizophrenia"] },
+      { name: "Entorhinal Cortex", aliases: ["entorhinal", "EC", "BA 28"], brodmann: ["BA 28"], lobe: "Temporal", functions: ["Memory encoding", "Spatial processing", "Grid cells"], mni: "(-26, -14, -24)", relatedFunctions: ["Memory", "Navigation"], relatedDisorders: ["Alzheimer's Disease", "Epilepsy"] },
+      { name: "Calcarine Sulcus", aliases: ["primary visual cortex", "V1", "BA 17", "striate cortex"], brodmann: ["BA 17"], lobe: "Occipital", functions: ["Primary visual processing", "Retinotopic mapping"], mni: "(-8, -80, 6)", relatedFunctions: ["Vision", "Spatial"], relatedDisorders: ["Stroke", "Migraine"] },
+      { name: "Cuneus", aliases: ["cuneus", "medial occipital"], brodmann: ["BA 18", "BA 19"], lobe: "Occipital", functions: ["Visual processing", "Color processing"], mni: "(-12, -84, 24)", relatedFunctions: ["Vision"], relatedDisorders: ["Migraine", "Stroke"] },
+      { name: "Lingual Gyrus", aliases: ["lingual", "medial occipital"], brodmann: ["BA 17", "BA 18", "BA 19"], lobe: "Occipital", functions: ["Visual word recognition", "Color perception"], mni: "(-14, -72, -6)", relatedFunctions: ["Vision", "Reading", "Color"], relatedDisorders: ["Stroke", "Migraine"] },
+      { name: "Lateral Occipital Cortex", aliases: ["LOC", "visual processing"], brodmann: ["BA 19", "BA 37"], lobe: "Occipital", functions: ["Object recognition", "Visual processing"], mni: "(-48, -76, -8)", relatedFunctions: ["Vision", "Face"], relatedDisorders: ["Stroke", "Migraine"] },
+      { name: "Anterior Insula", aliases: ["aI", "anterior insular cortex"], brodmann: ["BA 13", "BA 14", "BA 15"], lobe: "Insular", functions: ["Interoception", "Emotion processing", "Social cognition"], mni: "(-32, 20, 8)", relatedFunctions: ["Aversive", "Emotions", "Pain", "Reward"], relatedDisorders: ["Anxiety Disorders", "PTSD", "Substance Use Disorders", "Chronic Pain", "Schizophrenia", "OCD"] },
+      { name: "Posterior Insula", aliases: ["pI", "posterior insular"], brodmann: ["BA 13"], lobe: "Insular", functions: ["Somatosensory processing", "Pain", "Interoception"], mni: "(-40, -22, 18)", relatedFunctions: ["Pain", "Touch", "Arousal"], relatedDisorders: ["Chronic Pain", "Migraine", "Stroke"] },
+      { name: "Hippocampus - CA1", aliases: ["CA1", "Ammon's horn"], brodmann: [], lobe: "Temporal", functions: ["Episodic memory", "Contextual memory"], mni: "(-24, -14, -12)", relatedFunctions: ["Memory", "Navigation", "Emotions"], relatedDisorders: ["Alzheimer's Disease", "PTSD", "Depression (MDD)", "Schizophrenia", "Epilepsy"] },
+      { name: "Hippocampus - CA3", aliases: ["CA3", "Ammon's horn"], brodmann: [], lobe: "Temporal", functions: ["Pattern separation", "Memory consolidation"], mni: "(-22, -16, -10)", relatedFunctions: ["Memory"], relatedDisorders: ["Alzheimer's Disease", "Depression (MDD)", "Epilepsy", "Schizophrenia"] },
+      { name: "Hippocampus - Dentate Gyrus", aliases: ["DG", "dentate"], brodmann: [], lobe: "Temporal", functions: ["Pattern separation", "Neurogenesis"], mni: "(-20, -18, -8)", relatedFunctions: ["Memory"], relatedDisorders: ["Alzheimer's Disease", "Depression (MDD)", "Epilepsy"] },
+      { name: "Hippocampus - Subiculum", aliases: ["subiculum", "subicular complex"], brodmann: [], lobe: "Temporal", functions: ["Memory consolidation", "Episodic memory"], mni: "(-18, -20, -6)", relatedFunctions: ["Memory", "Navigation"], relatedDisorders: ["Alzheimer's Disease", "PTSD", "Schizophrenia"] },
+      { name: "Amygdala - Basolateral", aliases: ["BLA", "basolateral amygdala"], brodmann: [], lobe: "Temporal", functions: ["Fear learning", "Emotional memory", "Reward"], mni: "(-22, -6, -16)", relatedFunctions: ["Fear", "Emotions", "Reward", "Memory"], relatedDisorders: ["Anxiety Disorders", "PTSD", "Depression (MDD)", "Autism", "Bipolar Disorder"] },
+      { name: "Amygdala - Central", aliases: ["CeA", "central amygdala"], brodmann: [], lobe: "Temporal", functions: ["Fear response", "Threat detection"], mni: "(-18, -8, -16)", relatedFunctions: ["Fear", "Aversive", "Emotions"], relatedDisorders: ["Anxiety Disorders", "PTSD", "Substance Use Disorders"] },
+      { name: "Caudate Nucleus", aliases: ["caudate", "head of caudate"], brodmann: [], lobe: "Subcortical", functions: ["Reward learning", "Habit formation", "Attention"], mni: "(-12, 16, 12)", relatedFunctions: ["Reward", "Attention", "Movement"], relatedDisorders: ["ADHD", "OCD", "Tourette's Syndrome", "Huntington's Disease", "Schizophrenia"] },
+      { name: "Putamen", aliases: ["putamen", "dorsolateral striatum"], brodmann: [], lobe: "Subcortical", functions: ["Motor learning", "Action selection"], mni: "(-26, 6, 4)", relatedFunctions: ["Movement", "Reward"], relatedDisorders: ["Parkinson's Disease", "Huntington's Disease", "OCD", "Tourette's Syndrome"] },
+      { name: "Globus Pallidus - External", aliases: ["GPe", "external globus pallidus"], brodmann: [], lobe: "Subcortical", functions: ["Motor control", "Inhibition"], mni: "(-18, -4, 2)", relatedFunctions: ["Movement"], relatedDisorders: ["Parkinson's Disease", "Huntington's Disease"] },
+      { name: "Globus Pallidus - Internal", aliases: ["GPi", "internal globus pallidus"], brodmann: [], lobe: "Subcortical", functions: ["Motor output", "Movement control"], mni: "(-14, -4, 0)", relatedFunctions: ["Movement"], relatedDisorders: ["Parkinson's Disease", "Huntington's Disease"] },
+      { name: "Nucleus Accumbens", aliases: ["NAc", "ventral striatum", "reward center"], brodmann: [], lobe: "Subcortical", functions: ["Reward anticipation", "Motivation", "Addiction"], mni: "(-10, 12, -8)", relatedFunctions: ["Reward", "Addiction", "Emotions", "Pleasant"], relatedDisorders: ["Substance Use Disorders", "Depression (MDD)", "ADHD", "Schizophrenia"] },
+      { name: "Thalamus - Anterior", aliases: ["anterior thalamus", "ATh"], brodmann: [], lobe: "Subcortical", functions: ["Memory integration", "Attention"], mni: "(-12, -4, 8)", relatedFunctions: ["Memory", "Attention"], relatedDisorders: ["Alzheimer's Disease", "Depression (MDD)", "Epilepsy"] },
+      { name: "Thalamus - Mediodorsal", aliases: ["MD", "mediodorsal nucleus"], brodmann: [], lobe: "Subcortical", functions: ["Cognitive function", "Executive control"], mni: "(-8, -12, 8)", relatedFunctions: ["Attention", "Decision Making"], relatedDisorders: ["Schizophrenia", "Substance Use Disorders", "Depression (MDD)"] },
+      { name: "Thalamus - VL/VA", aliases: ["VL", "ventral lateral", "VA", "ventral anterior"], brodmann: [], lobe: "Subcortical", functions: ["Motor relay", "Movement planning"], mni: "(-12, -12, 10)", relatedFunctions: ["Movement", "Tapping"], relatedDisorders: ["Parkinson's Disease", "Epilepsy", "Cerebral Palsy"] },
+      { name: "Thalamus - VPL", aliases: ["VPL", "ventral posterolateral"], brodmann: [], lobe: "Subcortical", functions: ["Somatosensory relay", "Touch processing"], mni: "(-14, -20, 12)", relatedFunctions: ["Touch", "Pain"], relatedDisorders: ["Chronic Pain", "Stroke", "MS"] },
+      { name: "Thalamus - VPM", aliases: ["VPM", "ventral posteromedial"], brodmann: [], lobe: "Subcortical", functions: ["Facial sensory relay", "Touch"], mni: "(-12, -22, 8)", relatedFunctions: ["Touch", "Face"], relatedDisorders: ["Migraine", "Chronic Pain"] },
+      { name: "Thalamus - Pulvinar", aliases: ["pulvinar", "pulvinar nucleus"], brodmann: [], lobe: "Subcortical", functions: ["Visuospatial processing", "Attention"], mni: "(-16, -28, 12)", relatedFunctions: ["Vision", "Spatial", "Attention"], relatedDisorders: ["Schizophrenia", "Autism", "Stroke"] },
+      { name: "Thalamus - LGN", aliases: ["lateral geniculate nucleus", "LGN"], brodmann: [], lobe: "Subcortical", functions: ["Visual relay", "Vision"], mni: "(-20, -28, 4)", relatedFunctions: ["Vision"], relatedDisorders: ["MS", "Stroke"] },
+      { name: "Thalamus - MGN", aliases: ["medial geniculate nucleus", "MGN"], brodmann: [], lobe: "Subcortical", functions: ["Auditory relay", "Hearing"], mni: "(-16, -28, 6)", relatedFunctions: ["Hearing", "Sound"], relatedDisorders: ["Schizophrenia", "Autism"] },
+      { name: "Hypothalamus", aliases: ["hypothalamus", "anterior hypothalamus"], brodmann: [], lobe: "Subcortical", functions: ["Homeostasis", "Appetite", "Sleep regulation", "Autonomic control"], mni: "(-8, -2, -10)", relatedFunctions: ["Food", "Sleep", "Arousal", "Heart Rate"], relatedDisorders: ["Depression (MDD)", "Sleep Disorders", "Eating Disorders", "Substance Use Disorders"] },
+      { name: "Substantia Nigra", aliases: ["SN", "substantia nigra"], brodmann: [], lobe: "Midbrain", functions: ["Dopamine production", "Motor control"], mni: "(-10, -18, -8)", relatedFunctions: ["Movement", "Reward"], relatedDisorders: ["Parkinson's Disease", "Huntington's Disease", "Substance Use Disorders"] },
+      { name: "Ventral Tegmental Area", aliases: ["VTA", "ventral tegmentum"], brodmann: [], lobe: "Midbrain", functions: ["Dopamine production", "Reward", "Motivation"], mni: "(-8, -16, -8)", relatedFunctions: ["Reward", "Addiction", "Pleasant"], relatedDisorders: ["Substance Use Disorders", "Depression (MDD)", "ADHD", "Schizophrenia"] },
+      { name: "Red Nucleus", aliases: ["red nucleus", "ruber"], brodmann: [], lobe: "Midbrain", functions: ["Motor coordination", "Movement"], mni: "(-6, -14, -8)", relatedFunctions: ["Movement"], relatedDisorders: ["Parkinson's Disease", "Stroke"] },
+      { name: "Superior Colliculus", aliases: ["SC", "colliculus"], brodmann: [], lobe: "Midbrain", functions: ["Saccade generation", "Eye movements", "Visual orienting"], mni: "(-4, -30, -2)", relatedFunctions: ["Eye Movements", "Vision", "Attention"], relatedDisorders: ["Autism", "ADHD"] },
+      { name: "Inferior Colliculus", aliases: ["IC", "colliculus"], brodmann: [], lobe: "Midbrain", functions: ["Auditory processing", "Hearing"], mni: "(-4, -38, -8)", relatedFunctions: ["Hearing", "Sound"], relatedDisorders: ["Migraine"] },
+      { name: "Periaqueductal Gray", aliases: ["PAG", "central gray"], brodmann: [], lobe: "Midbrain", functions: ["Pain modulation", "Fear response", "Autonomic control"], mni: "(-2, -28, -4)", relatedFunctions: ["Pain", "Fear", "Aversive", "Arousal"], relatedDisorders: ["PTSD", "Chronic Pain", "Migraine", "Anxiety Disorders"] },
+      { name: "Locus Coeruleus", aliases: ["LC", "noradrenergic system"], brodmann: [], lobe: "Brainstem", functions: ["Norepinephrine production", "Arousal", "Attention"], mni: "(-2, -36, -24)", relatedFunctions: ["Arousal", "Attention"], relatedDisorders: ["ADHD", "Anxiety Disorders", "PTSD", "Depression (MDD)", "Alzheimer's Disease"] },
+      { name: "Raphe Nuclei", aliases: ["raphe", "serotonergic system"], brodmann: [], lobe: "Brainstem", functions: ["Serotonin production", "Mood regulation", "Sleep"], mni: "(-2, -28, -16)", relatedFunctions: ["Sleep", "Emotions", "Arousal"], relatedDisorders: ["Depression (MDD)", "Anxiety Disorders", "Sleep Disorders", "Substance Use Disorders"] },
+      { name: "Nucleus Tractus Solitarius", aliases: ["NTS", "solitary nucleus"], brodmann: [], lobe: "Brainstem", functions: ["Taste processing", "Autonomic relay", "Interoception"], mni: "(-2, -34, -26)", relatedFunctions: ["Heart Rate", "Food"], relatedDisorders: ["Migraine", "Eating Disorders"] },
+      { name: "Bed Nucleus Stria Terminalis", aliases: ["BNST", "extended amygdala"], brodmann: [], lobe: "Subcortical", functions: ["Anxiety processing", "Sustained fear"], mni: "(-10, -4, -4)", relatedFunctions: ["Fear", "Aversive", "Anxiety"], relatedDisorders: ["PTSD", "Anxiety Disorders", "Substance Use Disorders"] },
+      { name: "Cerebellum - Vermis", aliases: ["cerebellar vermis", "midline cerebellum"], brodmann: [], lobe: "Cerebellum", functions: ["Timing", "Balance", "Coordination"], mni: "(-2, -72, -20)", relatedFunctions: ["Movement", "Tapping", "Eye Movements"], relatedDisorders: ["Autism", "Cerebral Palsy", "Stroke"] },
+      { name: "Cerebellum - Dentate Nucleus", aliases: ["dentate nucleus", "cerebellar output"], brodmann: [], lobe: "Cerebellum", functions: ["Motor timing", "Coordination"], mni: "(-16, -54, -26)", relatedFunctions: ["Movement", "Tapping"], relatedDisorders: ["Stroke", "Parkinson's Disease", "MS"] },
+      { name: "Basal Forebrain", aliases: ["basal forebrain", "cholinergic system"], brodmann: [], lobe: "Subcortical", functions: ["Arousal", "Attention", "Memory"], mni: "(-8, 2, -6)", relatedFunctions: ["Arousal", "Attention", "Memory"], relatedDisorders: ["Alzheimer's Disease", "Sleep Disorders"] },
+      { name: "Premotor Cortex", aliases: ["premotor", "BA 6", "PMC"], brodmann: ["BA 6"], lobe: "Frontal", functions: ["Motor planning", "Movement execution"], mni: "(-28, -8, 48)", relatedFunctions: ["Movement", "Tapping", "Imagery"], relatedDisorders: ["Parkinson's Disease", "Stroke", "Cerebral Palsy"] },
+      { name: "Dorsolateral Prefrontal Cortex", aliases: ["dlPFC", "lateral PFC", "BA 46"], brodmann: ["BA 46", "BA 9", "BA 10"], lobe: "Frontal", functions: ["Working memory", "Cognitive control", "Executive function"], mni: "(-42, 32, 20)", relatedFunctions: ["Attention", "Decision Making", "Memory", "Language"], relatedDisorders: ["Schizophrenia", "Depression (MDD)", "ADHD", "PTSD", "Bipolar Disorder"] }
+    ];
+
+    // ============================================================
+    // DATA: DISORDERS (26 total)
+    // ============================================================
+    const DISORDERS = [
+      { name: "ADHD", aliases: ["attention deficit hyperactivity disorder", "attention deficit", "ADD", "hyperactivity", "inattention", "ADHD"], affectedRegions: ["PFC", "ACC", "caudate", "cerebellum", "dlPFC", "ventral striatum"], affectedFunctions: ["Attention", "Decision Making", "Reward", "Movement"], keyGenes: ["DRD4", "DAT1", "SLC6A3", "COMT", "SNAP25"], treatments: ["stimulants", "methylphenidate", "amphetamine", "atomoxetine", "behavioral therapy"] },
+      { name: "Alzheimer's Disease", aliases: ["Alzheimer", "AD", "dementia", "cognitive decline", "memory loss"], affectedRegions: ["hippocampus", "entorhinal cortex", "temporal lobe", "parietal lobe"], affectedFunctions: ["Memory", "Default Mode", "Navigation", "Language"], keyGenes: ["APP", "PSEN1", "PSEN2", "MAPT", "APOE"], treatments: ["cholinesterase inhibitors", "memantine", "cognitive training", "supportive care"] },
+      { name: "ALS", aliases: ["amyotrophic lateral sclerosis", "Lou Gehrig's disease", "motor neuron disease"], affectedRegions: ["motor cortex", "corticospinal tract", "spinal cord"], affectedFunctions: ["Movement", "Speech"], keyGenes: ["SOD1", "TARDBP", "FUS", "C9orf72"], treatments: ["riluzole", "edaravone", "supportive care", "ventilation"] },
+      { name: "Anxiety Disorders", aliases: ["generalized anxiety", "GAD", "social anxiety", "panic disorder", "anxiety"], affectedRegions: ["amygdala", "insula", "PFC", "ACC"], affectedFunctions: ["Fear", "Aversive", "Arousal"], keyGenes: ["GAD2", "GRIN2B", "SLC6A4", "BDNF"], treatments: ["SSRIs", "SNRIs", "benzodiazepines", "cognitive behavioral therapy"] },
+      { name: "Autism", aliases: ["autism spectrum disorder", "ASD", "autistic", "asperger"], affectedRegions: ["amygdala", "cerebellum", "PFC", "STS"], affectedFunctions: ["Theory of Mind", "Face", "Sound", "Social cognition"], keyGenes: ["CNTNAP2", "SHANK3", "PTEN", "TSC1", "TSC2"], treatments: ["behavioral therapy", "social skills training", "medication for comorbidities"] },
+      { name: "Bipolar Disorder", aliases: ["bipolar", "manic depression", "bipolar I", "bipolar II"], affectedRegions: ["striatum", "amygdala", "PFC", "insula"], affectedFunctions: ["Emotions", "Reward", "Pleasant", "Decision Making"], keyGenes: ["CACNA1C", "ODZ4", "ANK3", "DGKH"], treatments: ["mood stabilizers", "lithium", "antipsychotics", "psychotherapy"] },
+      { name: "Brain Cancer", aliases: ["brain tumor", "glioma", "glioblastoma", "meningioma", "CNS tumor"], affectedRegions: ["various", "depends on location", "motor cortex", "language areas"], affectedFunctions: ["variable", "motor deficits", "cognitive impairment"], keyGenes: ["TP53", "EGFR", "PDGFRA", "IDH1"], treatments: ["surgery", "chemotherapy", "radiation", "targeted therapy"] },
+      { name: "Cerebral Palsy", aliases: ["CP", "cerebral palsy", "spasticity"], affectedRegions: ["motor cortex", "basal ganglia", "cerebellum"], affectedFunctions: ["Movement", "Tapping", "Eye Movements"], keyGenes: ["genetic", "environmental factors"], treatments: ["physical therapy", "occupational therapy", "medication", "surgery"] },
+      { name: "Chronic Pain", aliases: ["chronic pain syndrome", "fibromyalgia", "persistent pain", "pain disorder"], affectedRegions: ["insula", "ACC", "PFC", "thalamus"], affectedFunctions: ["Pain", "Emotions", "Arousal"], keyGenes: ["SCN9A", "OPRM1", "COMT"], treatments: ["analgesics", "antidepressants", "therapy", "mindfulness"] },
+      { name: "Eating Disorders", aliases: ["anorexia nervosa", "bulimia", "binge eating disorder", "eating disorder"], affectedRegions: ["insula", "OFC", "hypothalamus", "amygdala"], affectedFunctions: ["Food", "Reward", "Emotions"], keyGenes: ["HTR2A", "BDNF", "NPY"], treatments: ["psychotherapy", "nutritional counseling", "medication"] },
+      { name: "Epilepsy", aliases: ["seizure disorder", "epileptic", "convulsion", "seizures"], affectedRegions: ["various", "temporal lobe", "frontal lobe"], affectedFunctions: ["multiple", "depends on seizure focus"], keyGenes: ["SCN1A", "SCN1B", "GABRG2", "PCDH19"], treatments: ["antiepileptic drugs", "surgery", "neurostimulation"] },
+      { name: "Huntington's Disease", aliases: ["Huntington", "HD", "chorea"], affectedRegions: ["striatum", "basal ganglia", "cortex"], affectedFunctions: ["Movement", "Emotion", "Cognition"], keyGenes: ["HTT"], treatments: ["symptom management", "tetrabenazine", "supportive care"] },
+      { name: "Depression (MDD)", aliases: ["major depressive disorder", "depression", "major depression", "depressive disorder"], affectedRegions: ["PFC", "amygdala", "striatum", "hippocampus"], affectedFunctions: ["Emotions", "Reward", "Sleep", "Memory"], keyGenes: ["SLC6A4", "BDNF", "TPH2", "CREB1"], treatments: ["SSRIs", "SNRIs", "tricyclic antidepressants", "psychotherapy"] },
+      { name: "Meningitis", aliases: ["meningococcal", "viral meningitis", "bacterial meningitis"], affectedRegions: ["meninges", "brain tissue", "variable"], affectedFunctions: ["varies", "depends on severity"], keyGenes: ["none specific"], treatments: ["antibiotics", "antivirals", "supportive care"] },
+      { name: "Migraine", aliases: ["migraine headache", "hemiplegic migraine", "cluster headache"], affectedRegions: ["cortex", "brainstem", "TG system"], affectedFunctions: ["Vision", "Pain", "Arousal"], keyGenes: ["CACNA1A", "ATP1A2", "SCN1A"], treatments: ["triptans", "preventive agents", "NSAIDs", "lifestyle modification"] },
+      { name: "MS", aliases: ["multiple sclerosis", "MS"], affectedRegions: ["white matter", "cortex", "brainstem"], affectedFunctions: ["Movement", "Vision", "Sensation", "Cognition"], keyGenes: ["HLA genes", "IL7R", "TNFSF14"], treatments: ["disease-modifying therapies", "immunosuppressants", "symptom management"] },
+      { name: "OCD", aliases: ["obsessive-compulsive disorder", "obsessions", "compulsions"], affectedRegions: ["OFC", "striatum", "ACC", "anterior insula"], affectedFunctions: ["Fear", "Decision Making", "Attention"], keyGenes: ["SLC1A1", "COMT", "GRIN2B"], treatments: ["SSRIs", "cognitive behavioral therapy", "exposure therapy"] },
+      { name: "Parkinson's Disease", aliases: ["Parkinson", "PD", "parkinsonism"], affectedRegions: ["substantia nigra", "striatum", "basal ganglia"], affectedFunctions: ["Movement", "Reward", "Emotions"], keyGenes: ["SNCA", "PARK2", "PINK1", "DJ1", "LRRK2"], treatments: ["levodopa", "dopamine agonists", "deep brain stimulation"] },
+      { name: "PTSD", aliases: ["post-traumatic stress disorder", "trauma", "PTSD"], affectedRegions: ["amygdala", "vmPFC", "hippocampus", "insula"], affectedFunctions: ["Fear", "Memory", "Emotions", "Arousal"], keyGenes: ["FKBP5", "BDNF", "SLC6A4"], treatments: ["trauma-focused therapy", "SSRIs", "prazosin", "EMDR"] },
+      { name: "Schizophrenia", aliases: ["schizophrenia", "psychosis", "psychotic disorder"], affectedRegions: ["PFC", "striatum", "temporal lobe"], affectedFunctions: ["Attention", "Language", "Theory of Mind"], keyGenes: ["DTNBP1", "NRG1", "COMT", "DISC1", "ZNF804A"], treatments: ["antipsychotics", "psychosocial therapy", "family support"] },
+      { name: "Sleep Disorders", aliases: ["insomnia", "sleep apnea", "narcolepsy", "RLS", "sleep disorder"], affectedRegions: ["hypothalamus", "brainstem", "basal forebrain"], affectedFunctions: ["Sleep", "Arousal"], keyGenes: ["HCRT", "OREXIN", "PER2", "CLOCK"], treatments: ["sleep hygiene", "CBT-I", "PAP therapy", "stimulants"] },
+      { name: "Spinal Cord Injury", aliases: ["SCI", "paraplegia", "tetraplegia", "spinal injury"], affectedRegions: ["spinal cord", "motor pathways"], affectedFunctions: ["Movement", "Touch", "Pain"], keyGenes: ["none specific"], treatments: ["rehabilitation", "pain management", "mobility aids"] },
+      { name: "Stroke", aliases: ["cerebrovascular accident", "CVA", "ischemic stroke", "hemorrhagic stroke"], affectedRegions: ["variable", "depends on location"], affectedFunctions: ["variable", "motor", "language", "sensory"], keyGenes: ["none specific"], treatments: ["thrombolytics", "thrombectomy", "rehabilitation"] },
+      { name: "Substance Use Disorders", aliases: ["addiction", "substance abuse", "alcohol use disorder", "opioid use disorder"], affectedRegions: ["striatum", "PFC", "insula", "amygdala"], affectedFunctions: ["Addiction", "Reward", "Decision Making"], keyGenes: ["DRD2", "COMT", "OPRM1", "SLC6A4"], treatments: ["behavioral therapy", "medication-assisted treatment", "support groups"] },
+      { name: "Tourette's Syndrome", aliases: ["Tourette", "tics", "motor tics", "vocal tics"], affectedRegions: ["basal ganglia", "striatum", "PFC"], affectedFunctions: ["Movement", "Attention"], keyGenes: ["CNTNAP2", "IMMP2L"], treatments: ["behavioral therapy", "antipsychotics", "clonidine"] },
+      { name: "TBI", aliases: ["traumatic brain injury", "head injury", "concussion", "diffuse axonal injury"], affectedRegions: ["frontal lobe", "temporal lobe", "diffuse"], affectedFunctions: ["cognition", "memory", "movement"], keyGenes: ["APOE"], treatments: ["rehabilitation", "symptom management", "cognitive therapy"] }
+    ];
+
+    // ============================================================
+    // DATA: GENE CATEGORIES
+    // ============================================================
+    const GENE_CATEGORIES = [
+      { category: "Alzheimer Disease", genes: ["APP", "PSEN1", "PSEN2", "MAPT", "APOE", "TREM2", "CLU", "BIN1", "SORL1"], relatedDisorders: ["Alzheimer's Disease"], relatedFunctions: ["Memory", "Default Mode", "Navigation"] },
+      { category: "Autism", genes: ["CNTNAP2", "SHANK3", "PTEN", "TSC1", "TSC2", "NLGN3", "NLGN4", "MECP2"], relatedDisorders: ["Autism"], relatedFunctions: ["Theory of Mind", "Face", "Sound"] },
+      { category: "Depression", genes: ["SLC6A4", "BDNF", "TPH2", "CREB1", "GCR", "FKBP5"], relatedDisorders: ["Depression (MDD)", "PTSD", "Anxiety Disorders"], relatedFunctions: ["Emotions", "Sleep", "Reward"] },
+      { category: "Epilepsy", genes: ["SCN1A", "SCN1B", "GABRG2", "PCDH19", "SYN1", "GRIN2A"], relatedDisorders: ["Epilepsy"], relatedFunctions: ["Arousal", "Movement"] },
+      { category: "Huntington", genes: ["HTT"], relatedDisorders: ["Huntington's Disease"], relatedFunctions: ["Movement", "Emotions"] },
+      { category: "Parkinson", genes: ["SNCA", "PARK2", "PINK1", "DJ1", "LRRK2", "VPS35"], relatedDisorders: ["Parkinson's Disease"], relatedFunctions: ["Movement", "Reward"] },
+      { category: "Schizophrenia", genes: ["DTNBP1", "NRG1", "COMT", "DISC1", "ZNF804A", "GRIN2A"], relatedDisorders: ["Schizophrenia"], relatedFunctions: ["Attention", "Language", "Theory of Mind"] },
+      { category: "Neurotransmitter - Dopamine", genes: ["DRD1", "DRD2", "DRD3", "DRD4", "DRD5", "TH", "COMT", "MAO", "MAOA", "MAOB", "DAT1", "SLC6A3"], relatedDisorders: ["ADHD", "Parkinson's Disease", "Schizophrenia", "Bipolar Disorder"], relatedFunctions: ["Reward", "Movement", "Attention", "Addiction"] },
+      { category: "Neurotransmitter - Serotonin", genes: ["SLC6A4", "HTR1A", "HTR2A", "TPH2", "MAOA", "MAOB"], relatedDisorders: ["Depression (MDD)", "Anxiety Disorders", "OCD"], relatedFunctions: ["Emotions", "Sleep", "Aversive"] },
+      { category: "Neurotransmitter - GABA", genes: ["GAD1", "GAD2", "GABRA1", "GABRA2", "GABRA3", "GABRA4", "GABRA5", "GABRA6", "GABRB1", "GABRB2", "GABRB3", "GABRG1", "GABRG2", "GABRG3"], relatedDisorders: ["Anxiety Disorders", "Epilepsy", "Sleep Disorders"], relatedFunctions: ["Arousal", "Fear", "Sleep"] },
+      { category: "Neurotransmitter - Glutamate", genes: ["GRIN1", "GRIN2A", "GRIN2B", "GRIN2C", "GRIN2D", "GRM1", "GRM2", "GRM3", "GRM4", "GRM5", "GRM6", "GRM7", "GRM8", "GRIA1", "GRIA2", "GRIA3", "GRIA4"], relatedDisorders: ["Schizophrenia", "ALS", "Epilepsy"], relatedFunctions: ["Learning", "Memory", "Synaptic plasticity"] },
+      { category: "Neurotransmitter - Acetylcholine", genes: ["CHRNA4", "CHRNB2", "CHAT", "ACHE"], relatedDisorders: ["Parkinson's Disease", "Sleep Disorders"], relatedFunctions: ["Arousal", "Memory", "Attention"] },
+      { category: "Neurotransmitter - Norepinephrine", genes: ["DBH", "NET", "SLC6A2", "ADRA1A", "ADRA1B", "ADRB1", "ADRB2"], relatedDisorders: ["ADHD", "Anxiety Disorders", "PTSD"], relatedFunctions: ["Arousal", "Attention", "Aversive"] },
+      { category: "Bipolar Disorder", genes: ["CACNA1C", "ODZ4", "ANK3", "DGKH"], relatedDisorders: ["Bipolar Disorder"], relatedFunctions: ["Emotions", "Reward", "Pleasant", "Decision Making"] },
+      { category: "ALS / Motor Neuron", genes: ["SOD1", "TARDBP", "FUS", "C9orf72"], relatedDisorders: ["ALS"], relatedFunctions: ["Movement", "Speech"] },
+      { category: "Pain & Opioid", genes: ["SCN9A", "OPRM1"], relatedDisorders: ["Chronic Pain", "Substance Use Disorders"], relatedFunctions: ["Pain", "Addiction", "Reward"] },
+      { category: "Ion Channel - Calcium", genes: ["CACNA1A", "CACNA1C"], relatedDisorders: ["Migraine", "Epilepsy", "Bipolar Disorder"], relatedFunctions: ["Movement", "Pain", "Emotions"] },
+      { category: "ADHD", genes: ["DRD4", "DAT1", "SLC6A3", "COMT", "SNAP25"], relatedDisorders: ["ADHD"], relatedFunctions: ["Attention", "Decision Making", "Reward"] },
+      { category: "Circadian / Sleep", genes: ["HCRT", "OREXIN", "PER2", "CLOCK"], relatedDisorders: ["Sleep Disorders", "Narcolepsy"], relatedFunctions: ["Sleep", "Arousal"] },
+      { category: "OCD", genes: ["SLC1A1", "COMT", "GRIN2B"], relatedDisorders: ["OCD"], relatedFunctions: ["Fear", "Decision Making", "Attention"] },
+      { category: "Neurotransmitter - Neuropeptide", genes: ["NPY", "HCRT", "OREXIN"], relatedDisorders: ["Eating Disorders", "Anxiety Disorders", "Sleep Disorders"], relatedFunctions: ["Food", "Fear", "Arousal", "Sleep"] },
+      { category: "Neuro-oncology", genes: ["TP53", "EGFR", "PDGFRA", "IDH1"], relatedDisorders: ["Brain Cancer"], relatedFunctions: ["variable"] },
+      { category: "Multiple Sclerosis", genes: ["IL7R", "TNFSF14"], relatedDisorders: ["MS"], relatedFunctions: ["Movement", "Vision"] },
+      { category: "Tourette Syndrome", genes: ["CNTNAP2", "IMMP2L"], relatedDisorders: ["Tourette's Syndrome"], relatedFunctions: ["Movement", "Attention"] },
+      { category: "Migraine", genes: ["CACNA1A", "ATP1A2", "SCN1A"], relatedDisorders: ["Migraine"], relatedFunctions: ["Pain", "Vision", "Arousal"] }
+    ];
+
+    // ============================================================
+    // SEARCH FUNCTIONALITY
+    // ============================================================
+    const STOP_WORDS = new Set(["the", "a", "an", "is", "are", "in", "of", "to", "and", "or", "for", "with", "that", "this", "what", "which", "how", "does", "do", "can", "about", "between", "from", "by", "on", "at", "be", "been", "was", "were", "have", "has", "had", "do", "does", "did", "will", "would", "should", "could", "may", "might", "must", "shall", "can"]);
+
+    // Multi-word terms that must be kept together during tokenization.
+    // Sorted longest-first so "anterior cingulate cortex" is matched before "cingulate cortex".
+    const COMPOUND_TERMS = [
+      "basal ganglia", "basal forebrain", "bed nucleus stria terminalis",
+      "angular gyrus", "fusiform gyrus", "supramarginal gyrus", "cingulate gyrus",
+      "parahippocampal gyrus", "superior frontal gyrus", "middle frontal gyrus",
+      "inferior frontal gyrus", "precentral gyrus", "postcentral gyrus",
+      "superior temporal gyrus", "middle temporal gyrus", "inferior temporal gyrus",
+      "transverse temporal gyrus", "lingual gyrus", "medial frontal gyrus",
+      "anterior cingulate cortex", "posterior cingulate cortex",
+      "orbitofrontal cortex", "prefrontal cortex", "premotor cortex",
+      "insular cortex", "entorhinal cortex", "calcarine sulcus",
+      "lateral occipital cortex", "dorsolateral prefrontal cortex",
+      "superior parietal lobule", "inferior parietal lobule",
+      "frontal pole", "temporal pole", "frontal lobe", "temporal lobe",
+      "parietal lobe", "occipital lobe",
+      "caudate nucleus", "red nucleus", "dentate nucleus",
+      "nucleus accumbens", "nucleus tractus solitarius",
+      "globus pallidus", "substantia nigra", "ventral tegmental area",
+      "superior colliculus", "inferior colliculus",
+      "periaqueductal gray", "locus coeruleus", "raphe nuclei",
+      "supplementary motor area", "frontal eye field",
+      "default mode network", "default mode",
+      "deep brain stimulation", "cognitive behavioral therapy",
+      "motor cortex", "visual cortex", "auditory cortex", "somatosensory cortex",
+      "spinal cord", "brain cancer", "brain tumor",
+      "bipolar disorder", "eating disorder", "eating disorders",
+      "sleep disorder", "sleep disorders", "anxiety disorder", "anxiety disorders",
+      "substance use", "chronic pain", "cerebral palsy",
+      "working memory", "episodic memory", "spatial memory",
+      "eye movement", "eye movements", "heart rate",
+      "decision making", "theory of mind",
+      "parkinsons disease", "alzheimers disease", "huntingtons disease",
+      "major depressive disorder", "obsessive compulsive disorder",
+      "traumatic brain injury", "spinal cord injury",
+      "multiple sclerosis", "amyotrophic lateral sclerosis",
+      "wernickes area", "wernicke area", "brocas area", "broca area"
+    ].sort((a, b) => b.length - a.length);
+
+    function tokenize(query) {
+      let q = query.toLowerCase().replace(/['']/g, '');
+
+      // Replace recognized compound terms with a joined placeholder token
+      // (underscore-joined so they survive the whitespace split)
+      const preserved = [];
+      for (const term of COMPOUND_TERMS) {
+        const idx = q.indexOf(term);
+        if (idx !== -1) {
+          const joined = term.replace(/\s+/g, '_');
+          q = q.substring(0, idx) + joined + q.substring(idx + term.length);
+          preserved.push(joined);
+        }
+      }
+
+      return q
+        .split(/\s+/)
+        .map(token => token.replace(/[^\w_]/g, ''))
+        .filter(token => token.length > 0 && !STOP_WORDS.has(token));
+    }
+
+    // Generic words that should not trigger matches on their own —
+    // they appear in many disorder/function names and cause indiscriminate results.
+    // These are NOT stop words (they survive tokenization) but they only count
+    // as a match when the term they appear in also has a specific-word match.
+    const GENERIC_TERMS = new Set([
+      // Medical/clinical terms
+      "disease", "disorder", "disorders", "syndrome", "injury",
+      "chronic", "use", "cord", "brain",
+      // Anatomical terms that appear in many region names
+      "gyrus", "cortex", "cortical", "lobe", "lobule", "sulcus",
+      "nucleus", "nuclei", "area", "region", "tract", "pathway",
+      "anterior", "posterior", "superior", "inferior", "medial", "lateral",
+      "dorsal", "ventral", "left", "right",
+      // Neuroscience terms too broad to be useful alone
+      "neuron", "neurons", "neural", "neuronal", "nerve",
+      "processing", "function", "system", "activity", "response",
+      "control", "regulation", "modulation"
+    ]);
+
+    function matchTerms(tokens, termList) {
+      return tokens.filter(token => {
+        // Check if this is a compound token (underscore-joined)
+        const isCompound = token.includes('_');
+        const tokenSpaced = isCompound ? token.replace(/_/g, ' ') : token;
+
+        // Generic terms only blocked for single-word tokens
+        if (!isCompound && GENERIC_TERMS.has(token)) return false;
+
+        return termList.some(term => {
+          const termLower = term.toLowerCase().replace(/['']/g, '');
+
+          // For compound tokens, check if the full phrase appears in the term
+          if (isCompound) {
+            return termLower.includes(tokenSpaced) || tokenSpaced.includes(termLower);
+          }
+
+          // Single-word token: match against individual words in the term
+          const words = termLower.split(/[\s\-\/,]+/);
+          // Exact word match
+          if (words.some(w => w === token)) return true;
+          // Prefix match for abbreviations (e.g. "parkinson" matches "parkinsons")
+          if (token.length >= 4 && words.some(w => w.startsWith(token) || token.startsWith(w))) return true;
+          return false;
+        });
+      });
+    }
+
+    // Weighted scoring: name matches get highest weight, then synonyms, then other fields
+    function scoreMatches(tokens, item, type) {
+      let score = 0;
+      const matched = [];
+      const nameLower = item.name ? item.name.toLowerCase().replace(/['']/g, '') :
+                        (item.category ? item.category.toLowerCase().replace(/['']/g, '') : '');
+      const nameWords = nameLower.split(/[\s\-\/,]+/);
+
+      tokens.forEach(token => {
+        const isCompound = token.includes('_');
+        const tokenSpaced = isCompound ? token.replace(/_/g, ' ') : token;
+
+        // Skip generic single-word tokens
+        if (!isCompound && GENERIC_TERMS.has(token)) return;
+
+        // Check for name match (highest priority: +10 points)
+        let matchedName = false;
+        if (isCompound) {
+          if (nameLower.includes(tokenSpaced) || tokenSpaced.includes(nameLower)) {
+            score += 10;
+            matched.push(token);
+            matchedName = true;
+          }
+        } else {
+          if (nameWords.some(w => w === token)) {
+            score += 10;
+            matched.push(token);
+            matchedName = true;
+          } else if (token.length >= 4 && nameWords.some(w => w.startsWith(token) || token.startsWith(w))) {
+            score += 8;
+            matched.push(token);
+            matchedName = true;
+          }
+        }
+
+        if (matchedName) return;
+
+        // Check synonyms (medium priority: +5 points)
+        const synonyms = item.synonyms || [];
+        const synonymMatch = synonyms.some(term => {
+          const termLower = term.toLowerCase().replace(/['']/g, '');
+          if (isCompound) return termLower.includes(tokenSpaced) || tokenSpaced.includes(termLower);
+          const words = termLower.split(/[\s\-\/,]+/);
+          if (words.some(w => w === token)) return true;
+          if (token.length >= 4 && words.some(w => w.startsWith(token) || token.startsWith(w))) return true;
+          return false;
+        });
+        if (synonymMatch) {
+          score += 5;
+          matched.push(token);
+          return;
+        }
+
+        // Check aliases (medium priority: +5 points)
+        const aliases = item.aliases || [];
+        const aliasMatch = aliases.some(term => {
+          const termLower = term.toLowerCase().replace(/['']/g, '');
+          if (isCompound) return termLower.includes(tokenSpaced) || tokenSpaced.includes(termLower);
+          const words = termLower.split(/[\s\-\/,]+/);
+          if (words.some(w => w === token)) return true;
+          if (token.length >= 4 && words.some(w => w.startsWith(token) || token.startsWith(w))) return true;
+          return false;
+        });
+        if (aliasMatch) {
+          score += 5;
+          matched.push(token);
+          return;
+        }
+
+        // Check all other fields (lower priority: +2 points)
+        let otherTerms = [];
+        if (type === 'function') {
+          otherTerms = [...(item.disorderTerms || []), ...(item.keyRegions || []), ...(item.relatedDisorders || [])];
+        } else if (type === 'region') {
+          otherTerms = [...(item.functions || []), ...(item.relatedFunctions || []), ...(item.relatedDisorders || []), item.lobe || ''].filter(Boolean);
+        } else if (type === 'disorder') {
+          otherTerms = [...(item.affectedRegions || []), ...(item.affectedFunctions || []), ...(item.keyGenes || [])];
+        } else if (type === 'gene') {
+          otherTerms = [...(item.genes || []), ...(item.relatedDisorders || []), ...(item.relatedFunctions || [])];
+        }
+
+        const otherMatch = otherTerms.some(term => {
+          const termLower = term.toLowerCase().replace(/['']/g, '');
+          if (isCompound) return termLower.includes(tokenSpaced) || tokenSpaced.includes(termLower);
+          const words = termLower.split(/[\s\-\/,]+/);
+          if (words.some(w => w === token)) return true;
+          if (token.length >= 4 && words.some(w => w.startsWith(token) || token.startsWith(w))) return true;
+          return false;
+        });
+        if (otherMatch) {
+          score += 2;
+          matched.push(token);
+        }
+      });
+
+      return { score, matches: matched };
+    }
+
+    function search(query, filter = 'all') {
+      const tokens = tokenize(query);
+      if (tokens.length === 0) return { functions: [], regions: [], disorders: [], genes: [] };
+
+      const results = {
+        functions: [],
+        regions: [],
+        disorders: [],
+        genes: []
+      };
+
+      // Search Functions
+      if (filter === 'all' || filter === 'function') {
+        FUNCTIONS.forEach(func => {
+          const { score, matches } = scoreMatches(tokens, func, 'function');
+          if (matches.length > 0) {
+            results.functions.push({
+              item: func,
+              score: score,
+              type: 'function',
+              matches: matches
+            });
+          }
+        });
+        results.functions.sort((a, b) => b.score - a.score);
+      }
+
+      // Search Regions
+      if (filter === 'all' || filter === 'region') {
+        BRAIN_REGIONS.forEach(region => {
+          const { score, matches } = scoreMatches(tokens, region, 'region');
+          if (matches.length > 0) {
+            results.regions.push({
+              item: region,
+              score: score,
+              type: 'region',
+              matches: matches
+            });
+          }
+        });
+        results.regions.sort((a, b) => b.score - a.score);
+      }
+
+      // Search Disorders
+      if (filter === 'all' || filter === 'disorder') {
+        DISORDERS.forEach(disorder => {
+          const { score, matches } = scoreMatches(tokens, disorder, 'disorder');
+          if (matches.length > 0) {
+            results.disorders.push({
+              item: disorder,
+              score: score,
+              type: 'disorder',
+              matches: matches
+            });
+          }
+        });
+        results.disorders.sort((a, b) => b.score - a.score);
+      }
+
+      // Search Genes
+      if (filter === 'all' || filter === 'gene') {
+        GENE_CATEGORIES.forEach(category => {
+          const { score, matches } = scoreMatches(tokens, category, 'gene');
+          if (matches.length > 0) {
+            results.genes.push({
+              item: category,
+              score: score,
+              type: 'gene',
+              matches: matches
+            });
+          }
+        });
+        results.genes.sort((a, b) => b.score - a.score);
+      }
+
+      return results;
+    }
+
+    // ============================================================
+    // UI RENDERING
+    // ============================================================
+    // List of the 29 primary functions for highlighting
+    const PRIMARY_FUNCTIONS = new Set(FUNCTIONS.map(f => f.name));
+
+    function makeFunctionXref(funcName) {
+      const isPrimary = PRIMARY_FUNCTIONS.has(funcName);
+      const cls = isPrimary ? 'function-primary' : '';
+      return `<span class="xref-item clickable ${cls}" data-slot-type="func" data-slot-value="${funcName.replace(/"/g, '&quot;')}" onclick="fillSearchAndSearch('${funcName.replace(/'/g, "\\'")}')">${funcName}</span>`;
+    }
+
+    function makeRegionXref(regionName) {
+      return `<span class="xref-item clickable" data-slot-type="region" data-slot-value="${regionName.replace(/"/g, '&quot;')}" onclick="fillSearchAndSearch('${regionName.replace(/'/g, "\\'")}')">${regionName}</span>`;
+    }
+
+    function makeDisorderXref(disorderName) {
+      return `<span class="xref-item clickable" onclick="fillSearchAndSearch('${disorderName.replace(/'/g, "\\'")}')">${disorderName}</span>`;
+    }
+
+    function makeGeneXref(geneName) {
+      const isSelected = SELECTED_GENES.has(geneName);
+      const cls = isSelected ? 'gene-selected' : '';
+      return `<span class="xref-item clickable ${cls}" data-slot-type="gene" data-slot-value="${geneName}" onclick="fillSearchAndSearch('${geneName.replace(/'/g, "\\'")}')">${geneName}</span>`;
+    }
+
+    function createResultCard(result) {
+      const { item, score, type, matches } = result;
+      let badgeClass, categoryLabel, content, titleLink;
+
+      // Build matched terms indicator
+      const matchedTermsHtml = matches && matches.length > 0
+        ? `<div class="matched-terms">Matched: ${matches.map(m => '<strong>' + m + '</strong>').join(', ')}</div>`
+        : '';
+
+      if (type === 'function') {
+        badgeClass = 'badge-function';
+        categoryLabel = 'FUNCTION';
+        const isPrimary = PRIMARY_FUNCTIONS.has(item.name);
+        titleLink = makeFunctionLink(item.name, isPrimary);
+        content = `
+          <div class="card-detail">
+            <span class="detail-label">Key Regions:</span>
+            <span class="detail-value">${item.keyRegions.slice(0, 3).map(r => makeRegionLink(r)).join(', ')}</span>
+          </div>
+          <div class="card-detail">
+            <span class="detail-label">Related:</span>
+            <span class="detail-value">${item.relatedDisorders.slice(0, 2).map(d => makeDisorderLink(d)).join(', ')}</span>
+          </div>
+          <div class="xref-section">
+            <div class="xref-title">Linked Regions</div>
+            <div class="xref-items">${item.keyRegions.slice(0, 5).map(r => makeRegionXref(r)).join('')}</div>
+          </div>
+          <div class="xref-section">
+            <div class="xref-title">Linked Disorders</div>
+            <div class="xref-items">${item.relatedDisorders.slice(0, 4).map(d => makeDisorderXref(d)).join('')}</div>
+          </div>
+          ${matchedTermsHtml}
+        `;
+      } else if (type === 'region') {
+        badgeClass = 'badge-region';
+        categoryLabel = 'REGION';
+        titleLink = makeRegionLink(item.name);
+        content = `
+          <div class="card-detail">
+            <span class="detail-label">Lobe:</span>
+            <span class="detail-value">${item.lobe}</span>
+          </div>
+          <div class="card-detail">
+            <span class="detail-label">Brodmann:</span>
+            <span class="detail-value">${item.brodmann.join(', ') || 'Subcortical'}</span>
+          </div>
+          <div class="card-detail">
+            <span class="detail-label">MNI:</span>
+            <span class="detail-value">${makeMNILink(item.mni)}</span>
+          </div>
+          <div class="xref-section">
+            <div class="xref-title">Functions</div>
+            <div class="xref-items">${item.relatedFunctions.slice(0, 4).map(f => makeFunctionXref(f)).join('')}</div>
+          </div>
+          ${matchedTermsHtml}
+        `;
+      } else if (type === 'disorder') {
+        badgeClass = 'badge-disorder';
+        categoryLabel = 'DISORDER';
+        titleLink = makeDisorderLink(item.name);
+        content = `
+          <div class="card-detail">
+            <span class="detail-label">Regions:</span>
+            <span class="detail-value">${item.affectedRegions.slice(0, 3).map(r => makeRegionLink(r)).join(', ')}</span>
+          </div>
+          <div class="card-detail">
+            <span class="detail-label">Functions:</span>
+            <span class="detail-value">${item.affectedFunctions.slice(0, 2).map(f => makeFunctionLink(f, PRIMARY_FUNCTIONS.has(f))).join(', ')}</span>
+          </div>
+          <div class="xref-section">
+            <div class="xref-title">Key Genes</div>
+            <div class="xref-items">${item.keyGenes.slice(0, 4).map(g => makeGeneXref(g)).join('')}</div>
+          </div>
+          <div class="xref-section">
+            <div class="xref-title">Treatment Types</div>
+            <div class="xref-items">${item.treatments.slice(0, 3).map(t => `<span class="xref-item">${makeTreatmentLink(t)}</span>`).join('')}</div>
+          </div>
+          ${matchedTermsHtml}
+        `;
+      } else if (type === 'gene') {
+        badgeClass = 'badge-gene';
+        categoryLabel = 'GENE CATEGORY';
+        titleLink = item.category;
+        content = `
+          <div class="card-detail">
+            <span class="detail-label">Genes:</span>
+            <span class="detail-value">${item.genes.slice(0, 6).map(g => makeGeneLink(g)).join(' ')}</span>
+          </div>
+          <div class="xref-section">
+            <div class="xref-title">Related Disorders</div>
+            <div class="xref-items">${item.relatedDisorders.slice(0, 3).map(d => makeDisorderXref(d)).join('')}</div>
+          </div>
+          <div class="xref-section">
+            <div class="xref-title">Functions</div>
+            <div class="xref-items">${item.relatedFunctions.slice(0, 3).map(f => makeFunctionXref(f)).join('')}</div>
+          </div>
+          ${matchedTermsHtml}
+        `;
+      }
+
+      // Determine the drag data: item name and the slot type it maps to
+      const dragName = item.name || item.category || '';
+      // Map card type → sidebar slot type
+      const slotMap = { region: 'region', function: 'func', disorder: null, gene: 'gene' };
+      const dragSlot = slotMap[type] || '';
+      const draggable = dragSlot ? 'true' : 'false';
+
+      return `
+        <div class="result-card matched" draggable="${draggable}"
+             data-drag-name="${dragName.replace(/"/g, '&quot;')}"
+             data-drag-slot="${dragSlot}"
+             data-drag-type="${type}">
+          <div class="card-header">
+            <div class="category-badge ${badgeClass}">${categoryLabel[0]}</div>
+            <div class="card-title">${titleLink}</div>
+            <div class="match-score">${score} match${score > 1 ? 'es' : ''}</div>
+          </div>
+          <div class="card-body">
+            ${content}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderResults(results) {
+      const container = document.getElementById('resultsContainer');
+      const totalMatches = results.functions.length + results.regions.length + results.disorders.length + results.genes.length;
+
+      if (totalMatches === 0) {
+        container.innerHTML = `
+          <div class="no-results">
+            <p class="no-results-title">No results found</p>
+            <p>Try refining your search or selecting a category</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `
+        <div class="results-header">
+          <div class="results-count">Found <strong>${totalMatches}</strong> match${totalMatches > 1 ? 'es' : ''} across ${[results.functions.length > 0 ? 'functions' : '', results.regions.length > 0 ? 'regions' : '', results.disorders.length > 0 ? 'disorders' : '', results.genes.length > 0 ? 'genes' : ''].filter(Boolean).join(', ')}</div>
+        </div>
+        <div class="results-grid">
+      `;
+
+      results.functions.forEach(result => html += createResultCard(result));
+      results.regions.forEach(result => html += createResultCard(result));
+      results.disorders.forEach(result => html += createResultCard(result));
+      results.genes.forEach(result => html += createResultCard(result));
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // ============================================================
+    // HISTORY / BACK NAVIGATION (functions hoisted; init at end of script)
+    // ============================================================
+    const historyStack = [];   // Stack of previous states
+    let isRestoringState = false;  // Flag to prevent pushing state while restoring
+
+    function captureState() {
+      const si = document.getElementById('searchInput');
+      return {
+        query: si ? si.value : '',
+        filter: currentFilter || 'all',
+        selections: {
+          region: selections ? selections.region : null,
+          func: selections ? selections.func : null,
+          gene: selections ? selections.gene : null
+        }
+      };
+    }
+
+    function pushHistory() {
+      if (isRestoringState) return;
+      const state = captureState();
+      // Don't push duplicate consecutive states
+      if (historyStack.length > 0) {
+        const prev = historyStack[historyStack.length - 1];
+        if (prev.query === state.query && prev.filter === state.filter &&
+            prev.selections.region === state.selections.region &&
+            prev.selections.func === state.selections.func &&
+            prev.selections.gene === state.selections.gene) {
+          return;
+        }
+      }
+      historyStack.push(state);
+      history.pushState(state, '', '');
+      updateBackBtn();
+    }
+
+    function restoreState(state) {
+      if (!state) return;
+      isRestoringState = true;
+
+      const si = document.getElementById('searchInput');
+      if (si) si.value = state.query || '';
+      if (typeof lastCommittedQuery !== 'undefined') lastCommittedQuery = state.query || '';
+
+      currentFilter = state.filter || 'all';
+      document.querySelectorAll('.chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.filter === currentFilter);
+      });
+
+      if (state.selections) {
+        selections.region = state.selections.region;
+        selections.func = state.selections.func;
+        selections.gene = state.selections.gene;
+        updateSlotUI();
+      }
+
+      if (state.query) {
+        const results = search(state.query, currentFilter);
+        renderResults(results);
+      } else {
+        document.getElementById('resultsContainer').innerHTML = '';
+      }
+
+      isRestoringState = false;
+      updateBackBtn();
+    }
+
+    function navigateBack() {
+      if (historyStack.length > 0) {
+        const prevState = historyStack.pop();
+        restoreState(prevState);
+      }
+    }
+
+    function updateBackBtn() {
+      const btn = document.getElementById('backBtn');
+      if (btn) btn.disabled = historyStack.length === 0;
+    }
+
+    // ============================================================
+    // EVENT HANDLERS
+    // ============================================================
+    let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    const filterChips = document.querySelectorAll('.chip');
+    const exampleBtns = document.querySelectorAll('.example-btn');
+    let currentFilter = 'all';
+
+    function performSearch(saveHistory) {
+      const query = searchInput.value.trim();
+      if (query.length === 0) {
+        document.getElementById('resultsContainer').innerHTML = '';
+        return;
+      }
+      if (saveHistory) pushHistory();
+      const results = search(query, currentFilter);
+      renderResults(results);
+    }
+
+    // Debounced keyup: push history only when user pauses typing after a change
+    let lastCommittedQuery = '';
+    searchInput.addEventListener('keyup', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const q = searchInput.value.trim();
+        if (q && q !== lastCommittedQuery) {
+          pushHistory();  // Save previous state before new results
+          lastCommittedQuery = q;
+        }
+        performSearch(false);
+      }, 500);
+    });
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        pushHistory();
+        filterChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentFilter = chip.dataset.filter;
+        performSearch(false);
+      });
+    });
+
+    exampleBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        pushHistory();
+        searchInput.value = btn.textContent;
+        lastCommittedQuery = btn.textContent;
+        performSearch(false);
+        searchInput.focus();
+      });
+    });
+
+    // ============================================================
+    // v1.3: SELECTION SLOTS — Save, Categorize, Export
+    // ============================================================
+
+    // Build lookup sets for categorization
+    const ALL_REGION_NAMES = new Set(BRAIN_REGIONS.map(r => r.name.toLowerCase()));
+    const ALL_REGION_ALIASES = {};
+    BRAIN_REGIONS.forEach(r => {
+      ALL_REGION_ALIASES[r.name.toLowerCase()] = r.name;
+      r.aliases.forEach(a => { ALL_REGION_ALIASES[a.toLowerCase()] = r.name; });
+    });
+
+    const ALL_FUNCTION_NAMES = new Set(FUNCTIONS.map(f => f.name.toLowerCase()));
+    const ALL_FUNCTION_ALIASES = {};
+    FUNCTIONS.forEach(f => {
+      ALL_FUNCTION_ALIASES[f.name.toLowerCase()] = f.name;
+      f.synonyms.forEach(s => { ALL_FUNCTION_ALIASES[s.toLowerCase()] = f.name; });
+    });
+
+    const ALL_GENE_NAMES = new Set();
+    const ALL_GENE_LOOKUP = {};
+    GENE_CATEGORIES.forEach(cat => {
+      cat.genes.forEach(g => {
+        ALL_GENE_NAMES.add(g.toLowerCase());
+        ALL_GENE_LOOKUP[g.toLowerCase()] = g;
+      });
+    });
+
+    // Current selections
+    const selections = { region: null, func: null, gene: null };
+
+    function categorizeTerm(term) {
+      const t = term.toLowerCase().trim();
+      if (!t) return null;
+
+      // Check exact gene match first (gene names are short uppercase strings)
+      if (ALL_GENE_LOOKUP[t]) return { type: 'gene', canonical: ALL_GENE_LOOKUP[t] };
+
+      // Check exact function match
+      if (ALL_FUNCTION_ALIASES[t]) return { type: 'function', canonical: ALL_FUNCTION_ALIASES[t] };
+
+      // Check exact region match (require 3+ chars to avoid tiny abbreviations like SC, SN, IC)
+      if (t.length >= 3 && ALL_REGION_ALIASES[t]) return { type: 'region', canonical: ALL_REGION_ALIASES[t] };
+
+      // Partial matching: only check if the INPUT is a substring of a KNOWN alias/name.
+      // Never check the reverse (alias inside input) — short aliases like "SC", "SN"
+      // would false-match inside unrelated words (e.g. "schizophrenia" contains "sc").
+      // Also require the input to be at least 4 chars to avoid tiny-substring noise.
+      if (t.length >= 4) {
+        // Best match tracking: prefer longest alias that contains the term
+        let bestRegion = null, bestRegionLen = 0;
+        for (const [alias, canonical] of Object.entries(ALL_REGION_ALIASES)) {
+          if (alias.length >= 4 && alias.includes(t) && alias.length > bestRegionLen) {
+            bestRegion = canonical;
+            bestRegionLen = alias.length;
+          }
+        }
+        if (bestRegion) return { type: 'region', canonical: bestRegion };
+
+        let bestFunc = null, bestFuncLen = 0;
+        for (const [alias, canonical] of Object.entries(ALL_FUNCTION_ALIASES)) {
+          if (alias.length >= 4 && alias.includes(t) && alias.length > bestFuncLen) {
+            bestFunc = canonical;
+            bestFuncLen = alias.length;
+          }
+        }
+        if (bestFunc) return { type: 'function', canonical: bestFunc };
+      }
+
+      return null;
+    }
+
+    function updateSlotUI() {
+      const slotRegion = document.getElementById('slotRegion');
+      const slotFunction = document.getElementById('slotFunction');
+      const slotGene = document.getElementById('slotGene');
+      const clearRegion = document.getElementById('clearRegion');
+      const clearFunction = document.getElementById('clearFunction');
+      const clearGene = document.getElementById('clearGene');
+      const exportBtn = document.getElementById('exportBtn');
+
+      // Region slot
+      if (selections.region) {
+        slotRegion.value = selections.region;
+        slotRegion.classList.add('filled');
+        clearRegion.classList.remove('hidden');
+      } else {
+        if (document.activeElement !== slotRegion) slotRegion.value = '';
+        slotRegion.classList.remove('filled');
+        clearRegion.classList.add('hidden');
+      }
+
+      // Function slot
+      if (selections.func) {
+        slotFunction.value = selections.func;
+        slotFunction.classList.add('filled');
+        clearFunction.classList.remove('hidden');
+      } else {
+        if (document.activeElement !== slotFunction) slotFunction.value = '';
+        slotFunction.classList.remove('filled');
+        clearFunction.classList.add('hidden');
+      }
+
+      // Gene slot
+      if (selections.gene) {
+        slotGene.value = selections.gene;
+        slotGene.classList.add('filled');
+        clearGene.classList.remove('hidden');
+      } else {
+        if (document.activeElement !== slotGene) slotGene.value = '';
+        slotGene.classList.remove('filled');
+        clearGene.classList.add('hidden');
+      }
+
+      exportBtn.disabled = !(selections.region && selections.func && selections.gene);
+    }
+
+    function clearSlot(type) {
+      pushHistory();  // Save state before clearing
+      selections[type] = null;
+      updateSlotUI();
+    }
+
+    // Handle direct typing into slot inputs — commit on Enter or blur
+    function commitSlotInput(inputEl) {
+      const val = inputEl.value.trim();
+      const slotType = inputEl.dataset.slottype;
+
+      if (!val) {
+        // Cleared by user — remove the selection
+        selections[slotType] = null;
+        updateSlotUI();
+        return;
+      }
+
+      // Accept the typed value directly into the slot
+      if (slotType === 'region') selections.region = val;
+      else if (slotType === 'func') selections.func = val;
+      else if (slotType === 'gene') selections.gene = val;
+
+      updateSlotUI();
+    }
+
+    document.querySelectorAll('.slot-input').forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          commitSlotInput(input);
+          input.blur();
+        }
+      });
+      input.addEventListener('blur', () => {
+        commitSlotInput(input);
+      });
+    });
+
+    // Map slot types to input IDs (shared by double-click and drag-and-drop)
+    const SLOT_INPUT_MAP = {
+      region: 'slotRegion',
+      func:   'slotFunction',
+      gene:   'slotGene'
+    };
+
+    // ============================================================
+    // RIGHT-CLICK CONTEXT MENU: small text items → sidebar slots
+    // ============================================================
+    const SLOT_LABELS = {
+      region: 'Brain Area',
+      func:   'Function',
+      gene:   'Gene'
+    };
+
+    const SLOT_ICON_CLASS = {
+      region: 'ctx-icon-region',
+      func:   'ctx-icon-func',
+      gene:   'ctx-icon-gene'
+    };
+
+    const SLOT_ICON_LETTER = {
+      region: 'R',
+      func:   'F',
+      gene:   'G'
+    };
+
+    let activeCtxMenu = null;
+
+    function dismissCtxMenu() {
+      if (activeCtxMenu) {
+        activeCtxMenu.remove();
+        activeCtxMenu = null;
+      }
+    }
+
+    // Close context menu on any click or Escape
+    document.addEventListener('click', dismissCtxMenu);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismissCtxMenu(); });
+
+    // Intercept right-click on slottable items inside results
+    document.getElementById('resultsContainer').addEventListener('contextmenu', (e) => {
+      const el = e.target.closest('[data-slot-type]');
+      if (!el) return;  // Not a slottable item — let the normal menu appear
+
+      const slotType  = el.dataset.slotType;
+      const slotValue = el.dataset.slotValue;
+      if (!slotType || !slotValue) return;
+
+      e.preventDefault();
+      dismissCtxMenu();
+
+      // Build the context menu
+      const menu = document.createElement('div');
+      menu.className = 'ctx-menu';
+
+      // Header: show what was right-clicked
+      const header = document.createElement('div');
+      header.className = 'ctx-menu-header';
+      header.textContent = slotValue;
+      menu.appendChild(header);
+
+      // "Save to [slot]" option
+      const saveItem = document.createElement('div');
+      saveItem.className = 'ctx-menu-item';
+      saveItem.innerHTML = `
+        <span class="ctx-icon ${SLOT_ICON_CLASS[slotType]}">${SLOT_ICON_LETTER[slotType]}</span>
+        <span>Save to <strong>${SLOT_LABELS[slotType]}</strong> slot</span>
+      `;
+      saveItem.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        pushHistory();
+        selections[slotType] = slotValue;
+        updateSlotUI();
+
+        // Flash the target slot input
+        const targetInput = document.getElementById(SLOT_INPUT_MAP[slotType]);
+        if (targetInput) {
+          targetInput.classList.add('drag-accepted');
+          setTimeout(() => targetInput.classList.remove('drag-accepted'), 500);
+        }
+        dismissCtxMenu();
+      });
+      menu.appendChild(saveItem);
+
+      // "Search for [value]" option
+      const searchItem = document.createElement('div');
+      searchItem.className = 'ctx-menu-item';
+      searchItem.innerHTML = `
+        <span class="ctx-icon" style="background:#4a6a8a;">&#x1F50D;</span>
+        <span>Search for <strong>${slotValue.length > 22 ? slotValue.slice(0, 20) + '...' : slotValue}</strong></span>
+      `;
+      searchItem.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        fillSearchAndSearch(slotValue);
+        dismissCtxMenu();
+      });
+      menu.appendChild(searchItem);
+
+      // Position the menu at the cursor, clamped to viewport
+      document.body.appendChild(menu);
+      const menuRect = menu.getBoundingClientRect();
+      let x = e.clientX;
+      let y = e.clientY;
+      if (x + menuRect.width > window.innerWidth)  x = window.innerWidth - menuRect.width - 8;
+      if (y + menuRect.height > window.innerHeight) y = window.innerHeight - menuRect.height - 8;
+      if (x < 4) x = 4;
+      if (y < 4) y = 4;
+      menu.style.left = x + 'px';
+      menu.style.top  = y + 'px';
+
+      activeCtxMenu = menu;
+    });
+
+    // ============================================================
+    // DRAG-AND-DROP: result cards → sidebar slots
+    // ============================================================
+    // Drag start/end on result cards (delegated on results container)
+    document.getElementById('resultsContainer').addEventListener('dragstart', (e) => {
+      const card = e.target.closest('.result-card[draggable="true"]');
+      if (!card) return;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'copy';
+      e.dataTransfer.setData('text/plain', JSON.stringify({
+        name: card.dataset.dragName,
+        slot: card.dataset.dragSlot,
+        type: card.dataset.dragType
+      }));
+    });
+
+    document.getElementById('resultsContainer').addEventListener('dragend', (e) => {
+      const card = e.target.closest('.result-card');
+      if (card) card.classList.remove('dragging');
+    });
+
+    // Set up each slot input as a drop target
+    document.querySelectorAll('.slot-input').forEach(input => {
+      const slotType = input.dataset.slottype;
+
+      input.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        try {
+          // We can't read the data during dragover in most browsers,
+          // so we just show the generic highlight; we validate on drop
+          e.dataTransfer.dropEffect = 'copy';
+          input.classList.add('drag-over');
+        } catch (err) {}
+      });
+
+      input.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        input.classList.add('drag-over');
+      });
+
+      input.addEventListener('dragleave', (e) => {
+        input.classList.remove('drag-over');
+        input.classList.remove('drag-over-wrong');
+      });
+
+      input.addEventListener('drop', (e) => {
+        e.preventDefault();
+        input.classList.remove('drag-over');
+        input.classList.remove('drag-over-wrong');
+
+        let data;
+        try {
+          data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        } catch (err) { return; }
+
+        if (!data || !data.name || !data.slot) return;
+
+        // Check if this card type matches the slot
+        if (data.slot !== slotType) {
+          // Wrong slot — brief red flash
+          input.classList.add('drag-over-wrong');
+          setTimeout(() => input.classList.remove('drag-over-wrong'), 400);
+          return;
+        }
+
+        // Populate the slot
+        pushHistory();
+        selections[slotType] = data.name;
+        updateSlotUI();
+
+        // Green flash feedback
+        input.classList.add('drag-accepted');
+        setTimeout(() => input.classList.remove('drag-accepted'), 500);
+      });
+    });
+
+    // Also allow dropping anywhere on the sidebar panel to auto-route
+    document.querySelector('.sidebar-panel').addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    });
+
+    document.querySelector('.sidebar-panel').addEventListener('drop', (e) => {
+      // Only handle if not caught by a specific slot input
+      if (e.target.classList.contains('slot-input')) return;
+      e.preventDefault();
+
+      let data;
+      try {
+        data = JSON.parse(e.dataTransfer.getData('text/plain'));
+      } catch (err) { return; }
+
+      if (!data || !data.name || !data.slot) return;
+
+      // Auto-route to the correct slot
+      const targetInputId = SLOT_INPUT_MAP[data.slot];
+      if (!targetInputId) return;
+
+      pushHistory();
+      selections[data.slot] = data.name;
+      updateSlotUI();
+
+      // Flash the correct input
+      const targetInput = document.getElementById(targetInputId);
+      if (targetInput) {
+        targetInput.classList.add('drag-accepted');
+        setTimeout(() => targetInput.classList.remove('drag-accepted'), 500);
+      }
+    });
+
+    function saveTerms() {
+      const query = searchInput.value.trim();
+      if (!query) return;
+      pushHistory();  // Save state before saving terms
+
+      // Split on commas, semicolons, or treat as space-separated tokens
+      // But first try the full query as one term, then individual tokens
+      const candidates = [];
+
+      // Try the full query first
+      candidates.push(query);
+
+      // Also try comma/semicolon separated parts
+      if (query.includes(',') || query.includes(';')) {
+        query.split(/[,;]+/).forEach(part => {
+          const p = part.trim();
+          if (p) candidates.push(p);
+        });
+      }
+
+      // Also try individual words for gene names (which are single tokens)
+      query.split(/\s+/).forEach(word => {
+        const w = word.replace(/[^\w'-]/g, '').trim();
+        if (w) candidates.push(w);
+      });
+
+      // Try progressively smaller n-grams for multi-word region/function names
+      const words = query.split(/\s+/);
+      for (let n = Math.min(words.length, 5); n >= 2; n--) {
+        for (let i = 0; i <= words.length - n; i++) {
+          candidates.push(words.slice(i, i + n).join(' '));
+        }
+      }
+
+      let saved = [];
+
+      for (const candidate of candidates) {
+        const result = categorizeTerm(candidate);
+        if (!result) continue;
+
+        if (result.type === 'region' && !selections.region) {
+          selections.region = result.canonical;
+          saved.push('Brain Area: ' + result.canonical);
+        } else if (result.type === 'function' && !selections.func) {
+          selections.func = result.canonical;
+          saved.push('Function: ' + result.canonical);
+        } else if (result.type === 'gene' && !selections.gene) {
+          selections.gene = result.canonical;
+          saved.push('Gene: ' + result.canonical);
+        }
+
+        // Stop if all slots are filled
+        if (selections.region && selections.func && selections.gene) break;
+      }
+
+      updateSlotUI();
+    }
+
+    function exportSelection() {
+      if (!selections.region || !selections.func || !selections.gene) return;
+
+      const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      const content = [
+        'PSYCH 332 Brain Explorer — Selection Export',
+        '============================================',
+        'Date: ' + timestamp,
+        '',
+        'Brain Area:  ' + selections.region,
+        'Function:    ' + selections.func,
+        'Gene:        ' + selections.gene,
+        '',
+        '--- Links ---',
+        'Region (PubMed reviews): https://pubmed.ncbi.nlm.nih.gov/?term=' + encodeURIComponent(selections.region + ' neuroanatomy') + '&filter=pubt.review',
+        'Function (NeuroSynth):   https://neurosynth.org/analyses/terms/' + encodeURIComponent(FUNCTION_NEUROSYNTH_TERMS[selections.func] || selections.func.toLowerCase()) + '/',
+        'Gene (Allen Brain):      https://human.brain-map.org/microarray/search/show?search_type=gene&search_term=' + encodeURIComponent(GENE_ALLEN_TERMS[selections.gene] || selections.gene),
+        ''
+      ].join('\n');
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'PSYCH332_Selection_' + selections.region.replace(/\s+/g, '_') + '_' + selections.func + '_' + selections.gene + '.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Wire up Save and Export buttons
+    document.getElementById('saveBtn').addEventListener('click', saveTerms);
+    document.getElementById('exportBtn').addEventListener('click', exportSelection);
+
+    // Initialize history: browser Back button support
+    window.addEventListener('popstate', (e) => {
+      if (historyStack.length > 0) {
+        const prevState = historyStack.pop();
+        restoreState(prevState);
+      }
+    });
+    history.replaceState(captureState(), '', '');
+    updateBackBtn();
+
+  </script>
+</body>
+</html>
