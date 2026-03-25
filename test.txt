@@ -1,2 +1,6 @@
 This is a test file added to the psych-332-resources project folder.
 Date: 2026-03-25
+
+This file serves as a placeholder for testing repository workflows and verifying
+that commits, pushes, and other Git operations work correctly within the
+psych-332-resources project.
