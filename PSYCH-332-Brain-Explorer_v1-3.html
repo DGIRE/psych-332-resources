@@ -2104,6 +2104,133 @@
       });
     });
 
+    // ============================================================
+    // DATA-CONVENTION REGION NAME MAP
+    // Maps Brain Explorer region names → analysis data naming convention
+    // so that exports match the Practicum Analysis page exactly.
+    // Many Explorer regions are finer-grained than the data regions,
+    // so multiple Explorer names may map to a single data name.
+    // ============================================================
+    const DATA_REGION_MAP = {
+      // Frontal lobe
+      "Superior Frontal Gyrus":                  "superior frontal gyrus",
+      "Middle Frontal Gyrus":                    "medial frontal gyrus",
+      "Inferior Frontal Gyrus - Pars Opercularis": "inferior frontal gyrus",
+      "Inferior Frontal Gyrus - Pars Triangularis": "inferior frontal gyrus",
+      "Inferior Frontal Gyrus - Pars Orbitalis": "inferior frontal gyrus",
+      "Precentral Gyrus":                        "precentral gyrus",
+      "Medial Frontal Gyrus":                    "medial frontal gyrus",
+      "Orbitofrontal Cortex - Medial":           "orbital gyrus",
+      "Orbitofrontal Cortex - Lateral":          "orbital gyrus",
+      "Frontal Pole":                            "frontal pole",
+      "Supplementary Motor Area":                "paracentral lobule",
+      "Premotor Cortex":                         "precentral gyrus",
+      "Dorsolateral Prefrontal Cortex":          "medial frontal gyrus",
+
+      // Cingulate / Limbic cortical
+      "Anterior Cingulate Cortex - Dorsal":      "cingulate gyrus frontal part",
+      "Anterior Cingulate Cortex - Ventral":     "cingulate gyrus frontal part",
+      "Anterior Cingulate Cortex - Subgenual":   "subcallosal cingulate gyrus",
+      "Posterior Cingulate Cortex":              "cingulate gyrus retrosplenial part",
+
+      // Parietal lobe
+      "Postcentral Gyrus":                       "postcentral gyrus",
+      "Superior Parietal Lobule":                "superior parietal lobule",
+      "Inferior Parietal Lobule":                "supramarginal gyrus",
+      "Supramarginal Gyrus":                     "supramarginal gyrus",
+      "Angular Gyrus":                           "angular gyrus",
+      "Precuneus":                               "precuneus",
+
+      // Temporal lobe
+      "Superior Temporal Gyrus":                 "superior temporal gyrus",
+      "Middle Temporal Gyrus":                   "middle temporal gyrus",
+      "Inferior Temporal Gyrus":                 "inferior temporal gyrus",
+      "Fusiform Gyrus":                          "fusiform gyrus",
+      "Transverse Temporal Gyrus":               "transverse gyri",
+      "Temporal Pole":                           "temporal pole",
+      "Parahippocampal Gyrus":                   "parahippocampal gyrus",
+      "Entorhinal Cortex":                       "parahippocampal gyrus",
+
+      // Occipital lobe
+      "Calcarine Sulcus":                        "cuneus",
+      "Cuneus":                                  "cuneus",
+      "Lingual Gyrus":                           "lingual gyrus",
+      "Lateral Occipital Cortex":                "inferior occipital gyrus",
+
+      // Insular
+      "Anterior Insula":                         "insula",
+      "Posterior Insula":                        "insula",
+
+      // Hippocampal formation
+      "Hippocampus - CA1":                       "hippocampus",
+      "Hippocampus - CA3":                       "hippocampus",
+      "Hippocampus - Dentate Gyrus":             "hippocampus",
+      "Hippocampus - Subiculum":                 "hippocampus",
+
+      // Amygdala
+      "Amygdala - Basolateral":                  "amygdala",
+      "Amygdala - Central":                      "amygdala",
+
+      // Basal ganglia / Striatum
+      "Caudate Nucleus":                         "caudate",
+      "Putamen":                                 "putamen",
+      "Globus Pallidus - External":              "globus pallidus",
+      "Globus Pallidus - Internal":              "globus pallidus",
+      "Nucleus Accumbens":                       "nucleus accumbens",
+
+      // Thalamus
+      "Thalamus - Anterior":                     "thalamus",
+      "Thalamus - Mediodorsal":                  "thalamus",
+      "Thalamus - VL/VA":                        "thalamus",
+      "Thalamus - VPL":                          "thalamus",
+      "Thalamus - VPM":                          "thalamus",
+      "Thalamus - Pulvinar":                     "thalamus",
+      "Thalamus - LGN":                          "thalamus",
+      "Thalamus - MGN":                          "thalamus",
+
+      // Hypothalamus / Epithalamus / Subthalamus
+      "Hypothalamus":                            "hypothalamus",
+
+      // Midbrain
+      "Substantia Nigra":                        "substantia nigra",
+      "Ventral Tegmental Area":                  "mesencephalon",
+      "Red Nucleus":                             "red nucleus",
+      "Superior Colliculus":                     "mesencephalon",
+      "Inferior Colliculus":                     "mesencephalon",
+      "Periaqueductal Gray":                     "mesencephalon",
+
+      // Brainstem
+      "Locus Coeruleus":                         "pontine tegmentum",
+      "Raphe Nuclei":                            "myelencephalon",
+      "Nucleus Tractus Solitarius":              "myelencephalon",
+
+      // Extended amygdala / Basal forebrain
+      "Bed Nucleus Stria Terminalis":            "substantia innominata",
+      "Basal Forebrain":                         "septal nuclei",
+
+      // Cerebellum
+      "Cerebellum - Vermis":                     "cerebellar cortex",
+      "Cerebellum - Dentate Nucleus":            "dentate nucleus"
+    };
+
+    /**
+     * Converts a Brain Explorer region name to the data-convention name
+     * used in the Practicum Analysis CSVs. Returns the original name
+     * if no mapping exists (e.g. user typed a custom value).
+     */
+    function toDataRegionName(explorerName) {
+      if (!explorerName) return explorerName;
+      // Try exact match first
+      if (DATA_REGION_MAP[explorerName]) return DATA_REGION_MAP[explorerName];
+      // Try case-insensitive match
+      const lower = explorerName.toLowerCase();
+      for (const [key, val] of Object.entries(DATA_REGION_MAP)) {
+        if (key.toLowerCase() === lower) return val;
+      }
+      // No match — return as lowercase (data convention is all lowercase)
+      return explorerName.toLowerCase();
+    }
+
     // Current selections
     const selections = { region: null, func: null, gene: null };
 
@@ -2212,7 +2339,7 @@
       }
 
       // Accept the typed value directly into the slot
-      if (slotType === 'region') selections.region = val;
+      if (slotType === 'region') selections.region = toDataRegionName(val);
       else if (slotType === 'func') selections.func = val;
       else if (slotType === 'gene') selections.gene = val;
 
@@ -2305,7 +2432,7 @@
       saveItem.addEventListener('click', (ev) => {
         ev.stopPropagation();
         pushHistory();
-        selections[slotType] = slotValue;
+        selections[slotType] = (slotType === 'region') ? toDataRegionName(slotValue) : slotValue;
         updateSlotUI();
 
         // Flash the target slot input
@@ -2412,9 +2539,9 @@
           return;
         }
 
-        // Populate the slot
+        // Populate the slot (convert region names to data convention)
         pushHistory();
-        selections[slotType] = data.name;
+        selections[slotType] = (slotType === 'region') ? toDataRegionName(data.name) : data.name;
         updateSlotUI();
 
         // Green flash feedback
@@ -2498,8 +2625,8 @@
         if (!result) continue;
 
         if (result.type === 'region' && !selections.region) {
-          selections.region = result.canonical;
-          saved.push('Brain Area: ' + result.canonical);
+          selections.region = toDataRegionName(result.canonical);
+          saved.push('Brain Area: ' + selections.region);
         } else if (result.type === 'function' && !selections.func) {
           selections.func = result.canonical;
           saved.push('Function: ' + result.canonical);
