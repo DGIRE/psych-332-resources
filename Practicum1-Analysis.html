@@ -218,6 +218,57 @@
         .save-btn:hover {
             background: rgba(7, 121, 190, 0.3);
         }
+
+        /* Searchable dropdown */
+        .search-select-wrapper {
+            position: relative;
+            max-width: 500px;
+        }
+        .search-select-input {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: #e8eef5;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            cursor: text;
+        }
+        .search-select-input:focus {
+            outline: none;
+            border-color: #0779be;
+            background: rgba(255,255,255,0.12);
+        }
+        .search-select-input::placeholder {
+            color: #7a9ab5;
+        }
+        .search-select-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: #1a2d42;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            z-index: 100;
+        }
+        .search-select-dropdown.open {
+            display: block;
+        }
+        .search-select-option {
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #e8eef5;
+        }
+        .search-select-option:hover, .search-select-option.highlighted {
+            background: rgba(7,121,190,0.3);
+        }
     </style>
 </head>
 <body>
@@ -682,49 +733,118 @@
             }
         }
 
+        // ========== SEARCHABLE SELECT ==========
+        function createSearchableSelect(selectElement, items, onChange) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'search-select-wrapper';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'search-select-input';
+            input.placeholder = 'Type to search...';
+            input.value = items[0] || '';
+
+            const dropdown = document.createElement('div');
+            dropdown.className = 'search-select-dropdown';
+
+            let currentValue = items[0] || '';
+            let highlightIdx = -1;
+
+            function renderOptions(filter) {
+                dropdown.innerHTML = '';
+                const filtered = filter ? items.filter(it => it.toLowerCase().includes(filter.toLowerCase())) : items;
+                highlightIdx = -1;
+                filtered.forEach((item, i) => {
+                    const opt = document.createElement('div');
+                    opt.className = 'search-select-option';
+                    opt.textContent = item;
+                    opt.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        input.value = item;
+                        currentValue = item;
+                        dropdown.classList.remove('open');
+                        onChange(item);
+                    });
+                    dropdown.appendChild(opt);
+                });
+                return filtered;
+            }
+
+            input.addEventListener('focus', () => {
+                input.select();
+                renderOptions(input.value === currentValue ? '' : input.value);
+                dropdown.classList.add('open');
+            });
+
+            input.addEventListener('input', () => {
+                renderOptions(input.value);
+                dropdown.classList.add('open');
+            });
+
+            input.addEventListener('blur', () => {
+                setTimeout(() => {
+                    dropdown.classList.remove('open');
+                    if (!items.includes(input.value)) input.value = currentValue;
+                }, 200);
+            });
+
+            input.addEventListener('keydown', (e) => {
+                const opts = dropdown.querySelectorAll('.search-select-option');
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    highlightIdx = Math.min(highlightIdx + 1, opts.length - 1);
+                    opts.forEach((o, i) => o.classList.toggle('highlighted', i === highlightIdx));
+                    if (opts[highlightIdx]) opts[highlightIdx].scrollIntoView({ block: 'nearest' });
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    highlightIdx = Math.max(highlightIdx - 1, 0);
+                    opts.forEach((o, i) => o.classList.toggle('highlighted', i === highlightIdx));
+                    if (opts[highlightIdx]) opts[highlightIdx].scrollIntoView({ block: 'nearest' });
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (highlightIdx >= 0 && opts[highlightIdx]) {
+                        const val = opts[highlightIdx].textContent;
+                        input.value = val;
+                        currentValue = val;
+                        dropdown.classList.remove('open');
+                        onChange(val);
+                    }
+                }
+            });
+
+            selectElement.style.display = 'none';
+            selectElement.parentNode.insertBefore(wrapper, selectElement);
+            wrapper.appendChild(input);
+            wrapper.appendChild(dropdown);
+
+            renderOptions('');
+            return { setValue(v) { input.value = v; currentValue = v; } };
+        }
+
         // ========== UI INITIALIZATION ==========
         function initializeUI() {
-            // Structure selector
-            const structureSelect = document.getElementById('structureSelect');
-            metadata.region_metadata.forEach(region => {
-                const option = document.createElement('option');
-                option.value = region.Name;
-                option.textContent = region.Name;
-                structureSelect.appendChild(option);
-            });
-            structureSelect.addEventListener('change', (e) => updateStructureView(e.target.value));
+            createSearchableSelect(
+                document.getElementById('structureSelect'),
+                metadata.region_metadata.map(r => r.Name),
+                updateStructureView
+            );
+            createSearchableSelect(
+                document.getElementById('geneSelect'),
+                metadata.gene_names,
+                updateGeneView
+            );
+            createSearchableSelect(
+                document.getElementById('dtiTargetSelect'),
+                metadata.dti_regions,
+                updateDTIView
+            );
+            createSearchableSelect(
+                document.getElementById('fmriSelect'),
+                metadata.fmri_functions,
+                updateFMRIView
+            );
 
-            // Gene selector
-            const geneSelect = document.getElementById('geneSelect');
-            metadata.gene_names.forEach(gene => {
-                const option = document.createElement('option');
-                option.value = gene;
-                option.textContent = gene;
-                geneSelect.appendChild(option);
-            });
-            geneSelect.addEventListener('change', (e) => updateGeneView(e.target.value));
-
-            // DTI target selector
-            const dtiTargetSelect = document.getElementById('dtiTargetSelect');
-            metadata.dti_regions.forEach(region => {
-                const option = document.createElement('option');
-                option.value = region;
-                option.textContent = region;
-                dtiTargetSelect.appendChild(option);
-            });
-            dtiTargetSelect.addEventListener('change', (e) => updateDTIView(e.target.value));
-
-            // fMRI function selector
-            const fmriSelect = document.getElementById('fmriSelect');
-            metadata.fmri_functions.forEach(func => {
-                const option = document.createElement('option');
-                option.value = func;
-                option.textContent = func;
-                fmriSelect.appendChild(option);
-            });
-            fmriSelect.addEventListener('change', (e) => updateFMRIView(e.target.value));
-
-            // Dimensionality reduction
+            // Dimensionality reduction (only 3 options, keep as regular select)
             document.getElementById('dimredDataType').addEventListener('change', (e) => updateDimRed(e.target.value));
 
             // Initialize first views
@@ -1133,92 +1253,23 @@
         }
 
         // ========== BRAIN MAP RENDERING ==========
-        function drawRegionOnBrainMap(canvasId, brainMapIds, regionName) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-
-            canvas.width = labeledBrainMap.width;
-            canvas.height = labeledBrainMap.height;
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(blankBrainImage, 0, 0);
-
-            if (!decodedBrainMap) {
-                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
-            }
-
-            // Build set of ALL pixel IDs that map to this region name via PIXEL_TO_REGION
-            const targetIds = new Set();
-            // Direct IDs from metadata
-            brainMapIds.split(',').forEach(id => targetIds.add(parseInt(id.trim())));
-            // Extended IDs from PIXEL_TO_REGION
-            for (const [pixelId, name] of Object.entries(PIXEL_TO_REGION)) {
-                if (name === regionName) {
-                    targetIds.add(parseInt(pixelId));
-                }
-            }
-
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const pixelData = imageData.data;
-
-            const cSize = 60;
-            whiteOutRect(pixelData, canvas.width, 0, 0, cSize, cSize);
-            whiteOutRect(pixelData, canvas.width, canvas.width - cSize, 0, cSize, cSize);
-            whiteOutRect(pixelData, canvas.width, 0, canvas.height - cSize, cSize, cSize);
-            whiteOutRect(pixelData, canvas.width, canvas.width - cSize, canvas.height - cSize, cSize, cSize);
-
-            // Paint selected region in dark blue
-            for (let y = 0; y < canvas.height; y++) {
-                for (let x = 0; x < canvas.width; x++) {
-                    const regionId = decodedBrainMap[y] && decodedBrainMap[y][x];
-                    if (regionId !== undefined && targetIds.has(regionId)) {
-                        const idx = (y * canvas.width + x) * 4;
-                        pixelData[idx] = 0;
-                        pixelData[idx + 1] = 30;
-                        pixelData[idx + 2] = 120;
-                        pixelData[idx + 3] = 220;
-                    }
-                }
-            }
-
-            ctx.putImageData(imageData, 0, 0);
-
-            // Draw region name at top-left
-            if (regionName) {
-                const displayName = regionName.charAt(0).toUpperCase() + regionName.slice(1);
-                ctx.font = 'bold 30px Inter, sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillStyle = '#000000';
-                ctx.fillText(displayName, 15, 35);
-            }
-        }
-
         function whiteOutRect(pixelData, canvasWidth, rx, ry, rw, rh) {
             for (let y = ry; y < ry + rh; y++) {
                 for (let x = rx; x < rx + rw; x++) {
                     const idx = (y * canvasWidth + x) * 4;
-                    pixelData[idx] = 255;
-                    pixelData[idx + 1] = 255;
-                    pixelData[idx + 2] = 255;
-                    pixelData[idx + 3] = 255;
+                    pixelData[idx] = pixelData[idx+1] = pixelData[idx+2] = pixelData[idx+3] = 255;
                 }
             }
         }
 
-        // Save a Plotly chart as PNG with white background
         function savePlotlyAsPNG(divId, filename) {
             Plotly.downloadImage(divId, {
-                format: 'png',
-                width: 1200,
-                height: 800,
-                scale: 2,
+                format: 'png', width: 1200, height: 800, scale: 2,
                 filename: filename,
                 setBackground: function() { return 'white'; }
             });
         }
 
-        // Save a canvas as PNG (already has white background)
         function saveCanvasAsPNG(canvasId, filename) {
             const canvas = document.getElementById(canvasId);
             const link = document.createElement('a');
@@ -1227,63 +1278,117 @@
             link.click();
         }
 
+        /**
+         * BFS gap-fill: creates a per-pixel value array where unmapped brain tissue
+         * inherits values from the nearest mapped region. This fills in the ~32% of
+         * brain pixels (ID 0 + unnamed IDs) that have no direct region assignment.
+         */
+        function buildFilledValueArray(valueMap, width, height) {
+            const total = width * height;
+            const values = new Float32Array(total);
+            const status = new Uint8Array(total); // 0=bg, 1=mapped, 2=needs-fill
+            const queue = [];
 
-        function drawGeneOnBrainMap(canvasId, geneName) {
+            // Pass 1: classify every pixel
+            for (let y = 0; y < height; y++) {
+                const row = decodedBrainMap[y];
+                if (!row) continue;
+                for (let x = 0; x < Math.min(row.length, width); x++) {
+                    const rid = row[x];
+                    const idx = y * width + x;
+                    if (rid === -100 || rid === undefined) {
+                        status[idx] = 0;
+                    } else if (valueMap[rid] !== undefined) {
+                        status[idx] = 1;
+                        values[idx] = valueMap[rid];
+                        queue.push(idx); // seed for BFS
+                    } else {
+                        status[idx] = 2; // brain tissue, no value
+                    }
+                }
+            }
+
+            // Pass 2: BFS from mapped pixels to fill adjacent unmapped brain tissue
+            let qi = 0;
+            while (qi < queue.length) {
+                const idx = queue[qi++];
+                const y = (idx / width) | 0;
+                const x = idx % width;
+                const val = values[idx];
+                if (y > 0)          { const ni = idx - width; if (status[ni] === 2) { status[ni] = 1; values[ni] = val; queue.push(ni); } }
+                if (y < height - 1) { const ni = idx + width; if (status[ni] === 2) { status[ni] = 1; values[ni] = val; queue.push(ni); } }
+                if (x > 0)          { const ni = idx - 1;     if (status[ni] === 2) { status[ni] = 1; values[ni] = val; queue.push(ni); } }
+                if (x < width - 1)  { const ni = idx + 1;     if (status[ni] === 2) { status[ni] = 1; values[ni] = val; queue.push(ni); } }
+            }
+
+            return { values, status };
+        }
+
+        /**
+         * Generic brain heatmap renderer with title, colorbar, and BFS gap-fill.
+         */
+        function drawBrainHeatmap(canvasId, opts) {
+            const { valueMap, title, colorFn, colorbarLabel, centerAtZero, minOverride, maxOverride } = opts;
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
+            const bmW = labeledBrainMap.width, bmH = labeledBrainMap.height;
+            const titleH = 45, barW = 80;
 
-            // Extra space: title at top, colorbar on right
-            const titleH = 45;
-            const barW = 80;
-            canvas.width = labeledBrainMap.width + barW;
-            canvas.height = labeledBrainMap.height + titleH;
+            canvas.width = bmW + barW;
+            canvas.height = bmH + titleH;
 
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw brain image offset by title height
             ctx.drawImage(blankBrainImage, 0, titleH);
 
             if (!decodedBrainMap) {
-                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, bmW, bmH);
             }
 
-            // Build value map using comprehensive PIXEL_TO_REGION
-            const geneIndex = {};
-            for (const row of geneExpressionData) {
-                geneIndex[row.Name] = row[geneName] || 0;
+            // BFS gap-fill
+            const filled = buildFilledValueArray(valueMap, bmW, bmH);
+
+            // Compute data range
+            let dataMin = Infinity, dataMax = -Infinity;
+            for (let i = 0; i < filled.values.length; i++) {
+                if (filled.status[i] === 1) {
+                    if (filled.values[i] < dataMin) dataMin = filled.values[i];
+                    if (filled.values[i] > dataMax) dataMax = filled.values[i];
+                }
             }
-            const valueMap = buildPixelValueMap(name => geneIndex[name]);
+            if (minOverride !== undefined) dataMin = minOverride;
+            if (maxOverride !== undefined) dataMax = maxOverride;
 
-            const values = Object.values(valueMap);
-            const minVal = Math.min(...values);
-            const maxVal = Math.max(...values);
-            // Center at 0: use symmetric range
-            const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal)) || 1;
+            let normFn;
+            let barMin, barMax;
+            if (centerAtZero) {
+                const absMax = Math.max(Math.abs(dataMin), Math.abs(dataMax)) || 1;
+                barMin = -absMax; barMax = absMax;
+                normFn = v => (v + absMax) / (2 * absMax);
+            } else {
+                barMin = dataMin; barMax = dataMax;
+                const range = dataMax - dataMin || 1;
+                normFn = v => (v - dataMin) / range;
+            }
 
+            // Paint pixels
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            // White out corner boxes on the brain image area
             const cSize = 60;
             whiteOutRect(data, canvas.width, 0, titleH, cSize, cSize);
-            whiteOutRect(data, canvas.width, labeledBrainMap.width - cSize, titleH, cSize, cSize);
-            whiteOutRect(data, canvas.width, 0, titleH + labeledBrainMap.height - cSize, cSize, cSize);
-            whiteOutRect(data, canvas.width, labeledBrainMap.width - cSize, titleH + labeledBrainMap.height - cSize, cSize, cSize);
+            whiteOutRect(data, canvas.width, bmW - cSize, titleH, cSize, cSize);
+            whiteOutRect(data, canvas.width, 0, titleH + bmH - cSize, cSize, cSize);
+            whiteOutRect(data, canvas.width, bmW - cSize, titleH + bmH - cSize, cSize, cSize);
 
-            // Paint regions
-            for (let y = 0; y < labeledBrainMap.height; y++) {
-                for (let x = 0; x < labeledBrainMap.width; x++) {
-                    const regionId = decodedBrainMap[y] && decodedBrainMap[y][x];
-                    if (regionId !== undefined && valueMap[regionId] !== undefined) {
-                        const normalized = (valueMap[regionId] + absMax) / (2 * absMax); // center 0 at 0.5
-                        const color = getBWRColor(normalized);
-                        const idx = ((y + titleH) * canvas.width + x) * 4;
-                        data[idx] = color[0];
-                        data[idx + 1] = color[1];
-                        data[idx + 2] = color[2];
-                        data[idx + 3] = 230;
-                    }
+            for (let y = 0; y < bmH; y++) {
+                for (let x = 0; x < bmW; x++) {
+                    const fi = y * bmW + x;
+                    if (filled.status[fi] !== 1) continue;
+                    const normalized = Math.max(0, Math.min(1, normFn(filled.values[fi])));
+                    const color = colorFn(normalized);
+                    const ci = ((y + titleH) * canvas.width + x) * 4;
+                    data[ci] = color[0]; data[ci+1] = color[1]; data[ci+2] = color[2]; data[ci+3] = 230;
                 }
             }
 
@@ -1293,152 +1398,156 @@
             ctx.font = 'bold 22px Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillStyle = '#000000';
-            ctx.fillText(`Allen mRNA Gene Expression Map For: ${geneName}`, labeledBrainMap.width / 2, 30);
+            ctx.fillText(title, bmW / 2, 30);
 
-            // Colorbar on the right
-            const barX = labeledBrainMap.width + 15;
-            const barTop = titleH + 40;
-            const barHeight = labeledBrainMap.height - 100;
-            const barWidth = 18;
+            // Colorbar
+            const barX = bmW + 15, barTop = titleH + 40;
+            const barHeight = bmH - 100, barWidth = 18;
 
             for (let i = 0; i < barHeight; i++) {
-                const normalized = 1 - (i / barHeight); // top=1 (red), bottom=0 (blue)
-                const color = getBWRColor(normalized);
+                const normalized = 1 - (i / barHeight);
+                const color = colorFn(normalized);
                 ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
                 ctx.fillRect(barX, barTop + i, barWidth, 1);
             }
-
-            // Colorbar border
-            ctx.strokeStyle = '#666';
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
             ctx.strokeRect(barX, barTop, barWidth, barHeight);
 
-            // Colorbar labels
             ctx.font = '13px Inter, sans-serif';
             ctx.textAlign = 'left';
             ctx.fillStyle = '#000';
-            const labelX = barX + barWidth + 5;
-            ctx.fillText(absMax.toFixed(2), labelX, barTop + 5);
-            ctx.fillText((absMax / 2).toFixed(2), labelX, barTop + barHeight * 0.25 + 4);
-            ctx.fillText('0.00', labelX, barTop + barHeight * 0.5 + 4);
-            ctx.fillText((-absMax / 2).toFixed(2), labelX, barTop + barHeight * 0.75 + 4);
-            ctx.fillText((-absMax).toFixed(2), labelX, barTop + barHeight + 4);
+            const lx = barX + barWidth + 5;
+            ctx.fillText(barMax.toFixed(2), lx, barTop + 5);
+            ctx.fillText(((barMax + barMin) * 0.75 + barMin * 0.25).toFixed(2), lx, barTop + barHeight * 0.25 + 4);
+            ctx.fillText(((barMax + barMin) / 2).toFixed(2), lx, barTop + barHeight * 0.5 + 4);
+            ctx.fillText(((barMax + barMin) * 0.25 + barMax * 0.25).toFixed(2), lx, barTop + barHeight * 0.75 + 4);
+            ctx.fillText(barMin.toFixed(2), lx, barTop + barHeight + 4);
 
-            // Vertical label
             ctx.save();
             ctx.translate(barX + barWidth + 55, barTop + barHeight / 2);
             ctx.rotate(-Math.PI / 2);
             ctx.font = '12px Inter, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('Expression score', 0, 0);
+            ctx.fillText(colorbarLabel || '', 0, 0);
             ctx.restore();
         }
 
-        function drawDTIOnBrainMap(canvasId, targetRegion) {
+        function drawRegionOnBrainMap(canvasId, brainMapIds, regionName) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
+            const bmW = labeledBrainMap.width, bmH = labeledBrainMap.height;
 
-            canvas.width = labeledBrainMap.width;
-            canvas.height = labeledBrainMap.height;
+            canvas.width = bmW;
+            canvas.height = bmH;
 
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, bmW, bmH);
             ctx.drawImage(blankBrainImage, 0, 0);
 
             if (!decodedBrainMap) {
-                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, bmW, bmH);
             }
 
-            const dtiIndex = {};
-            for (const row of dtiData) {
-                dtiIndex[row.Row] = row[targetRegion] || 0;
+            // Build set of ALL pixel IDs that map to this region name
+            const targetIds = new Set();
+            brainMapIds.split(',').forEach(id => targetIds.add(parseInt(id.trim())));
+            for (const [pixelId, name] of Object.entries(PIXEL_TO_REGION)) {
+                if (name === regionName) targetIds.add(parseInt(pixelId));
             }
-            const valueMap = buildPixelValueMap(name => dtiIndex[name]);
 
-            const values = Object.values(valueMap);
-            const minVal = Math.min(...values);
-            const maxVal = Math.max(...values);
-            const range = maxVal - minVal || 1;
-
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-
-            const cSize = 60;
-            whiteOutRect(data, canvas.width, 0, 0, cSize, cSize);
-            whiteOutRect(data, canvas.width, canvas.width - cSize, 0, cSize, cSize);
-            whiteOutRect(data, canvas.width, 0, canvas.height - cSize, cSize, cSize);
-            whiteOutRect(data, canvas.width, canvas.width - cSize, canvas.height - cSize, cSize, cSize);
-
-            for (let y = 0; y < canvas.height; y++) {
-                for (let x = 0; x < canvas.width; x++) {
-                    const regionId = decodedBrainMap[y] && decodedBrainMap[y][x];
-                    if (regionId !== undefined && valueMap[regionId] !== undefined) {
-                        const normalized = (valueMap[regionId] - minVal) / range;
-                        const color = getRedsColor(normalized);
-                        const idx = (y * canvas.width + x) * 4;
-                        data[idx] = color[0];
-                        data[idx + 1] = color[1];
-                        data[idx + 2] = color[2];
-                        data[idx + 3] = 200;
+            // Also use BFS to fill unmapped brain pixels adjacent to target region
+            const isTarget = new Uint8Array(bmW * bmH); // 0=no, 1=yes, 2=brain-needs-check
+            for (let y = 0; y < bmH; y++) {
+                const row = decodedBrainMap[y];
+                if (!row) continue;
+                for (let x = 0; x < Math.min(row.length, bmW); x++) {
+                    const rid = row[x];
+                    const idx = y * bmW + x;
+                    if (rid === -100 || rid === undefined) continue;
+                    if (targetIds.has(rid)) {
+                        isTarget[idx] = 1;
+                    } else if (!(rid in PIXEL_TO_REGION) && rid !== -100) {
+                        isTarget[idx] = 2; // unmapped brain tissue
                     }
                 }
             }
+            // BFS from target pixels into adjacent unmapped tissue
+            const queue = [];
+            for (let i = 0; i < isTarget.length; i++) {
+                if (isTarget[i] === 1) queue.push(i);
+            }
+            let qi = 0;
+            while (qi < queue.length) {
+                const idx = queue[qi++];
+                const y = (idx / bmW) | 0, x = idx % bmW;
+                if (y > 0)       { const ni = idx - bmW; if (isTarget[ni] === 2) { isTarget[ni] = 1; queue.push(ni); } }
+                if (y < bmH - 1) { const ni = idx + bmW; if (isTarget[ni] === 2) { isTarget[ni] = 1; queue.push(ni); } }
+                if (x > 0)       { const ni = idx - 1;   if (isTarget[ni] === 2) { isTarget[ni] = 1; queue.push(ni); } }
+                if (x < bmW - 1) { const ni = idx + 1;   if (isTarget[ni] === 2) { isTarget[ni] = 1; queue.push(ni); } }
+            }
 
+            const imageData = ctx.getImageData(0, 0, bmW, bmH);
+            const pxd = imageData.data;
+            const cSize = 60;
+            whiteOutRect(pxd, bmW, 0, 0, cSize, cSize);
+            whiteOutRect(pxd, bmW, bmW - cSize, 0, cSize, cSize);
+            whiteOutRect(pxd, bmW, 0, bmH - cSize, cSize, cSize);
+            whiteOutRect(pxd, bmW, bmW - cSize, bmH - cSize, cSize, cSize);
+
+            for (let y = 0; y < bmH; y++) {
+                for (let x = 0; x < bmW; x++) {
+                    if (isTarget[y * bmW + x] === 1) {
+                        const ci = (y * bmW + x) * 4;
+                        pxd[ci] = 0; pxd[ci+1] = 30; pxd[ci+2] = 120; pxd[ci+3] = 220;
+                    }
+                }
+            }
             ctx.putImageData(imageData, 0, 0);
+
+            if (regionName) {
+                const displayName = regionName.charAt(0).toUpperCase() + regionName.slice(1);
+                ctx.font = 'bold 30px Inter, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#000000';
+                ctx.fillText(displayName, 15, 35);
+            }
+        }
+
+        function drawGeneOnBrainMap(canvasId, geneName) {
+            const geneIndex = {};
+            for (const row of geneExpressionData) geneIndex[row.Name] = row[geneName] || 0;
+            drawBrainHeatmap(canvasId, {
+                valueMap: buildPixelValueMap(name => geneIndex[name]),
+                title: `Allen mRNA Gene Expression Map For: ${geneName}`,
+                colorFn: getBWRColor,
+                colorbarLabel: 'Expression score',
+                centerAtZero: true
+            });
+        }
+
+        function drawDTIOnBrainMap(canvasId, targetRegion) {
+            const dtiIndex = {};
+            for (const row of dtiData) dtiIndex[row.Row] = row[targetRegion] || 0;
+            drawBrainHeatmap(canvasId, {
+                valueMap: buildPixelValueMap(name => dtiIndex[name]),
+                title: `DTI Connectivity Map For: ${targetRegion}`,
+                colorFn: getRedsColor,
+                colorbarLabel: 'Connectivity',
+                centerAtZero: false
+            });
         }
 
         function drawFMRIOnBrainMap(canvasId, funcName) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-
-            canvas.width = labeledBrainMap.width;
-            canvas.height = labeledBrainMap.height;
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(blankBrainImage, 0, 0);
-
-            if (!decodedBrainMap) {
-                decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
-            }
-
-            // Match fmri rows by Row field to region names
             const fmriIndex = {};
-            for (const row of fmriData) {
-                fmriIndex[row.Row] = row[funcName] || 0;
-            }
-            const valueMap = buildPixelValueMap(name => fmriIndex[name]);
-
-            const values = Object.values(valueMap);
-            const minVal = Math.min(...values);
-            const maxVal = Math.max(...values);
-            const range = maxVal - minVal || 1;
-
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-
-            const cSize = 60;
-            whiteOutRect(data, canvas.width, 0, 0, cSize, cSize);
-            whiteOutRect(data, canvas.width, canvas.width - cSize, 0, cSize, cSize);
-            whiteOutRect(data, canvas.width, 0, canvas.height - cSize, cSize, cSize);
-            whiteOutRect(data, canvas.width, canvas.width - cSize, canvas.height - cSize, cSize, cSize);
-
-            for (let y = 0; y < canvas.height; y++) {
-                for (let x = 0; x < canvas.width; x++) {
-                    const regionId = decodedBrainMap[y] && decodedBrainMap[y][x];
-                    if (regionId !== undefined && valueMap[regionId] !== undefined) {
-                        const normalized = (valueMap[regionId] - minVal) / range;
-                        const color = getBluesColor(normalized);
-                        const idx = (y * canvas.width + x) * 4;
-                        data[idx] = color[0];
-                        data[idx + 1] = color[1];
-                        data[idx + 2] = color[2];
-                        data[idx + 3] = 200;
-                    }
-                }
-            }
-
-            ctx.putImageData(imageData, 0, 0);
+            for (const row of fmriData) fmriIndex[row.Row] = row[funcName] || 0;
+            drawBrainHeatmap(canvasId, {
+                valueMap: buildPixelValueMap(name => fmriIndex[name]),
+                title: `fMRI Neurosynth Function Map For: ${funcName}`,
+                colorFn: getFMRIBluesColor,
+                colorbarLabel: 'Expression score',
+                centerAtZero: false,
+                minOverride: 0
+            });
         }
 
         // ========== COLOR FUNCTIONS ==========
@@ -1481,6 +1590,16 @@
             const r = 255;
             const g = Math.round(255 * (1 - value * 0.8));
             const b = Math.round(255 * (1 - value));
+            return [r, g, b];
+        }
+
+        // White-to-dark-blue for fMRI maps (matching Python output style)
+        function getFMRIBluesColor(value) {
+            value = Math.max(0, Math.min(1, value));
+            // 0 = white (#ffffff), 1 = dark navy (#001e50)
+            const r = Math.round(255 * (1 - value));
+            const g = Math.round(255 * (1 - value * 0.88));
+            const b = Math.round(255 * (1 - value * 0.69));
             return [r, g, b];
         }
 
