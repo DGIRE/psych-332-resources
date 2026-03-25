@@ -2573,7 +2573,7 @@
       if (!targetInputId) return;
 
       pushHistory();
-      selections[data.slot] = data.name;
+      selections[data.slot] = (data.slot === 'region') ? toDataRegionName(data.name) : data.name;
       updateSlotUI();
 
       // Flash the correct input
