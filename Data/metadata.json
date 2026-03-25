@@ -329,7 +329,7 @@
     },
     {
       "Name": "mesencephalon",
-      "structure_abbreviation": NaN,
+      "structure_abbreviation": null,
       "top_level_structure_name": "mesencephalon",
       "Brain Map ID-1": "180,183,201,218"
     },
