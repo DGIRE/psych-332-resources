@@ -1,0 +1,104 @@
+struct_abr_1,anatomical_name,greater_brain_region,cortical_scale,struct_nums
+FP,frontal pole,Frontal Lobe,0,4.0
+SFG,superior frontal gyrus,Frontal Lobe,0,9.0
+MFG,middle frontal gyrus,Frontal Lobe,0,10.0
+LOrG,lateral orbital gyrus,Frontal Lobe,0,11.0
+AOrG,anterior orbital gyrus,Frontal Lobe,0,12.0
+MOrG,medial orbital gyrus,Frontal Lobe,0,13.0
+orIFG,inferior frontal gyrus,Frontal Lobe,0,14.0
+POrG,posterior orbital gyrus,Frontal Lobe,0,15.0
+trIFG,"inferior frontal gyrus, triangular part",Frontal Lobe,0,16.0
+TP,temporal pole,Temporal Lobe,0,17.0
+SIG,short insular gyri,Insular Lobe,1,18.0
+PLP,planum polare,Temporal Lobe,0,19.0
+fro,frontal operculum,Frontal Lobe,0,20.0
+STG,superior temporal gyrus,Temporal Lobe,0,21.0
+MTG,middle temporal gyrus,Temporal Lobe,0,22.0
+opIFG,"inferior frontal gyrus, opercular part",Frontal Lobe,0,23.0
+ITG,inferior temporal gyrus,Temporal Lobe,0,24.0
+PrG,precentral gyrus,Frontal Lobe,0,25.0
+LIG,long insular gyri,Insular Lobe,1,26.0
+HG,Heschl's gyrus,Temporal Lobe,0,27.0
+PoG,postcentral gyrus,Parietal Lobe,0,28.0
+TG,transverse gyri,Temporal Lobe,0,29.0
+PLT,planum temporale,Temporal Lobe,0,30.0
+SMG,supramarginal gyrus,Parietal Lobe,0,31.0
+SPL,superior parietal lobule,Parietal Lobe,0,32.0
+AnG,angular gyrus,Parietal Lobe,0,33.0
+OTG,occipito-temporal gyrus,Temporal and Occipital Lobes,0,35.0
+IOG,inferior occipital gyrus,Occipital Lobe,0,36.0
+SOG,superior occipital gyrus,Occipital Lobe,0,38.0
+OP,occipital pole,Occipital Lobe,0,39.0
+Cun,cuneus,Occipital Lobe,0,44.0
+PCu,precuneus,Parietal Lobe,0,47.0
+CgGp,cingulate gyrus,Limbic System,2,50.0
+CgGr,"cingulate gyrus, retrosplenial part",Limbic System,2,52.0
+PCLp,"paracentral lobule, posterior part",Frontal and Parietal Lobes,0,53.0
+cc,corpus callosum,Not a brain region (major white matter tract),7,54.0
+FuG,fusiform gyrus,Temporal and Occipital Lobes,0,55.0
+PHG,parahippocampal gyrus,Temporal Lobe,0,56.0
+PCLa,"paracentral lobule, anterior part",Frontal and Parietal Lobes,0,58.0
+CgGf,"cingulate gyrus, superior bank of gyrus",Limbic System,2,59.0
+PTG,paraterminal gyrus,Limbic System,2,64.0
+PaOG,parolfactory gyri,Limbic System,2,66.0
+Pir,piriform cortex,Limbic System,2,67.0
+SCG,subcallosal cingulate gyrus,Limbic System,2,68.0
+SRoG,superior rostral gyrus,Frontal Lobe,0,69.0
+IRoG,inferior rostral gyrus,Frontal Lobe,0,70.0
+GRe,gyrus rectus,Frontal Lobe,0,71.0
+SptN,septal nuclei,Limbic System,2,77.0
+SI,substantia innominata,Limbic System,2,80.0
+Acb,nucleus accumbens,Limbic System,2,81.0
+BCd,caudate nucleus,Basal Ganglia,4,84.0
+GPi,"globus pallidus, internal segment",Basal Ganglia,4,87.0
+GPe,"glabus pallidus, external segment",Basal Ganglia,4,90.0
+Pu,putamen,Basal Ganglia,4,94.0
+BLA,basolateral nucleus,Limbic System (Amygdala),2,96.0
+S,subiculum,Limbic System,2,98.0
+BMA,basomedial nucleus,Limbic System (Amygdala),2,100.0
+LA,lateral nucleus,Limbic System (Amygdala),2,103.0
+CeA,central nucleus,Limbic System (Amygdala),2,104.0
+Cl,claustrum,Insular Lobe,1,109.0
+DG,dentate gyrus,Limbic System,2,110.0
+CA4,CA4 field,Limbic System,2,117.0
+CA3,CA3 field,Limbic System,2,123.0
+CA2,CA2 field,Limbic System,2,125.0
+CA1,CA1 field,Limbic System,2,128.0
+PrOR,preoptic region,Limbic System,2,134.0
+SO,supraoptic nucleus,Limbic System,2,136.0
+LHA,"lateral hypothalamic area, anterior region",Thalamus and Hypothalamus,3,137.0
+PVH,paraventricular nucleus of the hypothalamus,Thalamus and Hypothalamus,3,138.0
+AHA,anterior hypothalamic area,Thalamus and Hypothalamus,3,139.0
+LHT,"lateral hypothalamic area, tuberal region",Thalamus and Hypothalamus,3,141.0
+DMH,dorsomedial hypothalamic nucleus,Thalamus and Hypothalamus,3,142.0
+Hb,epithalamus,Thalamus and Hypothalamus,3,144.0
+ARH,arcuate nucleus of the hypothalamus,Thalamus and Hypothalamus,3,145.0
+VMH,ventromedial hypothalamic nucleus,Thalamus and Hypothalamus,3,146.0
+DTA,anterior group of nuclei,Thalamus and Hypothalamus,3,147.0
+TM,tuberomammillary nucleus,Thalamus and Hypothalamus,3,149.0
+LHM,"lateral hypothalamic area, mammillary region",Thalamus and Hypothalamus,3,151.0
+DTLv,"lateral group of nuclei, ventral division",Thalamus and Hypothalamus,3,153.0
+MB,mammillary body,Thalamus and Hypothalamus,3,157.0
+DTM,medial group of nuclei,Thalamus and Hypothalamus,3,162.0
+DTP,posterior group of nuclei,Thalamus and Hypothalamus,3,165.0
+VT,"reticular nucleus of thalamus, left",Thalamus and Hypothalamus,3,166.0
+Pn,pontine nuclei,Brainstem,6,167.0
+RN,red nucleus,Brainstem,6,168.0
+SN,substantia nigra,Brainstem,6,173.0
+SbT,subthalamus,Thalamus and Hypothalamus,3,174.0
+DTLd,"lateral group of nuclei, dorsal division",Thalamus and Hypothalamus,3,177.0
+MBRF,midbrain reticular formation,Brainstem,6,180.0
+PPRF,pontine raphe nucleus,Brainstem,6,182.0
+MBRa,midbrain raphe nuclei,Brainstem,6,183.0
+RPn,paramedian pontine reticular formation,Brainstem,6,187.0
+IO,inferior olivary complex,Brainstem,6,190.0
+LGd,dorsal lateral geneiculate nucleus,Thalamus and Hypothalamus,3,195.0
+SC,superior colliculus,Brainstem,6,201.0
+MG,medial geniculate complex,Thalamus and Hypothalamus,3,204.0
+Sp5,raphe nuclei of medulla,Brainstem,6,210.0
+CMRt,medullary reticular formation,Brainstem,6,213.0
+LC,locus ceruleus,Brainstem,6,216.0
+IC,inferior colliculus,Brainstem,6,218.0
+8Ve,vestibular nuclei,Brainstem,6,219.0
+Cb-Crus I,cerebellar cortex,Cerebellum,5,223.0
+Dt,cerebellar nuclei,Cerebellum,5,243.0

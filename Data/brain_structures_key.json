@@ -1,0 +1,723 @@
+[
+  {
+    "struct_abr_1": "FP",
+    "anatomical_name": "frontal pole",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 4.0
+  },
+  {
+    "struct_abr_1": "SFG",
+    "anatomical_name": "superior frontal gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 9.0
+  },
+  {
+    "struct_abr_1": "MFG",
+    "anatomical_name": "middle frontal gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 10.0
+  },
+  {
+    "struct_abr_1": "LOrG",
+    "anatomical_name": "lateral orbital gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 11.0
+  },
+  {
+    "struct_abr_1": "AOrG",
+    "anatomical_name": "anterior orbital gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 12.0
+  },
+  {
+    "struct_abr_1": "MOrG",
+    "anatomical_name": "medial orbital gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 13.0
+  },
+  {
+    "struct_abr_1": "orIFG",
+    "anatomical_name": "inferior frontal gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 14.0
+  },
+  {
+    "struct_abr_1": "POrG",
+    "anatomical_name": "posterior orbital gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 15.0
+  },
+  {
+    "struct_abr_1": "trIFG",
+    "anatomical_name": "inferior frontal gyrus, triangular part",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 16.0
+  },
+  {
+    "struct_abr_1": "TP",
+    "anatomical_name": "temporal pole",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 17.0
+  },
+  {
+    "struct_abr_1": "SIG",
+    "anatomical_name": "short insular gyri",
+    "greater_brain_region": "Insular Lobe",
+    "cortical_scale": 1,
+    "struct_nums": 18.0
+  },
+  {
+    "struct_abr_1": "PLP",
+    "anatomical_name": "planum polare",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 19.0
+  },
+  {
+    "struct_abr_1": "fro",
+    "anatomical_name": "frontal operculum",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 20.0
+  },
+  {
+    "struct_abr_1": "STG",
+    "anatomical_name": "superior temporal gyrus",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 21.0
+  },
+  {
+    "struct_abr_1": "MTG",
+    "anatomical_name": "middle temporal gyrus",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 22.0
+  },
+  {
+    "struct_abr_1": "opIFG",
+    "anatomical_name": "inferior frontal gyrus, opercular part",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 23.0
+  },
+  {
+    "struct_abr_1": "ITG",
+    "anatomical_name": "inferior temporal gyrus",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 24.0
+  },
+  {
+    "struct_abr_1": "PrG",
+    "anatomical_name": "precentral gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 25.0
+  },
+  {
+    "struct_abr_1": "LIG",
+    "anatomical_name": "long insular gyri",
+    "greater_brain_region": "Insular Lobe",
+    "cortical_scale": 1,
+    "struct_nums": 26.0
+  },
+  {
+    "struct_abr_1": "HG",
+    "anatomical_name": "Heschl's gyrus",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 27.0
+  },
+  {
+    "struct_abr_1": "PoG",
+    "anatomical_name": "postcentral gyrus",
+    "greater_brain_region": "Parietal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 28.0
+  },
+  {
+    "struct_abr_1": "TG",
+    "anatomical_name": "transverse gyri",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 29.0
+  },
+  {
+    "struct_abr_1": "PLT",
+    "anatomical_name": "planum temporale",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 30.0
+  },
+  {
+    "struct_abr_1": "SMG",
+    "anatomical_name": "supramarginal gyrus",
+    "greater_brain_region": "Parietal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 31.0
+  },
+  {
+    "struct_abr_1": "SPL",
+    "anatomical_name": "superior parietal lobule",
+    "greater_brain_region": "Parietal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 32.0
+  },
+  {
+    "struct_abr_1": "AnG",
+    "anatomical_name": "angular gyrus",
+    "greater_brain_region": "Parietal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 33.0
+  },
+  {
+    "struct_abr_1": "OTG",
+    "anatomical_name": "occipito-temporal gyrus",
+    "greater_brain_region": "Temporal and Occipital Lobes",
+    "cortical_scale": 0,
+    "struct_nums": 35.0
+  },
+  {
+    "struct_abr_1": "IOG",
+    "anatomical_name": "inferior occipital gyrus",
+    "greater_brain_region": "Occipital Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 36.0
+  },
+  {
+    "struct_abr_1": "SOG",
+    "anatomical_name": "superior occipital gyrus",
+    "greater_brain_region": "Occipital Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 38.0
+  },
+  {
+    "struct_abr_1": "OP",
+    "anatomical_name": "occipital pole",
+    "greater_brain_region": "Occipital Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 39.0
+  },
+  {
+    "struct_abr_1": "Cun",
+    "anatomical_name": "cuneus",
+    "greater_brain_region": "Occipital Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 44.0
+  },
+  {
+    "struct_abr_1": "PCu",
+    "anatomical_name": "precuneus",
+    "greater_brain_region": "Parietal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 47.0
+  },
+  {
+    "struct_abr_1": "CgGp",
+    "anatomical_name": "cingulate gyrus",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 50.0
+  },
+  {
+    "struct_abr_1": "CgGr",
+    "anatomical_name": "cingulate gyrus, retrosplenial part",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 52.0
+  },
+  {
+    "struct_abr_1": "PCLp",
+    "anatomical_name": "paracentral lobule, posterior part",
+    "greater_brain_region": "Frontal and Parietal Lobes",
+    "cortical_scale": 0,
+    "struct_nums": 53.0
+  },
+  {
+    "struct_abr_1": "cc",
+    "anatomical_name": "corpus callosum",
+    "greater_brain_region": "Not a brain region (major white matter tract)",
+    "cortical_scale": 7,
+    "struct_nums": 54.0
+  },
+  {
+    "struct_abr_1": "FuG",
+    "anatomical_name": "fusiform gyrus",
+    "greater_brain_region": "Temporal and Occipital Lobes",
+    "cortical_scale": 0,
+    "struct_nums": 55.0
+  },
+  {
+    "struct_abr_1": "PHG",
+    "anatomical_name": "parahippocampal gyrus",
+    "greater_brain_region": "Temporal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 56.0
+  },
+  {
+    "struct_abr_1": "PCLa",
+    "anatomical_name": "paracentral lobule, anterior part",
+    "greater_brain_region": "Frontal and Parietal Lobes",
+    "cortical_scale": 0,
+    "struct_nums": 58.0
+  },
+  {
+    "struct_abr_1": "CgGf",
+    "anatomical_name": "cingulate gyrus, superior bank of gyrus",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 59.0
+  },
+  {
+    "struct_abr_1": "PTG",
+    "anatomical_name": "paraterminal gyrus",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 64.0
+  },
+  {
+    "struct_abr_1": "PaOG",
+    "anatomical_name": "parolfactory gyri",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 66.0
+  },
+  {
+    "struct_abr_1": "Pir",
+    "anatomical_name": "piriform cortex",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 67.0
+  },
+  {
+    "struct_abr_1": "SCG",
+    "anatomical_name": "subcallosal cingulate gyrus",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 68.0
+  },
+  {
+    "struct_abr_1": "SRoG",
+    "anatomical_name": "superior rostral gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 69.0
+  },
+  {
+    "struct_abr_1": "IRoG",
+    "anatomical_name": "inferior rostral gyrus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 70.0
+  },
+  {
+    "struct_abr_1": "GRe",
+    "anatomical_name": "gyrus rectus",
+    "greater_brain_region": "Frontal Lobe",
+    "cortical_scale": 0,
+    "struct_nums": 71.0
+  },
+  {
+    "struct_abr_1": "SptN",
+    "anatomical_name": "septal nuclei",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 77.0
+  },
+  {
+    "struct_abr_1": "SI",
+    "anatomical_name": "substantia innominata",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 80.0
+  },
+  {
+    "struct_abr_1": "Acb",
+    "anatomical_name": "nucleus accumbens",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 81.0
+  },
+  {
+    "struct_abr_1": "BCd",
+    "anatomical_name": "caudate nucleus",
+    "greater_brain_region": "Basal Ganglia",
+    "cortical_scale": 4,
+    "struct_nums": 84.0
+  },
+  {
+    "struct_abr_1": "GPi",
+    "anatomical_name": "globus pallidus, internal segment",
+    "greater_brain_region": "Basal Ganglia",
+    "cortical_scale": 4,
+    "struct_nums": 87.0
+  },
+  {
+    "struct_abr_1": "GPe",
+    "anatomical_name": "glabus pallidus, external segment",
+    "greater_brain_region": "Basal Ganglia",
+    "cortical_scale": 4,
+    "struct_nums": 90.0
+  },
+  {
+    "struct_abr_1": "Pu",
+    "anatomical_name": "putamen",
+    "greater_brain_region": "Basal Ganglia",
+    "cortical_scale": 4,
+    "struct_nums": 94.0
+  },
+  {
+    "struct_abr_1": "BLA",
+    "anatomical_name": "basolateral nucleus",
+    "greater_brain_region": "Limbic System (Amygdala)",
+    "cortical_scale": 2,
+    "struct_nums": 96.0
+  },
+  {
+    "struct_abr_1": "S",
+    "anatomical_name": "subiculum",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 98.0
+  },
+  {
+    "struct_abr_1": "BMA",
+    "anatomical_name": "basomedial nucleus",
+    "greater_brain_region": "Limbic System (Amygdala)",
+    "cortical_scale": 2,
+    "struct_nums": 100.0
+  },
+  {
+    "struct_abr_1": "LA",
+    "anatomical_name": "lateral nucleus",
+    "greater_brain_region": "Limbic System (Amygdala)",
+    "cortical_scale": 2,
+    "struct_nums": 103.0
+  },
+  {
+    "struct_abr_1": "CeA",
+    "anatomical_name": "central nucleus",
+    "greater_brain_region": "Limbic System (Amygdala)",
+    "cortical_scale": 2,
+    "struct_nums": 104.0
+  },
+  {
+    "struct_abr_1": "Cl",
+    "anatomical_name": "claustrum",
+    "greater_brain_region": "Insular Lobe",
+    "cortical_scale": 1,
+    "struct_nums": 109.0
+  },
+  {
+    "struct_abr_1": "DG",
+    "anatomical_name": "dentate gyrus",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 110.0
+  },
+  {
+    "struct_abr_1": "CA4",
+    "anatomical_name": "CA4 field",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 117.0
+  },
+  {
+    "struct_abr_1": "CA3",
+    "anatomical_name": "CA3 field",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 123.0
+  },
+  {
+    "struct_abr_1": "CA2",
+    "anatomical_name": "CA2 field",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 125.0
+  },
+  {
+    "struct_abr_1": "CA1",
+    "anatomical_name": "CA1 field",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 128.0
+  },
+  {
+    "struct_abr_1": "PrOR",
+    "anatomical_name": "preoptic region",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 134.0
+  },
+  {
+    "struct_abr_1": "SO",
+    "anatomical_name": "supraoptic nucleus",
+    "greater_brain_region": "Limbic System",
+    "cortical_scale": 2,
+    "struct_nums": 136.0
+  },
+  {
+    "struct_abr_1": "LHA",
+    "anatomical_name": "lateral hypothalamic area, anterior region",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 137.0
+  },
+  {
+    "struct_abr_1": "PVH",
+    "anatomical_name": "paraventricular nucleus of the hypothalamus",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 138.0
+  },
+  {
+    "struct_abr_1": "AHA",
+    "anatomical_name": "anterior hypothalamic area",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 139.0
+  },
+  {
+    "struct_abr_1": "LHT",
+    "anatomical_name": "lateral hypothalamic area, tuberal region",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 141.0
+  },
+  {
+    "struct_abr_1": "DMH",
+    "anatomical_name": "dorsomedial hypothalamic nucleus",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 142.0
+  },
+  {
+    "struct_abr_1": "Hb",
+    "anatomical_name": "epithalamus",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 144.0
+  },
+  {
+    "struct_abr_1": "ARH",
+    "anatomical_name": "arcuate nucleus of the hypothalamus",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 145.0
+  },
+  {
+    "struct_abr_1": "VMH",
+    "anatomical_name": "ventromedial hypothalamic nucleus",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 146.0
+  },
+  {
+    "struct_abr_1": "DTA",
+    "anatomical_name": "anterior group of nuclei",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 147.0
+  },
+  {
+    "struct_abr_1": "TM",
+    "anatomical_name": "tuberomammillary nucleus",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 149.0
+  },
+  {
+    "struct_abr_1": "LHM",
+    "anatomical_name": "lateral hypothalamic area, mammillary region",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 151.0
+  },
+  {
+    "struct_abr_1": "DTLv",
+    "anatomical_name": "lateral group of nuclei, ventral division",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 153.0
+  },
+  {
+    "struct_abr_1": "MB",
+    "anatomical_name": "mammillary body",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 157.0
+  },
+  {
+    "struct_abr_1": "DTM",
+    "anatomical_name": "medial group of nuclei",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 162.0
+  },
+  {
+    "struct_abr_1": "DTP",
+    "anatomical_name": "posterior group of nuclei",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 165.0
+  },
+  {
+    "struct_abr_1": "VT",
+    "anatomical_name": "reticular nucleus of thalamus, left",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 166.0
+  },
+  {
+    "struct_abr_1": "Pn",
+    "anatomical_name": "pontine nuclei",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 167.0
+  },
+  {
+    "struct_abr_1": "RN",
+    "anatomical_name": "red nucleus",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 168.0
+  },
+  {
+    "struct_abr_1": "SN",
+    "anatomical_name": "substantia nigra",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 173.0
+  },
+  {
+    "struct_abr_1": "SbT",
+    "anatomical_name": "subthalamus",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 174.0
+  },
+  {
+    "struct_abr_1": "DTLd",
+    "anatomical_name": "lateral group of nuclei, dorsal division",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 177.0
+  },
+  {
+    "struct_abr_1": "MBRF",
+    "anatomical_name": "midbrain reticular formation",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 180.0
+  },
+  {
+    "struct_abr_1": "PPRF",
+    "anatomical_name": "pontine raphe nucleus",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 182.0
+  },
+  {
+    "struct_abr_1": "MBRa",
+    "anatomical_name": "midbrain raphe nuclei",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 183.0
+  },
+  {
+    "struct_abr_1": "RPn",
+    "anatomical_name": "paramedian pontine reticular formation",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 187.0
+  },
+  {
+    "struct_abr_1": "IO",
+    "anatomical_name": "inferior olivary complex",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 190.0
+  },
+  {
+    "struct_abr_1": "LGd",
+    "anatomical_name": "dorsal lateral geneiculate nucleus",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 195.0
+  },
+  {
+    "struct_abr_1": "SC",
+    "anatomical_name": "superior colliculus",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 201.0
+  },
+  {
+    "struct_abr_1": "MG",
+    "anatomical_name": "medial geniculate complex",
+    "greater_brain_region": "Thalamus and Hypothalamus",
+    "cortical_scale": 3,
+    "struct_nums": 204.0
+  },
+  {
+    "struct_abr_1": "Sp5",
+    "anatomical_name": "raphe nuclei of medulla",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 210.0
+  },
+  {
+    "struct_abr_1": "CMRt",
+    "anatomical_name": "medullary reticular formation",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 213.0
+  },
+  {
+    "struct_abr_1": "LC",
+    "anatomical_name": "locus ceruleus",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 216.0
+  },
+  {
+    "struct_abr_1": "IC",
+    "anatomical_name": "inferior colliculus",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 218.0
+  },
+  {
+    "struct_abr_1": "8Ve",
+    "anatomical_name": "vestibular nuclei",
+    "greater_brain_region": "Brainstem",
+    "cortical_scale": 6,
+    "struct_nums": 219.0
+  },
+  {
+    "struct_abr_1": "Cb-Crus I",
+    "anatomical_name": "cerebellar cortex",
+    "greater_brain_region": "Cerebellum",
+    "cortical_scale": 5,
+    "struct_nums": 223.0
+  },
+  {
+    "struct_abr_1": "Dt",
+    "anatomical_name": "cerebellar nuclei",
+    "greater_brain_region": "Cerebellum",
+    "cortical_scale": 5,
+    "struct_nums": 243.0
+  }
+]

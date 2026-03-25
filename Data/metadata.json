@@ -1,0 +1,658 @@
+{
+  "gene_names": [
+    "DRD4",
+    "KCNQ1OT1",
+    "CACNA1H",
+    "HCN4",
+    "CHRNA5",
+    "KCNH6",
+    "CHRM2",
+    "SCN1A",
+    "KCNA6",
+    "HCN2",
+    "KCNH8",
+    "CHRM4",
+    "ADRB2",
+    "CHRFAM7A",
+    "CHRM1",
+    "CHRNA7",
+    "CHRNA9",
+    "SCN9A",
+    "CACNA1I",
+    "HTR2C",
+    "ENTHD1",
+    "DRD5",
+    "HTR1B",
+    "HTR3C",
+    "KCNQ1DN",
+    "HCN3",
+    "CHRNB2",
+    "ADRB3",
+    "KCNQ1",
+    "CHRM5",
+    "CHRNA1",
+    "HTR7",
+    "KCNA5",
+    "CHRNB1",
+    "ADRA2B",
+    "DRD2",
+    "DRD3",
+    "HTR1D",
+    "HTR1E",
+    "KCNH4",
+    "ADRB1",
+    "DRD1",
+    "ADRA2C",
+    "HTR4",
+    "HTR3A",
+    "CACNA1E",
+    "CACNA1S",
+    "ADRA2A",
+    "KCNH5",
+    "ADRA1D",
+    "KCNA4",
+    "KCNQ3",
+    "CACNA1C",
+    "KCNQ4",
+    "HTR1A",
+    "ADRA1B",
+    "KCNB2",
+    "CHRM3",
+    "HTR2A",
+    "HTR1F",
+    "HTR3B",
+    "KCNB1",
+    "KCNH3",
+    "CACNA1F",
+    "KCNQ5",
+    "HCN1",
+    "SCN8A",
+    "CACNA1D",
+    "KCNH1",
+    "SCN2A",
+    "KCNQ2",
+    "KCNA1",
+    "CACNA1B",
+    "KCNH2",
+    "KCNAB3",
+    "KCND3",
+    "CACNA1A",
+    "CHRNE",
+    "CHRNA10",
+    "CHRNB3",
+    "CHRNB4",
+    "CHRNG",
+    "KCNA2",
+    "KCNA10",
+    "KCNA3",
+    "KCNC3",
+    "KCNC4",
+    "CACNA1G",
+    "KCNH7",
+    "HTR5A",
+    "HTR6",
+    "SCN3A",
+    "SCN5A",
+    "ADRA1A",
+    "HTR2B",
+    "HTR3D",
+    "HTR3E",
+    "KCNA7",
+    "CHRND",
+    "KCND1",
+    "CHRNA6",
+    "CHRNA2",
+    "CHRNA3",
+    "CHRNA4",
+    "KCND2"
+  ],
+  "region_names": [
+    "amygdala",
+    "angular gyrus",
+    "basal part of pons",
+    "caudate",
+    "cerebellar cortex",
+    "cingulate gyrus frontal part",
+    "cingulate gyrus parietal part",
+    "cingulate gyrus retrosplenial part",
+    "claustrum",
+    "cuneus",
+    "dentate nucleus",
+    "epithalamus",
+    "fastigial nucleus",
+    "frontal operculum",
+    "frontal pole",
+    "fusiform gyrus",
+    "globus pallidus",
+    "gyrus rectus",
+    "hippocampus",
+    "hypothalamus",
+    "inferior frontal gyrus",
+    "inferior occipital gyrus",
+    "inferior temporal gyrus",
+    "insula",
+    "interposed nucleus",
+    "lingual gyrus",
+    "mesencephalon",
+    "medial frontal gyrus",
+    "middle temporal gyrus",
+    "myelencephalon",
+    "nucleus accumbens",
+    "occipital pole",
+    "occipito-temporal gyrus",
+    "orbital gyrus",
+    "paracentral lobule",
+    "parahippocampal gyrus",
+    "paraterminal gyrus",
+    "parolfactory gyri",
+    "piriform cortex",
+    "planum polare",
+    "planum temporale",
+    "pontine tegmentum",
+    "postcentral gyrus",
+    "posterior orbital gyrus",
+    "precentral gyrus",
+    "precuneus",
+    "putamen",
+    "red nucleus",
+    "septal nuclei",
+    "subcallosal cingulate gyrus",
+    "substantia innominata",
+    "substantia nigra",
+    "subthalamic nucleus",
+    "superior frontal gyrus",
+    "superior occipital gyrus",
+    "superior parietal lobule",
+    "superior rostral gyrus",
+    "superior temporal gyrus",
+    "supramarginal gyrus",
+    "temporal pole",
+    "thalamus",
+    "transverse gyri"
+  ],
+  "region_metadata": [
+    {
+      "Name": "amygdala",
+      "structure_abbreviation": "amg",
+      "top_level_structure_name": "amygdala",
+      "Brain Map ID-1": "96,100,103,104"
+    },
+    {
+      "Name": "angular gyrus",
+      "structure_abbreviation": "AnG",
+      "top_level_structure_name": "parietal lobe",
+      "Brain Map ID-1": "33"
+    },
+    {
+      "Name": "basal part of pons",
+      "structure_abbreviation": "bpons",
+      "top_level_structure_name": "basal part of pons",
+      "Brain Map ID-1": "167"
+    },
+    {
+      "Name": "caudate",
+      "structure_abbreviation": "Cd",
+      "top_level_structure_name": "striatum",
+      "Brain Map ID-1": "84"
+    },
+    {
+      "Name": "cerebellar cortex",
+      "structure_abbreviation": "cb-ctx",
+      "top_level_structure_name": "cerebellar cortex",
+      "Brain Map ID-1": "223"
+    },
+    {
+      "Name": "cingulate gyrus frontal part",
+      "structure_abbreviation": "CgGf",
+      "top_level_structure_name": "cingulate gyrus",
+      "Brain Map ID-1": "59"
+    },
+    {
+      "Name": "cingulate gyrus parietal part",
+      "structure_abbreviation": "CgGp",
+      "top_level_structure_name": "cingulate gyrus",
+      "Brain Map ID-1": "50"
+    },
+    {
+      "Name": "cingulate gyrus retrosplenial part",
+      "structure_abbreviation": "CgGr",
+      "top_level_structure_name": "cingulate gyrus",
+      "Brain Map ID-1": "52"
+    },
+    {
+      "Name": "claustrum",
+      "structure_abbreviation": "Cl",
+      "top_level_structure_name": "claustrum",
+      "Brain Map ID-1": "109"
+    },
+    {
+      "Name": "cuneus",
+      "structure_abbreviation": "Cun",
+      "top_level_structure_name": "occipital lobe",
+      "Brain Map ID-1": "44"
+    },
+    {
+      "Name": "dentate nucleus",
+      "structure_abbreviation": "Dt",
+      "top_level_structure_name": "cerebellar nuclei",
+      "Brain Map ID-1": "243"
+    },
+    {
+      "Name": "epithalamus",
+      "structure_abbreviation": "epi",
+      "top_level_structure_name": "epithalamus",
+      "Brain Map ID-1": "144"
+    },
+    {
+      "Name": "fastigial nucleus",
+      "structure_abbreviation": "Fas",
+      "top_level_structure_name": "cerebellar nuclei",
+      "Brain Map ID-1": "243"
+    },
+    {
+      "Name": "frontal operculum",
+      "structure_abbreviation": "fro",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "20"
+    },
+    {
+      "Name": "frontal pole",
+      "structure_abbreviation": "FP",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "4"
+    },
+    {
+      "Name": "fusiform gyrus",
+      "structure_abbreviation": "FuG",
+      "top_level_structure_name": "temporal lobe",
+      "Brain Map ID-1": "55"
+    },
+    {
+      "Name": "globus pallidus",
+      "structure_abbreviation": "GP",
+      "top_level_structure_name": "globus pallidus",
+      "Brain Map ID-1": "87,90"
+    },
+    {
+      "Name": "gyrus rectus",
+      "structure_abbreviation": "GRe",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "70,71"
+    },
+    {
+      "Name": "hippocampus",
+      "structure_abbreviation": "HPC",
+      "top_level_structure_name": "hippocampal formation",
+      "Brain Map ID-1": "98,110,117,123,125,128"
+    },
+    {
+      "Name": "hypothalamus",
+      "structure_abbreviation": "hyp",
+      "top_level_structure_name": "hypothalamus",
+      "Brain Map ID-1": "134,136,137,138,139,141,142,145,146,149,151,157"
+    },
+    {
+      "Name": "inferior frontal gyrus",
+      "structure_abbreviation": "IFG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "14,16,23"
+    },
+    {
+      "Name": "inferior occipital gyrus",
+      "structure_abbreviation": "IOG",
+      "top_level_structure_name": "occipital lobe",
+      "Brain Map ID-1": "36"
+    },
+    {
+      "Name": "inferior temporal gyrus",
+      "structure_abbreviation": "ITG",
+      "top_level_structure_name": "temporal lobe",
+      "Brain Map ID-1": "24"
+    },
+    {
+      "Name": "insula",
+      "structure_abbreviation": "IG",
+      "top_level_structure_name": "insula",
+      "Brain Map ID-1": "18,26,43"
+    },
+    {
+      "Name": "interposed nucleus",
+      "structure_abbreviation": "IntNuc",
+      "top_level_structure_name": "cerebellar nuclei",
+      "Brain Map ID-1": "243"
+    },
+    {
+      "Name": "lingual gyrus",
+      "structure_abbreviation": "LiG",
+      "top_level_structure_name": "occipital lobe",
+      "Brain Map ID-1": "43"
+    },
+    {
+      "Name": "mesencephalon",
+      "structure_abbreviation": NaN,
+      "top_level_structure_name": "mesencephalon",
+      "Brain Map ID-1": "180,183,201,218"
+    },
+    {
+      "Name": "medial frontal gyrus",
+      "structure_abbreviation": "MFG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "10"
+    },
+    {
+      "Name": "middle temporal gyrus",
+      "structure_abbreviation": "MTG",
+      "top_level_structure_name": "temporal lobe",
+      "Brain Map ID-1": "22"
+    },
+    {
+      "Name": "myelencephalon",
+      "structure_abbreviation": "myn",
+      "top_level_structure_name": "myelencephalon",
+      "Brain Map ID-1": "190,210,213,219"
+    },
+    {
+      "Name": "nucleus accumbens",
+      "structure_abbreviation": "Acb",
+      "top_level_structure_name": "striatum",
+      "Brain Map ID-1": "81"
+    },
+    {
+      "Name": "occipital pole",
+      "structure_abbreviation": "OP",
+      "top_level_structure_name": "occipital lobe",
+      "Brain Map ID-1": "39"
+    },
+    {
+      "Name": "occipito-temporal gyrus",
+      "structure_abbreviation": "OTG",
+      "top_level_structure_name": "occipital lobe",
+      "Brain Map ID-1": "35"
+    },
+    {
+      "Name": "orbital gyrus",
+      "structure_abbreviation": "OG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "11,12,13"
+    },
+    {
+      "Name": "paracentral lobule",
+      "structure_abbreviation": "PCL",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "53,58"
+    },
+    {
+      "Name": "parahippocampal gyrus",
+      "structure_abbreviation": "PHG",
+      "top_level_structure_name": "parahippocampal gyrus",
+      "Brain Map ID-1": "56"
+    },
+    {
+      "Name": "paraterminal gyrus",
+      "structure_abbreviation": "PTG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "64"
+    },
+    {
+      "Name": "parolfactory gyri",
+      "structure_abbreviation": "PaOG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "66"
+    },
+    {
+      "Name": "piriform cortex",
+      "structure_abbreviation": "Pir",
+      "top_level_structure_name": "brain",
+      "Brain Map ID-1": "67"
+    },
+    {
+      "Name": "planum polare",
+      "structure_abbreviation": "PLP",
+      "top_level_structure_name": "temporal lobe",
+      "Brain Map ID-1": "19"
+    },
+    {
+      "Name": "planum temporale",
+      "structure_abbreviation": "PLT",
+      "top_level_structure_name": "temporal lobe",
+      "Brain Map ID-1": "30"
+    },
+    {
+      "Name": "pontine tegmentum",
+      "structure_abbreviation": "pteg",
+      "top_level_structure_name": "pontine tegmentum",
+      "Brain Map ID-1": "182,187,216"
+    },
+    {
+      "Name": "postcentral gyrus",
+      "structure_abbreviation": "PoG",
+      "top_level_structure_name": "parietal lobe",
+      "Brain Map ID-1": "28"
+    },
+    {
+      "Name": "posterior orbital gyrus",
+      "structure_abbreviation": "POrG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "15"
+    },
+    {
+      "Name": "precentral gyrus",
+      "structure_abbreviation": "PrG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "25"
+    },
+    {
+      "Name": "precuneus",
+      "structure_abbreviation": "PCu",
+      "top_level_structure_name": "parietal lobe",
+      "Brain Map ID-1": "47"
+    },
+    {
+      "Name": "putamen",
+      "structure_abbreviation": "Pu",
+      "top_level_structure_name": "striatum",
+      "Brain Map ID-1": "94"
+    },
+    {
+      "Name": "red nucleus",
+      "structure_abbreviation": "RN",
+      "top_level_structure_name": "mesencephalon",
+      "Brain Map ID-1": "168"
+    },
+    {
+      "Name": "septal nuclei",
+      "structure_abbreviation": "SptN",
+      "top_level_structure_name": "basal forebrain",
+      "Brain Map ID-1": "77"
+    },
+    {
+      "Name": "subcallosal cingulate gyrus",
+      "structure_abbreviation": "SCG",
+      "top_level_structure_name": "cingulate gyrus",
+      "Brain Map ID-1": "68"
+    },
+    {
+      "Name": "substantia innominata",
+      "structure_abbreviation": "SI",
+      "top_level_structure_name": "basal forebrain",
+      "Brain Map ID-1": "80"
+    },
+    {
+      "Name": "substantia nigra",
+      "structure_abbreviation": "SN",
+      "top_level_structure_name": "mesencephalon",
+      "Brain Map ID-1": "173"
+    },
+    {
+      "Name": "subthalamic nucleus",
+      "structure_abbreviation": "sthal",
+      "top_level_structure_name": "subthalamus",
+      "Brain Map ID-1": "174"
+    },
+    {
+      "Name": "superior frontal gyrus",
+      "structure_abbreviation": "SFG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "9"
+    },
+    {
+      "Name": "superior occipital gyrus",
+      "structure_abbreviation": "SOG",
+      "top_level_structure_name": "occipital lobe",
+      "Brain Map ID-1": "38"
+    },
+    {
+      "Name": "superior parietal lobule",
+      "structure_abbreviation": "SPL",
+      "top_level_structure_name": "parietal lobe",
+      "Brain Map ID-1": "32"
+    },
+    {
+      "Name": "superior rostral gyrus",
+      "structure_abbreviation": "SRoG",
+      "top_level_structure_name": "frontal lobe",
+      "Brain Map ID-1": "69"
+    },
+    {
+      "Name": "superior temporal gyrus",
+      "structure_abbreviation": "STG",
+      "top_level_structure_name": "temporal lobe",
+      "Brain Map ID-1": "21"
+    },
+    {
+      "Name": "supramarginal gyrus",
+      "structure_abbreviation": "SMG",
+      "top_level_structure_name": "parietal lobe",
+      "Brain Map ID-1": "31"
+    },
+    {
+      "Name": "temporal pole",
+      "structure_abbreviation": "TP",
+      "top_level_structure_name": "temporal lobe",
+      "Brain Map ID-1": "17"
+    },
+    {
+      "Name": "thalamus",
+      "structure_abbreviation": "thal",
+      "top_level_structure_name": "thalamus",
+      "Brain Map ID-1": "147,153,162,165,166,177,195,204"
+    },
+    {
+      "Name": "transverse gyri",
+      "structure_abbreviation": "TG",
+      "top_level_structure_name": "temporal lobe",
+      "Brain Map ID-1": "27,29"
+    }
+  ],
+  "dti_regions": [
+    "amygdala",
+    "angular gyrus",
+    "caudate",
+    "cerebellar cortex",
+    "cingulate gyrus frontal part",
+    "cingulate gyrus parietal part",
+    "cingulate gyrus retrosplenial part",
+    "claustrum",
+    "cuneus",
+    "dentate nucleus",
+    "epithalamus",
+    "fastigial nucleus",
+    "frontal operculum",
+    "frontal pole",
+    "fusiform gyrus",
+    "globus pallidus",
+    "gyrus rectus",
+    "hippocampus",
+    "inferior frontal gyrus",
+    "inferior temporal gyrus",
+    "insula",
+    "interposed nucleus",
+    "lingual gyrus",
+    "medial frontal gyrus",
+    "middle temporal gyrus",
+    "myelencephalon",
+    "nucleus accumbens",
+    "occipital pole",
+    "occipito-temporal gyrus",
+    "orbital gyrus",
+    "paracentral lobule",
+    "parahippocampal gyrus",
+    "parolfactory gyri",
+    "planum polare",
+    "planum temporale",
+    "pontine tegmentum",
+    "postcentral gyrus",
+    "precentral gyrus",
+    "precuneus",
+    "putamen",
+    "red nucleus",
+    "subcallosal cingulate gyrus",
+    "substantia nigra",
+    "subthalamic nucleus",
+    "superior frontal gyrus",
+    "superior parietal lobule",
+    "superior temporal gyrus",
+    "supramarginal gyrus",
+    "temporal pole",
+    "thalamus",
+    "transverse gyri"
+  ],
+  "fmri_functions": [
+    "addiction",
+    "arithmetic",
+    "arousal",
+    "attention",
+    "aversive",
+    "decisionMaking",
+    "defaultMode",
+    "emotions",
+    "eyeMovements",
+    "face",
+    "food",
+    "hearing",
+    "heartRate",
+    "imagery",
+    "language",
+    "memory",
+    "movement",
+    "navigation",
+    "pain",
+    "planning",
+    "pleasant",
+    "reading",
+    "reward",
+    "sleep",
+    "sound",
+    "spatial",
+    "tapping",
+    "theoryMind",
+    "touch",
+    "vision"
+  ],
+  "structure_groups": [
+    "amygdala",
+    "basal forebrain",
+    "basal part of pons",
+    "brain",
+    "cerebellar cortex",
+    "cerebellar nuclei",
+    "cingulate gyrus",
+    "claustrum",
+    "epithalamus",
+    "frontal lobe",
+    "globus pallidus",
+    "hippocampal formation",
+    "hypothalamus",
+    "insula",
+    "mesencephalon",
+    "myelencephalon",
+    "occipital lobe",
+    "parahippocampal gyrus",
+    "parietal lobe",
+    "pontine tegmentum",
+    "striatum",
+    "subthalamus",
+    "temporal lobe",
+    "thalamus"
+  ]
+}

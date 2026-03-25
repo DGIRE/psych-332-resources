@@ -1,0 +1,1586 @@
+{
+  "4": {
+    "name": "frontal pole",
+    "abbreviation": "FP",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "9": {
+    "name": "superior frontal gyrus",
+    "abbreviation": "SFG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "10": {
+    "name": "middle frontal gyrus",
+    "abbreviation": "MFG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "11": {
+    "name": "lateral orbital gyrus",
+    "abbreviation": "LOrG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "12": {
+    "name": "anterior orbital gyrus",
+    "abbreviation": "AOrG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "13": {
+    "name": "medial orbital gyrus",
+    "abbreviation": "MOrG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "14": {
+    "name": "inferior frontal gyrus",
+    "abbreviation": "orIFG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "15": {
+    "name": "posterior orbital gyrus",
+    "abbreviation": "POrG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "16": {
+    "name": "inferior frontal gyrus, triangular part",
+    "abbreviation": "trIFG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "17": {
+    "name": "temporal pole",
+    "abbreviation": "TP",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "18": {
+    "name": "short insular gyri",
+    "abbreviation": "SIG",
+    "group": "Insular Lobe",
+    "subgroup": "Insular Cortex"
+  },
+  "19": {
+    "name": "planum polare",
+    "abbreviation": "PLP",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "20": {
+    "name": "frontal operculum",
+    "abbreviation": "fro",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "21": {
+    "name": "superior temporal gyrus",
+    "abbreviation": "STG",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "22": {
+    "name": "middle temporal gyrus",
+    "abbreviation": "MTG",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "23": {
+    "name": "inferior frontal gyrus, opercular part",
+    "abbreviation": "opIFG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "24": {
+    "name": "inferior temporal gyrus",
+    "abbreviation": "ITG",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "25": {
+    "name": "precentral gyrus",
+    "abbreviation": "PrG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "26": {
+    "name": "long insular gyri",
+    "abbreviation": "LIG",
+    "group": "Insular Lobe",
+    "subgroup": "Insular Cortex"
+  },
+  "27": {
+    "name": "Heschl's gyrus",
+    "abbreviation": "HG",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "28": {
+    "name": "postcentral gyrus",
+    "abbreviation": "PoG",
+    "group": "Parietal Lobe",
+    "subgroup": "Parietal Lobe"
+  },
+  "29": {
+    "name": "transverse gyri",
+    "abbreviation": "TG",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "30": {
+    "name": "planum temporale",
+    "abbreviation": "PLT",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "31": {
+    "name": "supramarginal gyrus",
+    "abbreviation": "SMG",
+    "group": "Parietal Lobe",
+    "subgroup": "Parietal Lobe"
+  },
+  "32": {
+    "name": "superior parietal lobule",
+    "abbreviation": "SPL",
+    "group": "Parietal Lobe",
+    "subgroup": "Parietal Lobe"
+  },
+  "33": {
+    "name": "angular gyrus",
+    "abbreviation": "AnG",
+    "group": "Parietal Lobe",
+    "subgroup": "Parietal Lobe"
+  },
+  "35": {
+    "name": "occipito-temporal gyrus",
+    "abbreviation": "OTG",
+    "group": "Temporal and Occipital Lobes",
+    "subgroup": "Temporal-Occipital"
+  },
+  "36": {
+    "name": "inferior occipital gyrus",
+    "abbreviation": "IOG",
+    "group": "Occipital Lobe",
+    "subgroup": "Occipital Lobe"
+  },
+  "38": {
+    "name": "superior occipital gyrus",
+    "abbreviation": "SOG",
+    "group": "Occipital Lobe",
+    "subgroup": "Occipital Lobe"
+  },
+  "39": {
+    "name": "occipital pole",
+    "abbreviation": "OP",
+    "group": "Occipital Lobe",
+    "subgroup": "Occipital Lobe"
+  },
+  "44": {
+    "name": "cuneus",
+    "abbreviation": "Cun",
+    "group": "Occipital Lobe",
+    "subgroup": "Occipital Lobe"
+  },
+  "47": {
+    "name": "precuneus",
+    "abbreviation": "PCu",
+    "group": "Parietal Lobe",
+    "subgroup": "Parietal Lobe"
+  },
+  "50": {
+    "name": "cingulate gyrus",
+    "abbreviation": "CgGp",
+    "group": "Limbic System",
+    "subgroup": "Cingulate Cortex"
+  },
+  "52": {
+    "name": "cingulate gyrus, retrosplenial part",
+    "abbreviation": "CgGr",
+    "group": "Limbic System",
+    "subgroup": "Cingulate Cortex"
+  },
+  "53": {
+    "name": "paracentral lobule, posterior part",
+    "abbreviation": "PCLp",
+    "group": "Frontal and Parietal Lobes",
+    "subgroup": "Frontal-Parietal"
+  },
+  "54": {
+    "name": "corpus callosum",
+    "abbreviation": "cc",
+    "group": "Not a brain region (major white matter tract)",
+    "subgroup": "White Matter"
+  },
+  "55": {
+    "name": "fusiform gyrus",
+    "abbreviation": "FuG",
+    "group": "Temporal and Occipital Lobes",
+    "subgroup": "Temporal-Occipital"
+  },
+  "56": {
+    "name": "parahippocampal gyrus",
+    "abbreviation": "PHG",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "58": {
+    "name": "paracentral lobule, anterior part",
+    "abbreviation": "PCLa",
+    "group": "Frontal and Parietal Lobes",
+    "subgroup": "Frontal-Parietal"
+  },
+  "59": {
+    "name": "cingulate gyrus, superior bank of gyrus",
+    "abbreviation": "CgGf",
+    "group": "Limbic System",
+    "subgroup": "Cingulate Cortex"
+  },
+  "64": {
+    "name": "paraterminal gyrus",
+    "abbreviation": "PTG",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "66": {
+    "name": "parolfactory gyri",
+    "abbreviation": "PaOG",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "67": {
+    "name": "piriform cortex",
+    "abbreviation": "Pir",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "68": {
+    "name": "subcallosal cingulate gyrus",
+    "abbreviation": "SCG",
+    "group": "Limbic System",
+    "subgroup": "Cingulate Cortex"
+  },
+  "69": {
+    "name": "superior rostral gyrus",
+    "abbreviation": "SRoG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "70": {
+    "name": "inferior rostral gyrus",
+    "abbreviation": "IRoG",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "71": {
+    "name": "gyrus rectus",
+    "abbreviation": "GRe",
+    "group": "Frontal Lobe",
+    "subgroup": "Frontal Lobe"
+  },
+  "77": {
+    "name": "septal nuclei",
+    "abbreviation": "SptN",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "80": {
+    "name": "substantia innominata",
+    "abbreviation": "SI",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "81": {
+    "name": "nucleus accumbens",
+    "abbreviation": "Acb",
+    "group": "Limbic System",
+    "subgroup": "Basal Ganglia"
+  },
+  "84": {
+    "name": "caudate nucleus",
+    "abbreviation": "BCd",
+    "group": "Basal Ganglia",
+    "subgroup": "Basal Ganglia"
+  },
+  "87": {
+    "name": "globus pallidus, internal segment",
+    "abbreviation": "GPi",
+    "group": "Basal Ganglia",
+    "subgroup": "Basal Ganglia"
+  },
+  "90": {
+    "name": "glabus pallidus, external segment",
+    "abbreviation": "GPe",
+    "group": "Basal Ganglia",
+    "subgroup": "Basal Ganglia"
+  },
+  "94": {
+    "name": "putamen",
+    "abbreviation": "Pu",
+    "group": "Basal Ganglia",
+    "subgroup": "Basal Ganglia"
+  },
+  "96": {
+    "name": "basolateral nucleus",
+    "abbreviation": "BLA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "98": {
+    "name": "subiculum",
+    "abbreviation": "S",
+    "group": "Limbic System",
+    "subgroup": "Subicular Complex"
+  },
+  "100": {
+    "name": "basomedial nucleus",
+    "abbreviation": "BMA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "103": {
+    "name": "lateral nucleus",
+    "abbreviation": "LA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "104": {
+    "name": "central nucleus",
+    "abbreviation": "CeA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "109": {
+    "name": "claustrum",
+    "abbreviation": "Cl",
+    "group": "Insular Lobe",
+    "subgroup": "Insular Cortex"
+  },
+  "110": {
+    "name": "dentate gyrus",
+    "abbreviation": "DG",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "117": {
+    "name": "CA4 field",
+    "abbreviation": "CA4",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "123": {
+    "name": "CA3 field",
+    "abbreviation": "CA3",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "125": {
+    "name": "CA2 field",
+    "abbreviation": "CA2",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "128": {
+    "name": "CA1 field",
+    "abbreviation": "CA1",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "134": {
+    "name": "preoptic region",
+    "abbreviation": "PrOR",
+    "group": "Limbic System",
+    "subgroup": "Hypothalamus"
+  },
+  "136": {
+    "name": "supraoptic nucleus",
+    "abbreviation": "SO",
+    "group": "Limbic System",
+    "subgroup": "Hypothalamus"
+  },
+  "137": {
+    "name": "lateral hypothalamic area, anterior region",
+    "abbreviation": "LHA",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "138": {
+    "name": "paraventricular nucleus of the hypothalamus",
+    "abbreviation": "PVH",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "139": {
+    "name": "anterior hypothalamic area",
+    "abbreviation": "AHA",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "141": {
+    "name": "lateral hypothalamic area, tuberal region",
+    "abbreviation": "LHT",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "142": {
+    "name": "dorsomedial hypothalamic nucleus",
+    "abbreviation": "DMH",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "144": {
+    "name": "epithalamus",
+    "abbreviation": "Hb",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "145": {
+    "name": "arcuate nucleus of the hypothalamus",
+    "abbreviation": "ARH",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "146": {
+    "name": "ventromedial hypothalamic nucleus",
+    "abbreviation": "VMH",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "147": {
+    "name": "anterior group of nuclei",
+    "abbreviation": "DTA",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "149": {
+    "name": "tuberomammillary nucleus",
+    "abbreviation": "TM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "151": {
+    "name": "lateral hypothalamic area, mammillary region",
+    "abbreviation": "LHM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "153": {
+    "name": "lateral group of nuclei, ventral division",
+    "abbreviation": "DTLv",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "157": {
+    "name": "mammillary body",
+    "abbreviation": "MB",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "162": {
+    "name": "medial group of nuclei",
+    "abbreviation": "DTM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "165": {
+    "name": "posterior group of nuclei",
+    "abbreviation": "DTP",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "166": {
+    "name": "reticular nucleus of thalamus, left",
+    "abbreviation": "VT",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "167": {
+    "name": "pontine nuclei",
+    "abbreviation": "Pn",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "168": {
+    "name": "red nucleus",
+    "abbreviation": "RN",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "173": {
+    "name": "substantia nigra",
+    "abbreviation": "SN",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "174": {
+    "name": "subthalamus",
+    "abbreviation": "SbT",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "177": {
+    "name": "lateral group of nuclei, dorsal division",
+    "abbreviation": "DTLd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "180": {
+    "name": "midbrain reticular formation",
+    "abbreviation": "MBRF",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "182": {
+    "name": "pontine raphe nucleus",
+    "abbreviation": "PPRF",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "183": {
+    "name": "midbrain raphe nuclei",
+    "abbreviation": "MBRa",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "187": {
+    "name": "paramedian pontine reticular formation",
+    "abbreviation": "RPn",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "190": {
+    "name": "inferior olivary complex",
+    "abbreviation": "IO",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "195": {
+    "name": "dorsal lateral geneiculate nucleus",
+    "abbreviation": "LGd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "201": {
+    "name": "superior colliculus",
+    "abbreviation": "SC",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "204": {
+    "name": "medial geniculate complex",
+    "abbreviation": "MG",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "210": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "213": {
+    "name": "medullary reticular formation",
+    "abbreviation": "CMRt",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "216": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "218": {
+    "name": "inferior colliculus",
+    "abbreviation": "IC",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "219": {
+    "name": "vestibular nuclei",
+    "abbreviation": "8Ve",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "223": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "243": {
+    "name": "cerebellar nuclei",
+    "abbreviation": "Dt",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "2": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "3": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "5": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "6": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "7": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "8": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "34": {
+    "name": "inferior temporal gyrus",
+    "abbreviation": "ITG",
+    "group": "Temporal Lobe",
+    "subgroup": "Temporal Lobe"
+  },
+  "37": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "40": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "43": {
+    "name": "lingular gyrus",
+    "abbreviation": "LiG",
+    "group": "Occipital Lobe",
+    "subgroup": "Occipital Lobe"
+  },
+  "48": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "57": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "62": {
+    "name": "fornix",
+    "abbreviation": "Fx",
+    "group": "Not a brain region (major white matter tract)",
+    "subgroup": "White Matter"
+  },
+  "73": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "74": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "75": {
+    "name": "substantia innominata",
+    "abbreviation": "SI",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "78": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "82": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "83": {
+    "name": "substantia innominata",
+    "abbreviation": "SI",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "85": {
+    "name": "substantia innominata",
+    "abbreviation": "SI",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "89": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "91": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "92": {
+    "name": "caudate nucleus",
+    "abbreviation": "BCd",
+    "group": "Basal Ganglia",
+    "subgroup": "Basal Ganglia"
+  },
+  "93": {
+    "name": "substantia innominata",
+    "abbreviation": "SI",
+    "group": "Limbic System",
+    "subgroup": "Basal Forebrain"
+  },
+  "95": {
+    "name": "subiculum",
+    "abbreviation": "S",
+    "group": "Limbic System",
+    "subgroup": "Subicular Complex"
+  },
+  "97": {
+    "name": "basomedial nucleus",
+    "abbreviation": "BMA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "99": {
+    "name": "basomedial nucleus",
+    "abbreviation": "BMA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "101": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "102": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "105": {
+    "name": "basomedial nucleus",
+    "abbreviation": "BMA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "106": {
+    "name": "basomedial nucleus",
+    "abbreviation": "BMA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "107": {
+    "name": "basomedial nucleus",
+    "abbreviation": "BMA",
+    "group": "Limbic System (Amygdala)",
+    "subgroup": "Amygdala"
+  },
+  "108": {
+    "name": "subiculum",
+    "abbreviation": "S",
+    "group": "Limbic System",
+    "subgroup": "Subicular Complex"
+  },
+  "111": {
+    "name": "subiculum",
+    "abbreviation": "S",
+    "group": "Limbic System",
+    "subgroup": "Subicular Complex"
+  },
+  "112": {
+    "name": "subiculum",
+    "abbreviation": "S",
+    "group": "Limbic System",
+    "subgroup": "Subicular Complex"
+  },
+  "113": {
+    "name": "dentate gyrus",
+    "abbreviation": "DG",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "114": {
+    "name": "dentate gyrus",
+    "abbreviation": "DG",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "115": {
+    "name": "subiculum",
+    "abbreviation": "S",
+    "group": "Limbic System",
+    "subgroup": "Subicular Complex"
+  },
+  "116": {
+    "name": "CA4 field",
+    "abbreviation": "CA4",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "118": {
+    "name": "CA4 field",
+    "abbreviation": "CA4",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "119": {
+    "name": "dentate gyrus",
+    "abbreviation": "DG",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "120": {
+    "name": "CA4 field",
+    "abbreviation": "CA4",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "121": {
+    "name": "dentate gyrus",
+    "abbreviation": "DG",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "124": {
+    "name": "CA4 field",
+    "abbreviation": "CA4",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "126": {
+    "name": "dentate gyrus",
+    "abbreviation": "DG",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "127": {
+    "name": "CA4 field",
+    "abbreviation": "CA4",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "129": {
+    "name": "dentate gyrus",
+    "abbreviation": "DG",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "131": {
+    "name": "dentate gyrus",
+    "abbreviation": "DG",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "133": {
+    "name": "CA1 field",
+    "abbreviation": "CA1",
+    "group": "Limbic System",
+    "subgroup": "Hippocampus"
+  },
+  "135": {
+    "name": "supraoptic nucleus",
+    "abbreviation": "SO",
+    "group": "Limbic System",
+    "subgroup": "Hypothalamus"
+  },
+  "143": {
+    "name": "arcuate nucleus of the hypothalamus",
+    "abbreviation": "ARH",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "148": {
+    "name": "ventromedial hypothalamic nucleus",
+    "abbreviation": "VMH",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "150": {
+    "name": "anterior group of nuclei",
+    "abbreviation": "DTA",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "152": {
+    "name": "anterior group of nuclei",
+    "abbreviation": "DTA",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "154": {
+    "name": "lateral hypothalamic area, mammillary region",
+    "abbreviation": "LHM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "155": {
+    "name": "lateral hypothalamic area, mammillary region",
+    "abbreviation": "LHM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "156": {
+    "name": "lateral group of nuclei, ventral division",
+    "abbreviation": "DTLv",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "158": {
+    "name": "lateral hypothalamic area, mammillary region",
+    "abbreviation": "LHM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "159": {
+    "name": "anterior group of nuclei",
+    "abbreviation": "DTA",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "160": {
+    "name": "lateral hypothalamic area, mammillary region",
+    "abbreviation": "LHM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "161": {
+    "name": "lateral hypothalamic area, mammillary region",
+    "abbreviation": "LHM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "163": {
+    "name": "lateral hypothalamic area, mammillary region",
+    "abbreviation": "LHM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Hypothalamus"
+  },
+  "164": {
+    "name": "medial group of nuclei",
+    "abbreviation": "DTM",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "169": {
+    "name": "reticular nucleus of thalamus, left",
+    "abbreviation": "VT",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "170": {
+    "name": "lateral group of nuclei, ventral division",
+    "abbreviation": "DTLv",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "171": {
+    "name": "lateral group of nuclei, ventral division",
+    "abbreviation": "DTLv",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "172": {
+    "name": "reticular nucleus of thalamus, left",
+    "abbreviation": "VT",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "175": {
+    "name": "lateral group of nuclei, dorsal division",
+    "abbreviation": "DTLd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "178": {
+    "name": "reticular nucleus of thalamus, left",
+    "abbreviation": "VT",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "179": {
+    "name": "lateral group of nuclei, dorsal division",
+    "abbreviation": "DTLd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "181": {
+    "name": "lateral group of nuclei, dorsal division",
+    "abbreviation": "DTLd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "185": {
+    "name": "posterior group of nuclei",
+    "abbreviation": "DTP",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "186": {
+    "name": "pontine raphe nucleus",
+    "abbreviation": "PPRF",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "188": {
+    "name": "midbrain reticular formation",
+    "abbreviation": "MBRF",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "189": {
+    "name": "inferior olivary complex",
+    "abbreviation": "IO",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "191": {
+    "name": "inferior olivary complex",
+    "abbreviation": "IO",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "192": {
+    "name": "pontine raphe nucleus",
+    "abbreviation": "PPRF",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "193": {
+    "name": "lateral group of nuclei, dorsal division",
+    "abbreviation": "DTLd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "196": {
+    "name": "pontine raphe nucleus",
+    "abbreviation": "PPRF",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "197": {
+    "name": "paramedian pontine reticular formation",
+    "abbreviation": "RPn",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "198": {
+    "name": "lateral group of nuclei, dorsal division",
+    "abbreviation": "DTLd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "199": {
+    "name": "lateral group of nuclei, dorsal division",
+    "abbreviation": "DTLd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "202": {
+    "name": "pontine raphe nucleus",
+    "abbreviation": "PPRF",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "203": {
+    "name": "lateral group of nuclei, dorsal division",
+    "abbreviation": "DTLd",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "205": {
+    "name": "inferior olivary complex",
+    "abbreviation": "IO",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "206": {
+    "name": "inferior olivary complex",
+    "abbreviation": "IO",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "207": {
+    "name": "medial geniculate complex",
+    "abbreviation": "MG",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "209": {
+    "name": "paramedian pontine reticular formation",
+    "abbreviation": "RPn",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "211": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "212": {
+    "name": "medial geniculate complex",
+    "abbreviation": "MG",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "214": {
+    "name": "medial geniculate complex",
+    "abbreviation": "MG",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "215": {
+    "name": "medial geniculate complex",
+    "abbreviation": "MG",
+    "group": "Thalamus and Hypothalamus",
+    "subgroup": "Thalamus"
+  },
+  "217": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "220": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "222": {
+    "name": "medullary reticular formation",
+    "abbreviation": "CMRt",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "224": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "225": {
+    "name": "vestibular nuclei",
+    "abbreviation": "8Ve",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "226": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "227": {
+    "name": "medullary reticular formation",
+    "abbreviation": "CMRt",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "228": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "229": {
+    "name": "vestibular nuclei",
+    "abbreviation": "8Ve",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "230": {
+    "name": "medullary reticular formation",
+    "abbreviation": "CMRt",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "231": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "232": {
+    "name": "vestibular nuclei",
+    "abbreviation": "8Ve",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "233": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "234": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "235": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "236": {
+    "name": "raphe nuclei of medulla",
+    "abbreviation": "Sp5",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "237": {
+    "name": "medullary reticular formation",
+    "abbreviation": "CMRt",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "238": {
+    "name": "medullary reticular formation",
+    "abbreviation": "CMRt",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "239": {
+    "name": "medullary reticular formation",
+    "abbreviation": "CMRt",
+    "group": "Brainstem",
+    "subgroup": "Brainstem"
+  },
+  "240": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "242": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "244": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "246": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "247": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "250": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "251": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "252": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "253": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "255": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "256": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "257": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "258": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "259": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "260": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "261": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "262": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "263": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "265": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "266": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "268": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "269": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "270": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "271": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "274": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "275": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "276": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "278": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "279": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "280": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "282": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "284": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "286": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "287": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "288": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "290": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "291": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "292": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "294": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "295": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "297": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "298": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "299": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "300": {
+    "name": "cerebellar cortex",
+    "abbreviation": "Cb-Crus I",
+    "group": "Cerebellum",
+    "subgroup": "Cerebellum"
+  },
+  "301": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "302": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "303": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "304": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "305": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  },
+  "306": {
+    "name": "",
+    "abbreviation": "",
+    "group": "",
+    "subgroup": ""
+  }
+}
