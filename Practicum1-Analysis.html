@@ -108,6 +108,11 @@
             font-size: 14px;
         }
 
+        select option {
+            color: #333;
+            background: #fff;
+        }
+
         select:hover, select:focus, input:hover, input:focus {
             outline: none;
             border-color: #0779be;
@@ -304,12 +309,26 @@
             'parietal lobe': 0.95, 'frontal lobe': 1.00, 'brain': 0.50
         };
 
+        const PLOTLY_CONFIG = {
+            responsive: true,
+            displayModeBar: true,
+            modeBarButtonsToAdd: [],
+            toImageButtonOptions: {
+                format: 'png',
+                filename: 'psych332_visualization',
+                height: 800,
+                width: 1200,
+                scale: 2
+            }
+        };
+
         const PLOTLY_DARK_LAYOUT = {
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { color: '#e8eef5', family: 'Inter, sans-serif' },
             showlegend: true,
             hovermode: 'closest',
+            dragmode: 'zoom',
             xaxis: { gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
             yaxis: { gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
         };
@@ -383,63 +402,90 @@
         }
 
         function simplePCA(data, nComponents = 2) {
-            // Simple PCA implementation
+            // PCA via power iteration with proper eigenvalue deflation
             const n = data.length;
             const m = data[0].length;
 
-            // Standardize
+            // Center and standardize each feature
             const means = Array(m).fill(0);
+            const stds = Array(m).fill(0);
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < m; j++) {
                     means[j] += data[i][j];
                 }
             }
-            means.forEach((_, i) => means[i] /= n);
+            for (let j = 0; j < m; j++) means[j] /= n;
 
-            const centered = data.map(row => row.map((x, i) => x - means[i]));
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < m; j++) {
+                    stds[j] += Math.pow(data[i][j] - means[j], 2);
+                }
+            }
+            for (let j = 0; j < m; j++) stds[j] = Math.sqrt(stds[j] / n) || 1;
 
-            // Covariance
+            const centered = data.map(row => row.map((x, j) => (x - means[j]) / stds[j]));
+
+            // Covariance matrix
             const cov = Array(m).fill(null).map(() => Array(m).fill(0));
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < m; j++) {
-                    for (let k = 0; k < m; k++) {
+                    for (let k = j; k < m; k++) {
                         cov[j][k] += centered[i][j] * centered[i][k];
                     }
                 }
             }
-            for (let i = 0; i < m; i++) {
-                for (let j = 0; j < m; j++) {
-                    cov[i][j] /= n;
+            for (let j = 0; j < m; j++) {
+                for (let k = j; k < m; k++) {
+                    cov[j][k] /= (n - 1);
+                    cov[k][j] = cov[j][k];
                 }
             }
 
-            // Power iteration for first two eigenvectors
+            // Power iteration for eigenvectors with proper deflation
             const components = [];
+            const eigenvalues = [];
             let tempCov = cov.map(row => [...row]);
 
             for (let comp = 0; comp < nComponents && comp < m; comp++) {
-                let v = Array(m).fill(1).map(() => Math.random());
-                for (let iter = 0; iter < 10; iter++) {
+                // Initialize with random unit vector
+                let v = Array(m).fill(0).map(() => Math.random() - 0.5);
+                let norm = Math.sqrt(v.reduce((a, b) => a + b * b, 0));
+                v = v.map(x => x / norm);
+
+                // 200 iterations for convergence
+                for (let iter = 0; iter < 200; iter++) {
                     const newV = Array(m).fill(0);
                     for (let i = 0; i < m; i++) {
                         for (let j = 0; j < m; j++) {
                             newV[i] += tempCov[i][j] * v[j];
                         }
                     }
-                    const norm = Math.sqrt(newV.reduce((a, b) => a + b * b));
+                    norm = Math.sqrt(newV.reduce((a, b) => a + b * b, 0));
+                    if (norm < 1e-10) break;
                     v = newV.map(x => x / norm);
                 }
                 components.push(v);
 
-                // Deflate
+                // Compute eigenvalue: lambda = v^T * cov * v
+                let eigenvalue = 0;
+                for (let i = 0; i < m; i++) {
+                    let rowDot = 0;
+                    for (let j = 0; j < m; j++) {
+                        rowDot += tempCov[i][j] * v[j];
+                    }
+                    eigenvalue += v[i] * rowDot;
+                }
+                eigenvalues.push(eigenvalue);
+
+                // Deflate: remove this component from covariance matrix
                 for (let i = 0; i < m; i++) {
                     for (let j = 0; j < m; j++) {
-                        tempCov[i][j] -= v[i] * v[j] * 0.01;
+                        tempCov[i][j] -= eigenvalue * v[i] * v[j];
                     }
                 }
             }
 
-            // Project
+            // Project data onto components
             const result = [];
             for (let i = 0; i < n; i++) {
                 const proj = components.map(comp => {
@@ -648,7 +694,7 @@
                 yaxis: { tickfont: { color: yticklabelColors } }
             };
 
-            Plotly.newPlot('geneExpressionHeatmap', [trace], layout, { responsive: true });
+            Plotly.newPlot('geneExpressionHeatmap', [trace], layout, PLOTLY_CONFIG);
         }
 
         function buildDTIHeatmap() {
@@ -693,7 +739,7 @@
                 yaxis: { tickfont: { color: yticklabelColors } }
             };
 
-            Plotly.newPlot('dtiHeatmap', [trace], layout, { responsive: true });
+            Plotly.newPlot('dtiHeatmap', [trace], layout, PLOTLY_CONFIG);
         }
 
         // ========== DIMENSIONALITY REDUCTION ==========
@@ -713,7 +759,13 @@
             }
 
             const pca = simplePCA(sourceData, 2);
-            const colors = geneExpressionData.map(row => nipySpectralColor(BRAIN_SCALE_DICT[row.top_level_structure_name] || 0.5));
+
+            // Map each region label to its structure color
+            const colors = regionLabels.map(name => {
+                const meta = metadata.region_metadata.find(r => r.Name === name);
+                const structName = meta ? meta.top_level_structure_name : 'brain';
+                return nipySpectralColor(BRAIN_SCALE_DICT[structName] || 0.5);
+            });
 
             const trace = {
                 x: pca.map(p => p[0]),
@@ -734,11 +786,12 @@
             const layout = {
                 ...PLOTLY_DARK_LAYOUT,
                 height: 600,
-                xaxis: { title: 'PC1' },
-                yaxis: { title: 'PC2' }
+                dragmode: 'zoom',
+                xaxis: { title: 'PC1', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
+                yaxis: { title: 'PC2', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
             };
 
-            Plotly.newPlot('dimredPlot', [trace], layout, { responsive: true });
+            Plotly.newPlot('dimredPlot', [trace], layout, PLOTLY_CONFIG);
         }
 
         // ========== STRUCTURE SELECTOR ==========
@@ -764,13 +817,13 @@
 
             document.getElementById('structureContent').innerHTML = html;
 
-            // Draw brain map
-            drawRegionOnBrainMap('structureBrainMap', region['Brain Map ID-1']);
+            // Draw brain map with region name
+            drawRegionOnBrainMap('structureBrainMap', region['Brain Map ID-1'], region.Name);
 
-            // Gene bar plot
+            // Gene bar plot — sort ascending so strongest genes appear at top of horizontal bar chart
             const genes = metadata.gene_names;
             const values = genes.map(gene => geneRow[gene] || 0);
-            const sorted = genes.map((gene, i) => ({ gene, value: values[i] })).sort((a, b) => b.value - a.value);
+            const sorted = genes.map((gene, i) => ({ gene, value: values[i] })).sort((a, b) => a.value - b.value);
 
             const trace = {
                 y: sorted.map(d => d.gene),
@@ -784,11 +837,12 @@
             const layout = {
                 ...PLOTLY_DARK_LAYOUT,
                 height: 800,
+                dragmode: 'zoom',
                 margin: { l: 150, r: 50, t: 30, b: 50 },
-                xaxis: { title: 'Expression Level' }
+                xaxis: { title: 'Expression Level', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
             };
 
-            Plotly.newPlot('structureGeneBar', [trace], layout, { responsive: true });
+            Plotly.newPlot('structureGeneBar', [trace], layout, PLOTLY_CONFIG);
         }
 
         // ========== GENE EXPLORER ==========
@@ -844,8 +898,8 @@
 
             document.getElementById('geneContent').innerHTML = html;
 
-            Plotly.newPlot('geneHistogram', [trace1], layout1, { responsive: true });
-            Plotly.newPlot('geneBarPlot', [trace2], layout2, { responsive: true });
+            Plotly.newPlot('geneHistogram', [trace1], layout1, PLOTLY_CONFIG);
+            Plotly.newPlot('geneBarPlot', [trace2], layout2, PLOTLY_CONFIG);
 
             drawGeneOnBrainMap('geneBrainMap', geneName);
         }
@@ -903,8 +957,8 @@
 
             document.getElementById('dtiContent').innerHTML = html;
 
-            Plotly.newPlot('dtiHistogram', [trace1], layout1, { responsive: true });
-            Plotly.newPlot('dtiBarPlot', [trace2], layout2, { responsive: true });
+            Plotly.newPlot('dtiHistogram', [trace1], layout1, PLOTLY_CONFIG);
+            Plotly.newPlot('dtiBarPlot', [trace2], layout2, PLOTLY_CONFIG);
 
             drawDTIOnBrainMap('dtiBrainMap', targetRegion);
         }
@@ -963,14 +1017,14 @@
 
             document.getElementById('fmriContent').innerHTML = html;
 
-            Plotly.newPlot('fmriHistogram', [trace1], layout1, { responsive: true });
-            Plotly.newPlot('fmriBarPlot', [trace2], layout2, { responsive: true });
+            Plotly.newPlot('fmriHistogram', [trace1], layout1, PLOTLY_CONFIG);
+            Plotly.newPlot('fmriBarPlot', [trace2], layout2, PLOTLY_CONFIG);
 
             drawFMRIOnBrainMap('fmriBrainMap', funcName);
         }
 
         // ========== BRAIN MAP RENDERING ==========
-        function drawRegionOnBrainMap(canvasId, brainMapIds) {
+        function drawRegionOnBrainMap(canvasId, brainMapIds, regionName) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
 
@@ -985,20 +1039,80 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            for (let y = 75; y < canvas.height - 75; y++) {
-                for (let x = 75; x < canvas.width - 75; x++) {
+            const margin = 75;
+
+            // Clear corner/border areas to background color
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    if (y < margin || y >= canvas.height - margin || x < margin || x >= canvas.width - margin) {
+                        const idx = (y * canvas.width + x) * 4;
+                        data[idx] = 18;     // match page background ~#0f1d2d
+                        data[idx + 1] = 35;
+                        data[idx + 2] = 55;
+                        data[idx + 3] = 255;
+                    }
+                }
+            }
+
+            // Paint selected region in dark blue
+            for (let y = margin; y < canvas.height - margin; y++) {
+                for (let x = margin; x < canvas.width - margin; x++) {
                     const regionId = decodedMap[y] && decodedMap[y][x];
                     if (idList.includes(regionId)) {
                         const idx = (y * canvas.width + x) * 4;
-                        data[idx] = 7;
-                        data[idx + 1] = 121;
-                        data[idx + 2] = 190;
-                        data[idx + 3] = 150;
+                        data[idx] = 0;
+                        data[idx + 1] = 40;
+                        data[idx + 2] = 120;
+                        data[idx + 3] = 200;
                     }
                 }
             }
 
             ctx.putImageData(imageData, 0, 0);
+
+            // Draw region name label
+            if (regionName) {
+                ctx.font = 'bold 28px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#e8eef5';
+                ctx.strokeStyle = 'rgba(15, 29, 45, 0.8)';
+                ctx.lineWidth = 4;
+                ctx.strokeText(regionName, canvas.width / 2, margin + 30);
+                ctx.fillText(regionName, canvas.width / 2, margin + 30);
+            }
+
+            // Add right-click download handler
+            canvas.oncontextmenu = function(e) {
+                e.preventDefault();
+                const link = document.createElement('a');
+                link.download = (regionName || 'brain_map') + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+        }
+
+        function clearBrainMapCorners(data, width, height, margin) {
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    if (y < margin || y >= height - margin || x < margin || x >= width - margin) {
+                        const idx = (y * width + x) * 4;
+                        data[idx] = 18;
+                        data[idx + 1] = 35;
+                        data[idx + 2] = 55;
+                        data[idx + 3] = 255;
+                    }
+                }
+            }
+        }
+
+        function addCanvasDownload(canvas, filename) {
+            canvas.oncontextmenu = function(e) {
+                e.preventDefault();
+                const link = document.createElement('a');
+                link.download = filename + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
         }
 
         function drawGeneOnBrainMap(canvasId, geneName) {
@@ -1011,6 +1125,7 @@
             ctx.drawImage(blankBrainImage, 0, 0);
 
             const decodedMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+            const margin = 75;
 
             // Build value map by region ID
             const valueMap = {};
@@ -1031,8 +1146,10 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            for (let y = 75; y < canvas.height - 75; y++) {
-                for (let x = 75; x < canvas.width - 75; x++) {
+            clearBrainMapCorners(data, canvas.width, canvas.height, margin);
+
+            for (let y = margin; y < canvas.height - margin; y++) {
+                for (let x = margin; x < canvas.width - margin; x++) {
                     const regionId = decodedMap[y] && decodedMap[y][x];
                     if (regionId !== -100 && regionId !== undefined && valueMap[regionId] !== undefined) {
                         const normalized = (valueMap[regionId] - minVal) / range;
@@ -1047,6 +1164,7 @@
             }
 
             ctx.putImageData(imageData, 0, 0);
+            addCanvasDownload(canvas, 'gene_' + geneName);
         }
 
         function drawDTIOnBrainMap(canvasId, targetRegion) {
@@ -1059,6 +1177,7 @@
             ctx.drawImage(blankBrainImage, 0, 0);
 
             const decodedMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+            const margin = 75;
 
             // Build value map by region ID
             const valueMap = {};
@@ -1079,8 +1198,10 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            for (let y = 75; y < canvas.height - 75; y++) {
-                for (let x = 75; x < canvas.width - 75; x++) {
+            clearBrainMapCorners(data, canvas.width, canvas.height, margin);
+
+            for (let y = margin; y < canvas.height - margin; y++) {
+                for (let x = margin; x < canvas.width - margin; x++) {
                     const regionId = decodedMap[y] && decodedMap[y][x];
                     if (regionId !== -100 && regionId !== undefined && valueMap[regionId] !== undefined) {
                         const normalized = (valueMap[regionId] - minVal) / range;
@@ -1095,6 +1216,7 @@
             }
 
             ctx.putImageData(imageData, 0, 0);
+            addCanvasDownload(canvas, 'dti_' + targetRegion);
         }
 
         function drawFMRIOnBrainMap(canvasId, funcName) {
@@ -1107,6 +1229,7 @@
             ctx.drawImage(blankBrainImage, 0, 0);
 
             const decodedMap = decodeRLE(labeledBrainMap.rle_rows, labeledBrainMap.width, labeledBrainMap.height);
+            const margin = 75;
 
             // Build value map by region ID
             const valueMap = {};
@@ -1128,8 +1251,10 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            for (let y = 75; y < canvas.height - 75; y++) {
-                for (let x = 75; x < canvas.width - 75; x++) {
+            clearBrainMapCorners(data, canvas.width, canvas.height, margin);
+
+            for (let y = margin; y < canvas.height - margin; y++) {
+                for (let x = margin; x < canvas.width - margin; x++) {
                     const regionId = decodedMap[y] && decodedMap[y][x];
                     if (regionId !== -100 && regionId !== undefined && valueMap[regionId] !== undefined) {
                         const normalized = (valueMap[regionId] - minVal) / range;
@@ -1144,6 +1269,7 @@
             }
 
             ctx.putImageData(imageData, 0, 0);
+            addCanvasDownload(canvas, 'fmri_' + funcName);
         }
 
         // ========== COLOR FUNCTIONS ==========
