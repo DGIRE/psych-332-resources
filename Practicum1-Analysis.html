@@ -966,53 +966,53 @@
                 </div>
             </section>
 
-            <!-- t-SNE -->
+            <!-- UMAP -->
             <section class="section">
                 <div class="section-label">Interactive Visualization</div>
-                <h2>t-SNE (t-distributed Stochastic Neighbor Embedding)</h2>
+                <h2>UMAP (Uniform Manifold Approximation and Projection)</h2>
 
                 <div class="control-group">
-                    <label for="tsneDataType">Data Type:</label>
-                    <select id="tsneDataType">
+                    <label for="umapDataType">Data Type:</label>
+                    <select id="umapDataType">
                         <option value="gene">Gene Expression</option>
                         <option value="dti">DTI Connectivity</option>
                         <option value="fmri">fMRI Functions</option>
                     </select>
                 </div>
 
-                <!-- t-SNE Settings -->
+                <!-- UMAP Settings -->
                 <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px 20px; margin-bottom: 18px;">
-                    <h3 style="font-size: 15px; color: #fff; margin-bottom: 10px;">t-SNE Settings</h3>
+                    <h3 style="font-size: 15px; color: #fff; margin-bottom: 10px;">UMAP Settings</h3>
                     <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 12px;">
                         <div>
-                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Perplexity</label>
-                            <input id="tsnePerplexity" type="number" value="30" min="2" max="100" step="1" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">n_neighbors</label>
+                            <input id="umapNeighbors" type="number" value="15" min="2" max="100" step="1" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Learning Rate</label>
-                            <input id="tsneLR" type="number" value="200" min="10" max="1000" step="10" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">min_dist</label>
+                            <input id="umapMinDist" type="number" value="0.1" min="0.0" max="1.0" step="0.05" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Iterations</label>
-                            <input id="tsneIter" type="number" value="1000" min="100" max="2000" step="50" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">n_epochs</label>
+                            <input id="umapEpochs" type="number" value="500" min="50" max="2000" step="50" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Early Exaggeration</label>
-                            <input id="tsneExagg" type="number" value="4" min="1" max="20" step="0.5" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Spread</label>
+                            <input id="umapSpread" type="number" value="1.0" min="0.1" max="5.0" step="0.1" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
                         </div>
-                        <button id="runTsneBtn" onclick="runTsne()" style="padding: 9px 18px; border-radius: 6px; border: 2px solid #0779be; background: rgba(7,121,190,0.25); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;">Run t-SNE</button>
+                        <button id="runUmapBtn" onclick="runUmap()" style="padding: 9px 18px; border-radius: 6px; border: 2px solid #0779be; background: rgba(7,121,190,0.25); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;">Run UMAP</button>
                     </div>
                     <div style="font-size: 12px; color: #7a9ab8; line-height: 1.6;">
-                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">Perplexity</strong> controls the effective number of neighbors each point considers. Low values (5&ndash;10) emphasize very local structure, revealing tight sub-clusters. High values (30&ndash;50) capture broader patterns but may blur fine detail. A good starting range is 5&ndash;50, roughly proportional to dataset size.</p>
-                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">Learning Rate</strong> controls the step size during gradient descent optimization. Too low and the embedding may get stuck in a poor local minimum; too high and points oscillate without converging. Values between 100&ndash;500 work well for most datasets.</p>
-                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">Iterations</strong> sets how many optimization steps are run. More iterations give the algorithm longer to settle into a stable embedding. 500&ndash;1000 is typical; increase if the plot still looks noisy.</p>
-                        <p><strong style="color:#b0c4de;">Early Exaggeration</strong> multiplies all pairwise affinities during the first 100 iterations, forcing clusters apart before fine-tuning. Higher values create wider initial separation between clusters. The default of 4 works well in most cases; increase to 8&ndash;12 if clusters appear overlapping.</p>
+                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">n_neighbors</strong> controls the size of the local neighborhood used to learn the manifold structure. Low values (5&ndash;10) preserve fine local detail and reveal tight sub-clusters. Higher values (30&ndash;50) capture more global structure but may merge nearby groups. This is the most important UMAP parameter &mdash; start with 15 and adjust from there.</p>
+                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">min_dist</strong> controls how tightly UMAP packs points together in the low-dimensional space. Values near 0 produce dense, well-separated clusters. Larger values (0.5&ndash;1.0) spread points more evenly, preserving broader topological structure at the expense of cluster compactness.</p>
+                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">n_epochs</strong> sets how many optimization passes the algorithm runs. More epochs produce a more refined embedding but take longer. 200&ndash;500 is typical; increase if the layout still looks unstable or crowded.</p>
+                        <p><strong style="color:#b0c4de;">Spread</strong> works together with min_dist to control the scale of the embedding. Higher spread values push clusters further apart. A spread of 1.0 is the default; increasing to 2&ndash;3 can help when clusters are tightly overlapping.</p>
                     </div>
                 </div>
 
-                <p id="tsneStatus" style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">t-SNE embedding of brain regions into 2D. Points colored by brain structure. Press <strong>Run t-SNE</strong> to compute.</p>
-                <div id="tsnePlot" class="chart-container"></div>
-                <button onclick="savePlotlyAsPNG('tsnePlot', 'tsne_plot')" class="save-btn">&#128190; Save as Image</button>
+                <p id="umapStatus" style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">UMAP embedding of brain regions into 2D. Points colored by brain structure. Press <strong>Run UMAP</strong> to compute.</p>
+                <div id="umapPlot" class="chart-container"></div>
+                <button onclick="savePlotlyAsPNG('umapPlot', 'umap_plot')" class="save-btn">&#128190; Save as Image</button>
             </section>
 
             <!-- Clustergram with Dendrograms -->
@@ -1649,7 +1649,7 @@
 
             // Dimensionality reduction (only 3 options, keep as regular select)
             document.getElementById('dimredDataType').addEventListener('change', (e) => updateDimRed(e.target.value));
-            document.getElementById('tsneDataType').addEventListener('change', () => runTsne());
+            document.getElementById('umapDataType').addEventListener('change', () => runUmap());
             document.getElementById('clustergramDataType').addEventListener('change', (e) => updateClustergram(e.target.value));
 
             // Check URL params for pre-population from Brain Explorer or Preparation page
@@ -1699,7 +1699,7 @@
             fmriCtrl.setValue(initFunc);
             updateFMRIView(initFunc);
             updateDimRed('gene');
-            runTsne();
+            runUmap();
             updateClustergram('gene');
         }
 
@@ -1858,150 +1858,228 @@
             Plotly.newPlot('dimredPlot', [trace], layout, PLOTLY_CONFIG);
         }
 
-        // ========== t-SNE ==========
+        // ========== UMAP ==========
 
-        // Full t-SNE implementation: Barnes-Hut approximation is not needed for
-        // the small datasets here (~200 regions), so we use exact gradient descent.
-        function tsneEmbed(data, opts = {}) {
-            const perplexity = opts.perplexity || 30;
-            const lr = opts.lr || 200;
-            const maxIter = opts.maxIter || 1000;
-            const earlyExagg = opts.earlyExagg || 4;
+        // UMAP (Uniform Manifold Approximation and Projection) implementation.
+        // Based on the original McInnes et al. algorithm:
+        // 1. Build fuzzy simplicial set from k-nearest-neighbor graph
+        // 2. Optimize low-dimensional layout via stochastic gradient descent
+        //    with attractive/repulsive forces derived from cross-entropy
+        function umapEmbed(data, opts = {}) {
+            const nNeighbors = opts.nNeighbors || 15;
+            const minDist = opts.minDist != null ? opts.minDist : 0.1;
+            const nEpochs = opts.nEpochs || 500;
+            const spread = opts.spread || 1.0;
             const n = data.length;
             const dim = 2;
+            const nFeatures = data[0].length;
 
-            // 1. Compute pairwise squared Euclidean distances in high-D
+            // --- Fit a/b curve parameters from min_dist and spread ---
+            // UMAP uses a smooth approximation: 1/(1 + a*d^(2b))
+            // We fit a, b such that the curve ≈ 1 for d < minDist and decays for d > minDist
+            let a, b;
+            if (minDist > 0) {
+                // Binary search / closed-form approximation matching reference implementation
+                b = 1.0;
+                // Newton-style fit: target is Phi(d) = 1/(1 + a*d^(2b)) ≈ exp(-(d-minDist)/spread) for d > minDist
+                // Use the reference heuristic:
+                const x = [];
+                const y = [];
+                for (let i = 0; i < 300; i++) {
+                    const d = i / 100.0 * 3.0 * spread;
+                    x.push(d);
+                    y.push(d <= minDist ? 1.0 : Math.exp(-(d - minDist) / spread));
+                }
+                // Fit a, b via least-squares on the curve 1/(1 + a * d^(2b))
+                a = 1.0; b = 1.0;
+                for (let iter = 0; iter < 100; iter++) {
+                    let gradA = 0, gradB = 0, loss = 0;
+                    for (let i = 0; i < x.length; i++) {
+                        const d = x[i];
+                        if (d === 0) continue;
+                        const d2b = Math.pow(d, 2 * b);
+                        const denom = 1 + a * d2b;
+                        const pred = 1.0 / denom;
+                        const err = pred - y[i];
+                        loss += err * err;
+                        // d(pred)/da = -d2b / denom^2
+                        gradA += 2 * err * (-d2b / (denom * denom));
+                        // d(pred)/db = -a * d2b * 2 * ln(d) / denom^2
+                        const lnD = Math.log(Math.max(d, 1e-10));
+                        gradB += 2 * err * (-a * d2b * 2 * lnD / (denom * denom));
+                    }
+                    a -= 0.01 * gradA;
+                    b -= 0.01 * gradB;
+                    if (a < 0.001) a = 0.001;
+                    if (b < 0.01) b = 0.01;
+                }
+            } else {
+                a = 1.929;
+                b = 0.7915;
+            }
+
+            // --- 1. Compute pairwise Euclidean distances ---
             const dists = new Float64Array(n * n);
             for (let i = 0; i < n; i++) {
                 for (let j = i + 1; j < n; j++) {
                     let s = 0;
-                    for (let k = 0; k < data[i].length; k++) {
+                    for (let k = 0; k < nFeatures; k++) {
                         const d = data[i][k] - data[j][k];
                         s += d * d;
                     }
-                    dists[i * n + j] = s;
-                    dists[j * n + i] = s;
+                    const dist = Math.sqrt(s);
+                    dists[i * n + j] = dist;
+                    dists[j * n + i] = dist;
                 }
             }
 
-            // 2. Compute pairwise affinities P using Gaussian kernels with
-            //    per-point sigma calibrated to match target perplexity via binary search
-            const P = new Float64Array(n * n);
-            const logPerp = Math.log(perplexity);
+            // --- 2. Find k-nearest neighbors for each point ---
+            const knn = [];
+            const knnDists = [];
+            const k = Math.min(nNeighbors, n - 1);
+            for (let i = 0; i < n; i++) {
+                const neighbors = [];
+                for (let j = 0; j < n; j++) {
+                    if (j !== i) neighbors.push({ idx: j, dist: dists[i * n + j] });
+                }
+                neighbors.sort((a, b) => a.dist - b.dist);
+                knn.push(neighbors.slice(0, k).map(nb => nb.idx));
+                knnDists.push(neighbors.slice(0, k).map(nb => nb.dist));
+            }
+
+            // --- 3. Compute fuzzy simplicial set (smooth kNN distances) ---
+            // For each point, find sigma such that sum of membership strengths = log2(k)
+            const sigmas = new Float64Array(n);
+            const rhos = new Float64Array(n);
+            const target = Math.log2(k);
 
             for (let i = 0; i < n; i++) {
-                let lo = 1e-20, hi = 1e4, mid = 1;
-                for (let iter = 0; iter < 100; iter++) {
+                rhos[i] = knnDists[i][0]; // distance to nearest neighbor
+                let lo = 1e-10, hi = 1000, mid = 1;
+                for (let iter = 0; iter < 64; iter++) {
                     mid = (lo + hi) / 2;
-                    // Compute conditional probabilities p(j|i)
-                    let sumExp = 0;
-                    for (let j = 0; j < n; j++) {
-                        if (j === i) continue;
-                        sumExp += Math.exp(-dists[i * n + j] * mid);
+                    let sumWeights = 0;
+                    for (let j = 0; j < k; j++) {
+                        const d = knnDists[i][j] - rhos[i];
+                        sumWeights += d > 0 ? Math.exp(-d / mid) : 1.0;
                     }
-                    if (sumExp < 1e-30) sumExp = 1e-30;
-
-                    // Compute entropy
-                    let H = 0;
-                    for (let j = 0; j < n; j++) {
-                        if (j === i) continue;
-                        const pj = Math.exp(-dists[i * n + j] * mid) / sumExp;
-                        if (pj > 1e-12) H -= pj * Math.log(pj);
-                    }
-
-                    if (H > logPerp) hi = mid;
+                    if (sumWeights > target) hi = mid;
                     else lo = mid;
-
-                    if (Math.abs(H - logPerp) < 1e-5) break;
+                    if (Math.abs(sumWeights - target) < 1e-5) break;
                 }
-
-                // Store conditional probabilities with calibrated sigma
-                let sumExp = 0;
-                for (let j = 0; j < n; j++) {
-                    if (j === i) continue;
-                    sumExp += Math.exp(-dists[i * n + j] * mid);
-                }
-                if (sumExp < 1e-30) sumExp = 1e-30;
-                for (let j = 0; j < n; j++) {
-                    if (j === i) { P[i * n + j] = 0; continue; }
-                    P[i * n + j] = Math.exp(-dists[i * n + j] * mid) / sumExp;
-                }
+                sigmas[i] = mid;
             }
 
-            // 3. Symmetrize: P_ij = (p(j|i) + p(i|j)) / (2n)
+            // --- 4. Build symmetrized graph weights ---
+            // w(i,j) = exp(-(d(i,j) - rho_i) / sigma_i), symmetrized: w_sym = w + w^T - w * w^T
+            const graph = new Float64Array(n * n);
+            for (let i = 0; i < n; i++) {
+                for (let jj = 0; jj < k; jj++) {
+                    const j = knn[i][jj];
+                    const d = dists[i * n + j] - rhos[i];
+                    graph[i * n + j] = d > 0 ? Math.exp(-d / sigmas[i]) : 1.0;
+                }
+            }
+            // Symmetrize: w_sym = w + w^T - w * w^T
+            const symGraph = new Float64Array(n * n);
             for (let i = 0; i < n; i++) {
                 for (let j = i + 1; j < n; j++) {
-                    const sym = (P[i * n + j] + P[j * n + i]) / (2 * n);
-                    P[i * n + j] = sym;
-                    P[j * n + i] = sym;
+                    const wij = graph[i * n + j];
+                    const wji = graph[j * n + i];
+                    const sym = wij + wji - wij * wji;
+                    symGraph[i * n + j] = sym;
+                    symGraph[j * n + i] = sym;
                 }
             }
 
-            // 4. Initialize embedding randomly (small Gaussian)
+            // --- 5. Build edge list with weights (for sampling) ---
+            const edges = [];
+            const edgeWeights = [];
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    if (symGraph[i * n + j] > 0.001) {
+                        edges.push([i, j]);
+                        edgeWeights.push(symGraph[i * n + j]);
+                    }
+                }
+            }
+            const nEdges = edges.length;
+
+            // Compute epochs-per-edge: higher-weight edges are sampled more often
+            const maxWeight = Math.max(...edgeWeights);
+            const epochsPerEdge = edgeWeights.map(w => {
+                const ep = Math.round(nEpochs * (w / maxWeight));
+                return Math.max(1, ep);
+            });
+            // For each edge, compute at which epochs it should be sampled
+            const edgeEpochs = epochsPerEdge.map(ep => {
+                const step = nEpochs / ep;
+                const epochs = [];
+                for (let e = 0; e < ep; e++) epochs.push(Math.floor(e * step));
+                return epochs;
+            });
+
+            // --- 6. Initialize embedding (spectral init fallback: random) ---
             const Y = new Float64Array(n * dim);
             for (let i = 0; i < n * dim; i++) {
-                Y[i] = (Math.random() - 0.5) * 0.01;
+                Y[i] = (Math.random() - 0.5) * 20;
             }
 
-            // Gradient descent with momentum
-            const gains = new Float64Array(n * dim).fill(1);
-            const velocity = new Float64Array(n * dim);
-            const grad = new Float64Array(n * dim);
-            const earlyExaggerEnd = 100;
-            const momentum1 = 0.5;
-            const momentum2 = 0.8;
+            // --- 7. SGD optimization ---
+            const negativeSampleRate = 5;
+            const initialAlpha = 1.0;
 
-            for (let iter = 0; iter < maxIter; iter++) {
-                const exagg = iter < earlyExaggerEnd ? earlyExagg : 1;
-                const mom = iter < 250 ? momentum1 : momentum2;
+            for (let epoch = 0; epoch < nEpochs; epoch++) {
+                const alpha = initialAlpha * (1.0 - epoch / nEpochs);
 
-                // Compute low-dimensional affinities Q (Student t with 1 DOF)
-                const qNum = new Float64Array(n * n);
-                let qSum = 0;
-                for (let i = 0; i < n; i++) {
-                    for (let j = i + 1; j < n; j++) {
-                        let s = 0;
-                        for (let d = 0; d < dim; d++) {
-                            const diff = Y[i * dim + d] - Y[j * dim + d];
-                            s += diff * diff;
-                        }
-                        const val = 1 / (1 + s);
-                        qNum[i * n + j] = val;
-                        qNum[j * n + i] = val;
-                        qSum += 2 * val;
+                for (let e = 0; e < nEdges; e++) {
+                    // Check if this edge should be sampled this epoch
+                    const epList = edgeEpochs[e];
+                    // Binary check: is epoch in the list? Use modular approach for speed
+                    const step = nEpochs / epochsPerEdge[e];
+                    const remainder = epoch % step;
+                    if (remainder > 0.5 && remainder < step - 0.5) continue;
+
+                    const [i, j] = edges[e];
+
+                    // --- Attractive force ---
+                    let distSq = 0;
+                    for (let d = 0; d < dim; d++) {
+                        const diff = Y[i * dim + d] - Y[j * dim + d];
+                        distSq += diff * diff;
                     }
-                }
-                if (qSum < 1e-30) qSum = 1e-30;
+                    const gradCoeff = (-2.0 * a * b * Math.pow(distSq, b - 1.0)) /
+                                      (1.0 + a * Math.pow(distSq, b));
 
-                // Compute gradients
-                grad.fill(0);
-                for (let i = 0; i < n; i++) {
-                    for (let j = 0; j < n; j++) {
-                        if (i === j) continue;
-                        const pij = P[i * n + j] * exagg;
-                        const qij = qNum[i * n + j] / qSum;
-                        const mult = 4 * (pij - qij) * qNum[i * n + j];
+                    for (let d = 0; d < dim; d++) {
+                        const diff = Y[i * dim + d] - Y[j * dim + d];
+                        const grad = gradCoeff * diff;
+                        const clipped = Math.max(-4, Math.min(4, grad));
+                        Y[i * dim + d] += alpha * clipped;
+                        Y[j * dim + d] -= alpha * clipped;
+                    }
+
+                    // --- Repulsive forces (negative sampling) ---
+                    for (let neg = 0; neg < negativeSampleRate; neg++) {
+                        const k2 = Math.floor(Math.random() * n);
+                        if (k2 === i) continue;
+
+                        let dSq = 0;
                         for (let d = 0; d < dim; d++) {
-                            grad[i * dim + d] += mult * (Y[i * dim + d] - Y[j * dim + d]);
+                            const diff = Y[i * dim + d] - Y[k2 * dim + d];
+                            dSq += diff * diff;
+                        }
+                        if (dSq < 0.001) dSq = 0.001;
+
+                        const repCoeff = (2.0 * b) / ((0.001 + dSq) * (1.0 + a * Math.pow(dSq, b)));
+
+                        for (let d = 0; d < dim; d++) {
+                            const diff = Y[i * dim + d] - Y[k2 * dim + d];
+                            const grad = repCoeff * diff;
+                            const clipped = Math.max(-4, Math.min(4, grad));
+                            Y[i * dim + d] += alpha * clipped;
                         }
                     }
-                }
-
-                // Update with adaptive gains and momentum
-                for (let i = 0; i < n * dim; i++) {
-                    const sameSign = (grad[i] > 0) === (velocity[i] > 0);
-                    gains[i] = sameSign ? gains[i] * 0.8 : gains[i] + 0.2;
-                    if (gains[i] < 0.01) gains[i] = 0.01;
-                    velocity[i] = mom * velocity[i] - lr * gains[i] * grad[i];
-                    Y[i] += velocity[i];
-                }
-
-                // Center embedding
-                for (let d = 0; d < dim; d++) {
-                    let mean = 0;
-                    for (let i = 0; i < n; i++) mean += Y[i * dim + d];
-                    mean /= n;
-                    for (let i = 0; i < n; i++) Y[i * dim + d] -= mean;
                 }
             }
 
@@ -2013,23 +2091,23 @@
             return result;
         }
 
-        let tsneRunning = false;
+        let umapRunning = false;
 
-        function runTsne() {
-            if (tsneRunning) return;
-            tsneRunning = true;
+        function runUmap() {
+            if (umapRunning) return;
+            umapRunning = true;
 
-            const dataType = document.getElementById('tsneDataType').value;
-            const perplexity = parseFloat(document.getElementById('tsnePerplexity').value) || 30;
-            const lr = parseFloat(document.getElementById('tsneLR').value) || 200;
-            const maxIter = parseInt(document.getElementById('tsneIter').value) || 1000;
-            const earlyExagg = parseFloat(document.getElementById('tsneExagg').value) || 4;
+            const dataType = document.getElementById('umapDataType').value;
+            const nNeighbors = parseInt(document.getElementById('umapNeighbors').value) || 15;
+            const minDist = parseFloat(document.getElementById('umapMinDist').value);
+            const nEpochs = parseInt(document.getElementById('umapEpochs').value) || 500;
+            const spread = parseFloat(document.getElementById('umapSpread').value) || 1.0;
 
-            const btn = document.getElementById('runTsneBtn');
-            const statusEl = document.getElementById('tsneStatus');
+            const btn = document.getElementById('runUmapBtn');
+            const statusEl = document.getElementById('umapStatus');
             btn.textContent = 'Running...';
             btn.style.opacity = '0.6';
-            statusEl.innerHTML = '<em>Computing t-SNE embedding... this may take a few seconds.</em>';
+            statusEl.innerHTML = '<em>Computing UMAP embedding... this may take a few seconds.</em>';
 
             let sourceData, regionLabels;
             if (dataType === 'gene') {
@@ -2043,25 +2121,25 @@
                 regionLabels = fmriData.map(row => row.Row);
             }
 
-            // Standardize features before t-SNE (same as PCA)
-            const n = sourceData.length;
+            // Standardize features before UMAP (same as PCA)
+            const ns = sourceData.length;
             const m = sourceData[0].length;
             const means = Array(m).fill(0);
             const stds = Array(m).fill(0);
-            for (let i = 0; i < n; i++) {
+            for (let i = 0; i < ns; i++) {
                 for (let j = 0; j < m; j++) means[j] += sourceData[i][j];
             }
-            for (let j = 0; j < m; j++) means[j] /= n;
-            for (let i = 0; i < n; i++) {
+            for (let j = 0; j < m; j++) means[j] /= ns;
+            for (let i = 0; i < ns; i++) {
                 for (let j = 0; j < m; j++) stds[j] += Math.pow(sourceData[i][j] - means[j], 2);
             }
-            for (let j = 0; j < m; j++) stds[j] = Math.sqrt(stds[j] / n) || 1;
+            for (let j = 0; j < m; j++) stds[j] = Math.sqrt(stds[j] / ns) || 1;
             const standardized = sourceData.map(row => row.map((x, j) => (x - means[j]) / stds[j]));
 
-            // Run t-SNE asynchronously so the UI doesn't freeze
+            // Run UMAP asynchronously so the UI doesn't freeze
             setTimeout(() => {
                 try {
-                    const embedding = tsneEmbed(standardized, { perplexity, lr, maxIter, earlyExagg });
+                    const embedding = umapEmbed(standardized, { nNeighbors, minDist, nEpochs, spread });
 
                     const colors = regionLabels.map(name => {
                         const meta = metadata.region_metadata.find(r => r.Name === name);
@@ -2082,26 +2160,26 @@
                             color: colors,
                             line: { color: '#e8eef5', width: 1 }
                         },
-                        hovertemplate: '<b>%{text}</b><br>t-SNE 1: %{x:.2f}<br>t-SNE 2: %{y:.2f}<extra></extra>'
+                        hovertemplate: '<b>%{text}</b><br>UMAP 1: %{x:.2f}<br>UMAP 2: %{y:.2f}<extra></extra>'
                     };
 
                     const layout = {
                         ...PLOTLY_DARK_LAYOUT,
                         height: 600,
                         dragmode: 'zoom',
-                        xaxis: { title: 't-SNE 1', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
-                        yaxis: { title: 't-SNE 2', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
+                        xaxis: { title: 'UMAP 1', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
+                        yaxis: { title: 'UMAP 2', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
                     };
 
-                    Plotly.newPlot('tsnePlot', [trace], layout, PLOTLY_CONFIG);
+                    Plotly.newPlot('umapPlot', [trace], layout, PLOTLY_CONFIG);
 
-                    statusEl.innerHTML = `t-SNE complete &mdash; perplexity=${perplexity}, lr=${lr}, ${maxIter} iterations, exaggeration=${earlyExagg}. Points colored by brain structure.`;
+                    statusEl.innerHTML = `UMAP complete &mdash; n_neighbors=${nNeighbors}, min_dist=${minDist}, ${nEpochs} epochs, spread=${spread}. Points colored by brain structure.`;
                 } catch (e) {
                     statusEl.innerHTML = `<span style="color:#ff6666;">Error: ${e.message}</span>`;
                 }
-                btn.textContent = 'Run t-SNE';
+                btn.textContent = 'Run UMAP';
                 btn.style.opacity = '1';
-                tsneRunning = false;
+                umapRunning = false;
             }, 50);
         }
 
