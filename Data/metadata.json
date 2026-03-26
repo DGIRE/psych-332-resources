@@ -313,7 +313,7 @@
       "Name": "insula",
       "structure_abbreviation": "IG",
       "top_level_structure_name": "insula",
-      "Brain Map ID-1": "18,26,109"
+      "Brain Map ID-1": "18,26"
     },
     {
       "Name": "interposed nucleus",
@@ -493,7 +493,7 @@
       "Name": "superior frontal gyrus",
       "structure_abbreviation": "SFG",
       "top_level_structure_name": "frontal lobe",
-      "Brain Map ID-1": "9"
+      "Brain Map ID-1": "9,69"
     },
     {
       "Name": "superior occipital gyrus",
