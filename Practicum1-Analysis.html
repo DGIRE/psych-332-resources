@@ -394,8 +394,8 @@
             34:'inferior temporal gyrus',35:'occipito-temporal gyrus',36:'inferior occipital gyrus',
             38:'superior occipital gyrus',39:'occipital pole',43:'lingual gyrus',44:'cuneus',
             47:'precuneus',50:'cingulate gyrus parietal part',52:'cingulate gyrus retrosplenial part',
-            53:'superior frontal gyrus',55:'fusiform gyrus',56:'parahippocampal gyrus',
-            58:'superior frontal gyrus',59:'cingulate gyrus frontal part',64:'paraterminal gyrus',
+            53:'paracentral lobule',55:'fusiform gyrus',56:'parahippocampal gyrus',
+            58:'paracentral lobule',59:'cingulate gyrus frontal part',64:'paraterminal gyrus',
             66:'parolfactory gyri',67:'piriform cortex',68:'subcallosal cingulate gyrus',
             69:'superior rostral gyrus',70:'gyrus rectus',71:'gyrus rectus',
             75:'substantia innominata',77:'septal nuclei',80:'substantia innominata',
@@ -453,62 +453,21 @@
             300:'cerebellar cortex'
         };
 
+        // Cerebellum bounding box — ID 0 pixels within this area are cerebellar cortex
+        const CEREBELLUM_BBOX = { minX: 1792, maxX: 2006, minY: 226, maxY: 459 };
+        const CEREBELLUM_PROXY_ID = 223; // a known cerebellar cortex ID
+
         /**
-         * Multi-source nearest-neighbor fill: assigns each ID 0 (unmapped brain
-         * tissue) pixel to the nearest labeled region by Manhattan distance.
-         * All labeled pixels start simultaneously, so each gap pixel gets its
-         * geometrically closest region — no over-filling across brain areas.
-         * Returns a new 2D array with ID 0 pixels replaced.
+         * Returns the effective pixel ID, mapping ID 0 pixels within the
+         * cerebellum bounding box to cerebellar cortex.
          */
-        let filledBrainMap = null; // computed once, then reused
-        function computeFilledBrainMap(decoded, width, height) {
-            const filled = [];
-            for (let y = 0; y < height; y++) {
-                filled[y] = decoded[y] ? decoded[y].slice() : [];
+        function effectivePixelId(rid, x, y) {
+            if (rid === 0 &&
+                x >= CEREBELLUM_BBOX.minX && x <= CEREBELLUM_BBOX.maxX &&
+                y >= CEREBELLUM_BBOX.minY && y <= CEREBELLUM_BBOX.maxY) {
+                return CEREBELLUM_PROXY_ID;
             }
-            const total = width * height;
-            const visited = new Uint8Array(total);
-            const queue = new Int32Array(total); // pre-allocated for speed
-            let head = 0, tail = 0;
-
-            // Seed: every non-zero, non-background pixel
-            for (let y = 0; y < height; y++) {
-                const row = decoded[y];
-                if (!row) continue;
-                for (let x = 0; x < Math.min(row.length, width); x++) {
-                    const id = row[x];
-                    if (id > 0) { // labeled brain pixel
-                        const idx = y * width + x;
-                        visited[idx] = 1;
-                        queue[tail++] = idx;
-                    } else if (id === -100) {
-                        visited[y * width + x] = 1; // mark background as visited
-                    }
-                }
-            }
-
-            // BFS: expand all seeds simultaneously into ID 0 territory
-            while (head < tail) {
-                const idx = queue[head++];
-                const y = (idx / width) | 0, x = idx % width;
-                const id = filled[y][x];
-                const neighbors = [
-                    y > 0          ? idx - width : -1,
-                    y < height - 1 ? idx + width : -1,
-                    x > 0          ? idx - 1     : -1,
-                    x < width - 1  ? idx + 1     : -1
-                ];
-                for (const ni of neighbors) {
-                    if (ni < 0 || visited[ni]) continue;
-                    const ny = (ni / width) | 0, nx = ni % width;
-                    if (decoded[ny][nx] === 0) {
-                        filled[ny][nx] = id;
-                        visited[ni] = 1;
-                        queue[tail++] = ni;
-                    }
-                }
-            }
-            return filled;
+            return rid;
         }
 
         const PLOTLY_CONFIG = {
@@ -1337,26 +1296,22 @@
         }
 
         /**
-         * Creates a per-pixel value array using the nearest-neighbor filled brain map.
-         * ID 0 gaps are resolved to their nearest labeled region.
+         * Creates a per-pixel value array using direct pixel mapping.
+         * Only pixels with a known region assignment are colored.
+         * Cerebellum ID 0 gaps are filled via effectivePixelId.
          */
         function buildFilledValueArray(valueMap, width, height) {
             const total = width * height;
             const values = new Float32Array(total);
             const status = new Uint8Array(total); // 0=bg, 1=mapped
 
-            // Ensure filled brain map is computed
-            if (!filledBrainMap) {
-                filledBrainMap = computeFilledBrainMap(decodedBrainMap, width, height);
-            }
-
             for (let y = 0; y < height; y++) {
-                const row = filledBrainMap[y];
+                const row = decodedBrainMap[y];
                 if (!row) continue;
                 for (let x = 0; x < Math.min(row.length, width); x++) {
-                    const rid = row[x];
+                    const rid = effectivePixelId(row[x], x, y);
                     const idx = y * width + x;
-                    if (rid !== -100 && rid !== 0 && rid !== undefined && valueMap[rid] !== undefined) {
+                    if (rid !== -100 && rid !== undefined && valueMap[rid] !== undefined) {
                         status[idx] = 1;
                         values[idx] = valueMap[rid];
                     }
@@ -1497,16 +1452,12 @@
                 if (name === regionName) targetIds.add(parseInt(pixelId));
             }
 
-            // Use nearest-neighbor filled map for gap-free rendering
-            if (!filledBrainMap) {
-                filledBrainMap = computeFilledBrainMap(decodedBrainMap, bmW, bmH);
-            }
             const isTarget = new Uint8Array(bmW * bmH);
             for (let y = 0; y < bmH; y++) {
-                const row = filledBrainMap[y];
+                const row = decodedBrainMap[y];
                 if (!row) continue;
                 for (let x = 0; x < Math.min(row.length, bmW); x++) {
-                    const rid = row[x];
+                    const rid = effectivePixelId(row[x], x, y);
                     if (targetIds.has(rid)) {
                         isTarget[y * bmW + x] = 1;
                     }
