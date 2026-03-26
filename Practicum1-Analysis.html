@@ -390,6 +390,57 @@
                 <button onclick="savePlotlyAsPNG('dimredPlot', 'pca_dimred')" class="save-btn">&#128190; Save as Image</button>
             </section>
 
+            <!-- PCA Video Guides -->
+            <section class="section">
+                <div class="section-label">Video Guide</div>
+                <h2>Understanding PCA</h2>
+                <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">These short videos explain how to interpret the PCA plots above and what the principal components reveal about brain region similarity.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                    <div>
+                        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                            <iframe src="https://drive.google.com/file/d/1vb1vAPCRAH8G781YVnMdtGU2VD6u5aR0/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        </div>
+                        <p style="color: #b0c4de; font-size: 13px; margin-top: 8px; text-align: center;">The "Big Five" of Biology: Decoding PCA</p>
+                    </div>
+                    <div>
+                        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                            <iframe src="https://drive.google.com/file/d/1jyVUXQXcshX98U4grZixN0n9JIshm5xL/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        </div>
+                        <p style="color: #b0c4de; font-size: 13px; margin-top: 8px; text-align: center;">Demystifying PCA Loadings: The Personality Recipe</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clustergram -->
+            <section class="section">
+                <div class="section-label">Interactive Visualization</div>
+                <h2>Clustergram</h2>
+                <div class="control-group">
+                    <label for="clustergramDataType">Data Type:</label>
+                    <select id="clustergramDataType">
+                        <option value="gene">Gene Expression</option>
+                        <option value="dti">DTI Connectivity</option>
+                        <option value="fmri">fMRI Functions</option>
+                    </select>
+                </div>
+                <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">Hierarchically clustered heatmap. Rows (brain regions) and columns (features) are reordered by similarity using agglomerative clustering so that related items appear adjacent.</p>
+                <div id="clustergramPlot" class="chart-container"></div>
+                <button onclick="savePlotlyAsPNG('clustergramPlot', 'clustergram')" class="save-btn">&#128190; Save as Image</button>
+            </section>
+
+            <!-- Clustergram Video Guide -->
+            <section class="section">
+                <div class="section-label">Video Guide</div>
+                <h2>Understanding Clustergrams</h2>
+                <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">This video explains how to read the clustergram above and what the hierarchical clustering reveals about the relationship between brain regions and their molecular or functional profiles.</p>
+                <div style="max-width: 640px;">
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                        <iframe src="https://drive.google.com/file/d/1mXHKjJEYRFncIpMcKEzSwrj1QkdPIWsj/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                    <p style="color: #b0c4de; font-size: 13px; margin-top: 8px; text-align: center;">The Biological Personality Test</p>
+                </div>
+            </section>
+
             <!-- Structure Selector -->
             <section class="section">
                 <div class="section-label">Interactive Visualization</div>
@@ -931,6 +982,7 @@
 
             // Dimensionality reduction (only 3 options, keep as regular select)
             document.getElementById('dimredDataType').addEventListener('change', (e) => updateDimRed(e.target.value));
+            document.getElementById('clustergramDataType').addEventListener('change', (e) => updateClustergram(e.target.value));
 
             // Check URL params for pre-population from Brain Explorer or Preparation page
             const params = new URLSearchParams(window.location.search);
@@ -942,7 +994,32 @@
             const initRegion = (urlRegion && regionNames.includes(urlRegion)) ? urlRegion : regionNames[0];
             const initGene   = (urlGene && metadata.gene_names.includes(urlGene)) ? urlGene : metadata.gene_names[0];
             const initDTI    = (urlRegion && metadata.dti_regions.includes(urlRegion)) ? urlRegion : metadata.dti_regions[0];
-            const initFunc   = (urlFunc && metadata.fmri_functions.includes(urlFunc)) ? urlFunc : metadata.fmri_functions[0];
+
+            // Map display function names (from Brain Explorer) to camelCase data keys
+            let resolvedFunc = null;
+            if (urlFunc) {
+                // Direct match first
+                if (metadata.fmri_functions.includes(urlFunc)) {
+                    resolvedFunc = urlFunc;
+                } else {
+                    // Try case-insensitive match (e.g. "Addiction" → "addiction")
+                    const lower = urlFunc.toLowerCase();
+                    resolvedFunc = metadata.fmri_functions.find(f => f.toLowerCase() === lower);
+                    if (!resolvedFunc) {
+                        // Convert display name to camelCase: "Decision Making" → "decisionMaking", "Theory of Mind" → "theoryMind"
+                        const camel = urlFunc.replace(/\s+(\w)/g, (_, c) => c.toUpperCase())
+                                             .replace(/^(\w)/, (_, c) => c.toLowerCase())
+                                             .replace(/\s+/g, '');
+                        resolvedFunc = metadata.fmri_functions.find(f => f === camel);
+                    }
+                    if (!resolvedFunc) {
+                        // Fuzzy: strip spaces, compare lowercase
+                        const stripped = urlFunc.replace(/\s+/g, '').toLowerCase();
+                        resolvedFunc = metadata.fmri_functions.find(f => f.toLowerCase() === stripped);
+                    }
+                }
+            }
+            const initFunc = resolvedFunc || metadata.fmri_functions[0];
 
             // Set values and initialize views
             structureCtrl.setValue(initRegion);
@@ -954,6 +1031,7 @@
             fmriCtrl.setValue(initFunc);
             updateFMRIView(initFunc);
             updateDimRed('gene');
+            updateClustergram('gene');
         }
 
         // ========== STATIC VISUALIZATIONS ==========
@@ -1109,6 +1187,119 @@
             };
 
             Plotly.newPlot('dimredPlot', [trace], layout, PLOTLY_CONFIG);
+        }
+
+        // ========== CLUSTERGRAM ==========
+        function clustergramDistance(a, b) {
+            // Euclidean distance
+            let sum = 0;
+            for (let i = 0; i < a.length; i++) { const d = a[i] - b[i]; sum += d * d; }
+            return Math.sqrt(sum);
+        }
+
+        function agglomerativeOrder(data) {
+            // Average-linkage agglomerative clustering, returns leaf order
+            const n = data.length;
+            if (n <= 1) return [0];
+            // Build distance matrix
+            const dist = Array.from({ length: n }, (_, i) =>
+                Array.from({ length: n }, (_, j) => i === j ? Infinity : clustergramDistance(data[i], data[j]))
+            );
+            // Cluster membership: each cluster is an array of original indices
+            let clusters = Array.from({ length: n }, (_, i) => [i]);
+            const active = new Set(Array.from({ length: n }, (_, i) => i));
+
+            while (active.size > 1) {
+                // Find closest pair
+                let minD = Infinity, mi = -1, mj = -1;
+                const ids = [...active];
+                for (let ii = 0; ii < ids.length; ii++) {
+                    for (let jj = ii + 1; jj < ids.length; jj++) {
+                        if (dist[ids[ii]][ids[jj]] < minD) {
+                            minD = dist[ids[ii]][ids[jj]];
+                            mi = ids[ii]; mj = ids[jj];
+                        }
+                    }
+                }
+                // Merge mj into mi (average linkage)
+                const newCluster = clusters[mi].concat(clusters[mj]);
+                clusters[mi] = newCluster;
+                active.delete(mj);
+                // Update distances
+                for (const k of active) {
+                    if (k === mi) continue;
+                    dist[mi][k] = dist[k][mi] = (dist[mi][k] * clusters[mi].length + dist[mj][k] * clusters[mj].length) /
+                        (clusters[mi].length + clusters[mj].length);
+                }
+            }
+            return clusters[[...active][0]];
+        }
+
+        function updateClustergram(dataType) {
+            let matrix, rowLabels, colLabels;
+
+            if (dataType === 'gene') {
+                colLabels = metadata.gene_names;
+                rowLabels = geneExpressionData.map(r => r.Name);
+                matrix = geneExpressionData.map(r => colLabels.map(g => r[g] || 0));
+            } else if (dataType === 'dti') {
+                colLabels = metadata.dti_regions;
+                rowLabels = dtiData.map(r => r.Row);
+                matrix = dtiData.map(r => colLabels.map(c => r[c] || 0));
+            } else {
+                colLabels = metadata.fmri_functions;
+                rowLabels = fmriData.map(r => r.Row);
+                matrix = fmriData.map(r => colLabels.map(f => r[f] || 0));
+            }
+
+            // Cluster rows
+            const rowOrder = agglomerativeOrder(matrix);
+            // Cluster columns (transpose, cluster, then use order)
+            const transposed = colLabels.map((_, ci) => matrix.map(row => row[ci]));
+            const colOrder = agglomerativeOrder(transposed);
+
+            // Reorder
+            const orderedRows = rowOrder.map(i => rowLabels[i]);
+            const orderedCols = colOrder.map(i => colLabels[i]);
+            const orderedZ = rowOrder.map(ri => colOrder.map(ci => matrix[ri][ci]));
+
+            // Color rows by brain structure
+            const rowColors = orderedRows.map(name => {
+                const meta = metadata.region_metadata.find(r => r.Name === name);
+                const structName = meta ? meta.top_level_structure_name : 'brain';
+                return nipySpectralColor(BRAIN_SCALE_DICT[structName] || 0.5);
+            });
+
+            const colorscale = dataType === 'gene' ? [[0, '#2166ac'], [0.5, '#f7f7f7'], [1, '#b2182b']] :
+                               dataType === 'dti' ? [[0, '#fff5f0'], [0.5, '#fb6a4a'], [1, '#67000d']] :
+                                                     [[0, '#f7fbff'], [0.5, '#6baed6'], [1, '#08306b']];
+
+            const trace = {
+                z: orderedZ,
+                x: orderedCols,
+                y: orderedRows,
+                type: 'heatmap',
+                colorscale: colorscale,
+                hovertemplate: '<b>Region:</b> %{y}<br><b>Feature:</b> %{x}<br><b>Value:</b> %{z:.3f}<extra></extra>'
+            };
+
+            const nRows = orderedRows.length;
+            const nCols = orderedCols.length;
+
+            const layout = {
+                ...PLOTLY_DARK_LAYOUT,
+                height: Math.max(600, nRows * 12 + 200),
+                margin: { l: 200, r: 60, t: 40, b: Math.max(120, nCols * 6) },
+                xaxis: { side: 'bottom', tickangle: 45, tickfont: { size: 9 } },
+                yaxis: {
+                    tickfont: {
+                        size: Math.max(7, Math.min(11, 700 / nRows)),
+                        color: rowColors.map(c => `rgb(${c[0]},${c[1]},${c[2]})`)
+                    }
+                }
+            };
+
+            Plotly.newPlot('clustergramPlot', [trace], layout, PLOTLY_CONFIG);
         }
 
         // ========== STRUCTURE SELECTOR ==========
