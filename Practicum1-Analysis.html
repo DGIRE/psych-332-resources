@@ -1054,6 +1054,14 @@
                             <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Spread</label>
                             <input id="umapSpread" type="number" value="1.0" min="0.1" max="5.0" step="0.1" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
                         </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Seed</label>
+                            <input id="umapSeed" type="number" value="" min="0" max="999999" step="1" placeholder="auto" style="width: 90px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px; padding-bottom: 4px;">
+                            <input id="umapLockSeed" type="checkbox" style="width: 16px; height: 16px; accent-color: #0779be; cursor: pointer;">
+                            <label for="umapLockSeed" style="font-size: 12px; color: #8aacc8; margin: 0; cursor: pointer; white-space: nowrap;">Lock seed</label>
+                        </div>
                         <button id="runUmapBtn" onclick="runUmap()" style="padding: 9px 18px; border-radius: 6px; border: 2px solid #0779be; background: rgba(7,121,190,0.25); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;">Run UMAP</button>
                     </div>
                     <div style="font-size: 12px; color: #7a9ab8; line-height: 1.6;">
@@ -1761,7 +1769,52 @@
             fmriCtrl.setValue(initFunc);
             updateFMRIView(initFunc);
             updateDimRed();
+
+            // Check URL query parameters for UMAP recipe presets
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('umap_neighbors')) {
+                document.getElementById('umapNeighbors').value = urlParams.get('umap_neighbors');
+            }
+            if (urlParams.has('umap_mindist')) {
+                document.getElementById('umapMinDist').value = urlParams.get('umap_mindist');
+            }
+            if (urlParams.has('umap_epochs')) {
+                document.getElementById('umapEpochs').value = urlParams.get('umap_epochs');
+            }
+            if (urlParams.has('umap_spread')) {
+                document.getElementById('umapSpread').value = urlParams.get('umap_spread');
+            }
+            if (urlParams.has('umap_seed')) {
+                document.getElementById('umapSeed').value = urlParams.get('umap_seed');
+                document.getElementById('umapLockSeed').checked = true;
+            }
+            if (urlParams.has('umap_data')) {
+                const dataVal = urlParams.get('umap_data');
+                const dataSelect = document.getElementById('umapDataType');
+                if (['gene', 'dti', 'fmri'].includes(dataVal)) {
+                    dataSelect.value = dataVal;
+                }
+            }
+            if (urlParams.has('umap_points')) {
+                const pointsVal = urlParams.get('umap_points');
+                const pointsSelect = document.getElementById('umapPointsType');
+                if (['regions', 'features'].includes(pointsVal)) {
+                    pointsSelect.value = pointsVal;
+                }
+            }
+
             runUmap();
+
+            // If arriving from a recipe link, scroll to UMAP section
+            if (urlParams.has('umap_neighbors') || urlParams.has('umap_recipe')) {
+                setTimeout(() => {
+                    const umapSection = document.getElementById('umapPlot');
+                    if (umapSection) {
+                        umapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 500);
+            }
+
             updateClustergram('gene');
         }
 
@@ -1989,6 +2042,7 @@
             const minDist = opts.minDist != null ? opts.minDist : 0.1;
             const nEpochs = opts.nEpochs || 500;
             const spread = opts.spread || 1.0;
+            const rng = opts.rng || Math.random;  // seeded PRNG or default
             const n = data.length;
             const dim = 2;
             const nFeatures = data[0].length;
@@ -2141,7 +2195,7 @@
             // --- 6. Initialize embedding (spectral init fallback: random) ---
             const Y = new Float64Array(n * dim);
             for (let i = 0; i < n * dim; i++) {
-                Y[i] = (Math.random() - 0.5) * 20;
+                Y[i] = (rng() - 0.5) * 20;
             }
 
             // --- 7. SGD optimization ---
@@ -2180,7 +2234,7 @@
 
                     // --- Repulsive forces (negative sampling) ---
                     for (let neg = 0; neg < negativeSampleRate; neg++) {
-                        const k2 = Math.floor(Math.random() * n);
+                        const k2 = Math.floor(rng() * n);
                         if (k2 === i) continue;
 
                         let dSq = 0;
@@ -2211,6 +2265,18 @@
         }
 
         let umapRunning = false;
+        let currentUmapSeed = null;
+
+        // Seeded PRNG (mulberry32) — deterministic random numbers from a 32-bit seed
+        function mulberry32(seed) {
+            let s = seed | 0;
+            return function() {
+                s = (s + 0x6D2B79F5) | 0;
+                let t = Math.imul(s ^ (s >>> 15), 1 | s);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
 
         function runUmap() {
             if (umapRunning) return;
@@ -2222,6 +2288,20 @@
             const minDist = parseFloat(document.getElementById('umapMinDist').value);
             const nEpochs = parseInt(document.getElementById('umapEpochs').value) || 500;
             const spread = parseFloat(document.getElementById('umapSpread').value) || 1.0;
+
+            // Seed handling: use locked seed, typed seed, or generate a new random one
+            const seedInput = document.getElementById('umapSeed');
+            const lockSeed = document.getElementById('umapLockSeed').checked;
+            let seed;
+            if (lockSeed && currentUmapSeed != null) {
+                seed = currentUmapSeed;
+            } else if (seedInput.value !== '') {
+                seed = parseInt(seedInput.value) || 0;
+            } else {
+                seed = Math.floor(Math.random() * 1000000);
+            }
+            currentUmapSeed = seed;
+            seedInput.value = seed;
 
             const btn = document.getElementById('runUmapBtn');
             const statusEl = document.getElementById('umapStatus');
@@ -2248,11 +2328,12 @@
 
             const pointsLabel = isRegions ? 'Brain Areas' : getFeatureLabel(dataType);
             const modalityLabel = getModalityLabel(dataType);
+            const rng = mulberry32(seed);
 
             // Run UMAP asynchronously so the UI doesn't freeze
             setTimeout(() => {
                 try {
-                    const embedding = umapEmbed(standardized, { nNeighbors, minDist, nEpochs, spread });
+                    const embedding = umapEmbed(standardized, { nNeighbors, minDist, nEpochs, spread, rng });
 
                     const colors = colorDimRedPoints(pointLabels, isRegions);
 
@@ -2280,13 +2361,21 @@
                         dragmode: 'zoom',
                         title: { text: titleText, font: { color: '#b0c4de', size: 14 }, x: 0.5 },
                         xaxis: { title: 'UMAP 1', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
-                        yaxis: { title: 'UMAP 2', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
+                        yaxis: { title: 'UMAP 2', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
+                        annotations: [{
+                            text: `seed: ${seed}`,
+                            xref: 'paper', yref: 'paper',
+                            x: 1, y: 1.06,
+                            xanchor: 'right', yanchor: 'bottom',
+                            showarrow: false,
+                            font: { size: 10, color: '#5a7d9e', family: 'monospace' }
+                        }]
                     };
 
                     Plotly.newPlot('umapPlot', [trace], layout, PLOTLY_CONFIG);
 
                     const ptDesc = isRegions ? 'Points colored by brain structure.' : `Each point is a ${getFeatureLabel(dataType).toLowerCase().replace(/s$/, '')}.`;
-                    statusEl.innerHTML = `UMAP complete &mdash; n_neighbors=${nNeighbors}, min_dist=${minDist}, ${nEpochs} epochs, spread=${spread}. ${ptDesc}`;
+                    statusEl.innerHTML = `UMAP complete &mdash; n_neighbors=${nNeighbors}, min_dist=${minDist}, ${nEpochs} epochs, spread=${spread}, seed=${seed}. ${ptDesc}`;
                 } catch (e) {
                     statusEl.innerHTML = `<span style="color:#ff6666;">Error: ${e.message}</span>`;
                 }

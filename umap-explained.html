@@ -294,6 +294,29 @@
       color: #8aacc8;
     }
 
+    .recipe-try-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: 2px solid #0779be;
+      background: rgba(7, 121, 190, 0.2);
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: inherit;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .recipe-try-btn:hover {
+      background: #0779be;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(7, 121, 190, 0.3);
+    }
+
     /* Ordered steps inside warnings */
     .step-list {
       counter-reset: step-counter;
@@ -497,6 +520,7 @@
           <span class="recipe-tag">n_epochs = 500</span>
         </div>
         <p>The default settings. A balanced view that reveals both local cluster structure and broad global organization. Start here whenever you encounter a new dataset or data type.</p>
+        <a class="recipe-try-btn" href="Practicum1-Analysis.html?umap_neighbors=15&umap_mindist=0.1&umap_spread=1.0&umap_epochs=500&umap_recipe=discovery">&#9654; Try this recipe</a>
       </div>
 
       <div class="recipe">
@@ -508,6 +532,7 @@
           <span class="recipe-tag">n_epochs = 500</span>
         </div>
         <p>Very local focus. Maximizes the separation of small subgroups and reveals fine-grained distinctions between individual brain regions. Useful when you suspect that a large cluster in the default view actually contains meaningful substructure. Be cautious: some of the small groups you see may be artifacts of noise.</p>
+        <a class="recipe-try-btn" href="Practicum1-Analysis.html?umap_neighbors=5&umap_mindist=0.0&umap_spread=1.0&umap_epochs=500&umap_recipe=fine-detail">&#9654; Try this recipe</a>
       </div>
 
       <div class="recipe">
@@ -519,6 +544,7 @@
           <span class="recipe-tag">n_epochs = 500</span>
         </div>
         <p>Broad, global view. Emphasizes the large-scale relationships between brain systems (e.g., cortical vs. subcortical, sensory vs. motor). Clusters blend together more because the algorithm is weighing global topology over local detail. Good for seeing where the brain's major organizational boundaries fall.</p>
+        <a class="recipe-try-btn" href="Practicum1-Analysis.html?umap_neighbors=50&umap_mindist=0.5&umap_spread=2.0&umap_epochs=500&umap_recipe=big-picture">&#9654; Try this recipe</a>
       </div>
 
       <div class="recipe">
@@ -530,6 +556,7 @@
           <span class="recipe-tag">n_epochs = 500</span>
         </div>
         <p>Spreads points evenly to reveal continuous variation rather than discrete clusters. Particularly useful with gene expression data, where brain regions often form gradients rather than hard categories. If the biology is truly continuous, this view will show it better than a tight-clustering setting that imposes artificial boundaries.</p>
+        <a class="recipe-try-btn" href="Practicum1-Analysis.html?umap_neighbors=20&umap_mindist=0.8&umap_spread=1.5&umap_epochs=500&umap_recipe=gradients">&#9654; Try this recipe</a>
       </div>
 
       <div class="recipe">
@@ -541,6 +568,7 @@
           <span class="recipe-tag">n_epochs = 500</span>
         </div>
         <p>Run the default settings multiple times (press "Run UMAP" repeatedly on the analysis page). Each run uses a different random initialization. Structures that reappear consistently &mdash; the same brain regions clustering together, the same groups staying separate &mdash; are robust features of your data. Structures that shift or break apart between runs are likely noise or weak signals.</p>
+        <a class="recipe-try-btn" href="Practicum1-Analysis.html?umap_neighbors=15&umap_mindist=0.1&umap_spread=1.0&umap_epochs=500&umap_recipe=stability">&#9654; Try this recipe</a>
       </div>
 
       <div class="recipe">
@@ -552,6 +580,7 @@
           <span class="recipe-tag">n_epochs = 500</span>
         </div>
         <p>Keep settings constant and switch between Gene Expression, DTI Connectivity, and fMRI Functions using the Data Type dropdown. With identical parameters, any differences in clustering reflect genuine differences in how each modality organizes brain regions. Brain areas that cluster together across all three modalities are very likely biologically related.</p>
+        <a class="recipe-try-btn" href="Practicum1-Analysis.html?umap_neighbors=15&umap_mindist=0.1&umap_spread=1.0&umap_epochs=500&umap_recipe=modalities">&#9654; Try this recipe</a>
       </div>
 
       <div class="recipe">
@@ -564,6 +593,7 @@
           <span class="recipe-tag">n_epochs = 500</span>
         </div>
         <p>Flip the perspective: instead of plotting brain regions in gene-expression space, plot genes in brain-region space. Genes that cluster together here have similar expression profiles across the brain. This can reveal gene co-expression modules &mdash; groups of genes that tend to be up-regulated or down-regulated together. Use lower n_neighbors since there are usually more features than brain regions.</p>
+        <a class="recipe-try-btn" href="Practicum1-Analysis.html?umap_neighbors=10&umap_mindist=0.1&umap_spread=1.0&umap_epochs=500&umap_points=features&umap_recipe=feature-perspective">&#9654; Try this recipe</a>
       </div>
 
       <div class="callout callout-info">
