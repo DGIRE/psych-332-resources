@@ -937,6 +937,55 @@
                 </div>
             </section>
 
+            <!-- t-SNE -->
+            <section class="section">
+                <div class="section-label">Interactive Visualization</div>
+                <h2>t-SNE (t-distributed Stochastic Neighbor Embedding)</h2>
+
+                <div class="control-group">
+                    <label for="tsneDataType">Data Type:</label>
+                    <select id="tsneDataType">
+                        <option value="gene">Gene Expression</option>
+                        <option value="dti">DTI Connectivity</option>
+                        <option value="fmri">fMRI Functions</option>
+                    </select>
+                </div>
+
+                <!-- t-SNE Settings -->
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px 20px; margin-bottom: 18px;">
+                    <h3 style="font-size: 15px; color: #fff; margin-bottom: 10px;">t-SNE Settings</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Perplexity</label>
+                            <input id="tsnePerplexity" type="number" value="15" min="2" max="100" step="1" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Learning Rate</label>
+                            <input id="tsneLR" type="number" value="200" min="10" max="1000" step="10" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Iterations</label>
+                            <input id="tsneIter" type="number" value="500" min="100" max="2000" step="50" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Early Exaggeration</label>
+                            <input id="tsneExagg" type="number" value="4" min="1" max="20" step="0.5" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                        </div>
+                        <button id="runTsneBtn" onclick="runTsne()" style="padding: 9px 18px; border-radius: 6px; border: 2px solid #0779be; background: rgba(7,121,190,0.25); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;">Run t-SNE</button>
+                    </div>
+                    <div style="font-size: 12px; color: #7a9ab8; line-height: 1.6;">
+                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">Perplexity</strong> controls the effective number of neighbors each point considers. Low values (5&ndash;10) emphasize very local structure, revealing tight sub-clusters. High values (30&ndash;50) capture broader patterns but may blur fine detail. A good starting range is 5&ndash;50, roughly proportional to dataset size.</p>
+                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">Learning Rate</strong> controls the step size during gradient descent optimization. Too low and the embedding may get stuck in a poor local minimum; too high and points oscillate without converging. Values between 100&ndash;500 work well for most datasets.</p>
+                        <p style="margin-bottom: 6px;"><strong style="color:#b0c4de;">Iterations</strong> sets how many optimization steps are run. More iterations give the algorithm longer to settle into a stable embedding. 500&ndash;1000 is typical; increase if the plot still looks noisy.</p>
+                        <p><strong style="color:#b0c4de;">Early Exaggeration</strong> multiplies all pairwise affinities during the first 100 iterations, forcing clusters apart before fine-tuning. Higher values create wider initial separation between clusters. The default of 4 works well in most cases; increase to 8&ndash;12 if clusters appear overlapping.</p>
+                    </div>
+                </div>
+
+                <p id="tsneStatus" style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">t-SNE embedding of brain regions into 2D. Points colored by brain structure. Press <strong>Run t-SNE</strong> to compute.</p>
+                <div id="tsnePlot" class="chart-container"></div>
+                <button onclick="savePlotlyAsPNG('tsnePlot', 'tsne_plot')" class="save-btn">&#128190; Save as Image</button>
+            </section>
+
             <!-- Clustergram with Dendrograms -->
             <section class="section">
                 <div class="section-label">Interactive Visualization</div>
@@ -1567,6 +1616,7 @@
 
             // Dimensionality reduction (only 3 options, keep as regular select)
             document.getElementById('dimredDataType').addEventListener('change', (e) => updateDimRed(e.target.value));
+            document.getElementById('tsneDataType').addEventListener('change', () => runTsne());
             document.getElementById('clustergramDataType').addEventListener('change', (e) => updateClustergram(e.target.value));
 
             // Check URL params for pre-population from Brain Explorer or Preparation page
@@ -1616,6 +1666,7 @@
             fmriCtrl.setValue(initFunc);
             updateFMRIView(initFunc);
             updateDimRed('gene');
+            runTsne();
             updateClustergram('gene');
         }
 
@@ -1772,6 +1823,253 @@
             };
 
             Plotly.newPlot('dimredPlot', [trace], layout, PLOTLY_CONFIG);
+        }
+
+        // ========== t-SNE ==========
+
+        // Full t-SNE implementation: Barnes-Hut approximation is not needed for
+        // the small datasets here (~200 regions), so we use exact gradient descent.
+        function tsneEmbed(data, opts = {}) {
+            const perplexity = opts.perplexity || 15;
+            const lr = opts.lr || 200;
+            const maxIter = opts.maxIter || 500;
+            const earlyExagg = opts.earlyExagg || 4;
+            const n = data.length;
+            const dim = 2;
+
+            // 1. Compute pairwise squared Euclidean distances in high-D
+            const dists = new Float64Array(n * n);
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    let s = 0;
+                    for (let k = 0; k < data[i].length; k++) {
+                        const d = data[i][k] - data[j][k];
+                        s += d * d;
+                    }
+                    dists[i * n + j] = s;
+                    dists[j * n + i] = s;
+                }
+            }
+
+            // 2. Compute pairwise affinities P using Gaussian kernels with
+            //    per-point sigma calibrated to match target perplexity via binary search
+            const P = new Float64Array(n * n);
+            const logPerp = Math.log(perplexity);
+
+            for (let i = 0; i < n; i++) {
+                let lo = 1e-20, hi = 1e4, mid = 1;
+                for (let iter = 0; iter < 100; iter++) {
+                    mid = (lo + hi) / 2;
+                    // Compute conditional probabilities p(j|i)
+                    let sumExp = 0;
+                    for (let j = 0; j < n; j++) {
+                        if (j === i) continue;
+                        sumExp += Math.exp(-dists[i * n + j] * mid);
+                    }
+                    if (sumExp < 1e-30) sumExp = 1e-30;
+
+                    // Compute entropy
+                    let H = 0;
+                    for (let j = 0; j < n; j++) {
+                        if (j === i) continue;
+                        const pj = Math.exp(-dists[i * n + j] * mid) / sumExp;
+                        if (pj > 1e-12) H -= pj * Math.log(pj);
+                    }
+
+                    if (H > logPerp) hi = mid;
+                    else lo = mid;
+
+                    if (Math.abs(H - logPerp) < 1e-5) break;
+                }
+
+                // Store conditional probabilities with calibrated sigma
+                let sumExp = 0;
+                for (let j = 0; j < n; j++) {
+                    if (j === i) continue;
+                    sumExp += Math.exp(-dists[i * n + j] * mid);
+                }
+                if (sumExp < 1e-30) sumExp = 1e-30;
+                for (let j = 0; j < n; j++) {
+                    if (j === i) { P[i * n + j] = 0; continue; }
+                    P[i * n + j] = Math.exp(-dists[i * n + j] * mid) / sumExp;
+                }
+            }
+
+            // 3. Symmetrize: P_ij = (p(j|i) + p(i|j)) / (2n)
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    const sym = (P[i * n + j] + P[j * n + i]) / (2 * n);
+                    P[i * n + j] = sym;
+                    P[j * n + i] = sym;
+                }
+            }
+
+            // 4. Initialize embedding randomly (small Gaussian)
+            const Y = new Float64Array(n * dim);
+            for (let i = 0; i < n * dim; i++) {
+                Y[i] = (Math.random() - 0.5) * 0.01;
+            }
+
+            // Gradient descent with momentum
+            const gains = new Float64Array(n * dim).fill(1);
+            const velocity = new Float64Array(n * dim);
+            const grad = new Float64Array(n * dim);
+            const earlyExaggerEnd = 100;
+            const momentum1 = 0.5;
+            const momentum2 = 0.8;
+
+            for (let iter = 0; iter < maxIter; iter++) {
+                const exagg = iter < earlyExaggerEnd ? earlyExagg : 1;
+                const mom = iter < 250 ? momentum1 : momentum2;
+
+                // Compute low-dimensional affinities Q (Student t with 1 DOF)
+                const qNum = new Float64Array(n * n);
+                let qSum = 0;
+                for (let i = 0; i < n; i++) {
+                    for (let j = i + 1; j < n; j++) {
+                        let s = 0;
+                        for (let d = 0; d < dim; d++) {
+                            const diff = Y[i * dim + d] - Y[j * dim + d];
+                            s += diff * diff;
+                        }
+                        const val = 1 / (1 + s);
+                        qNum[i * n + j] = val;
+                        qNum[j * n + i] = val;
+                        qSum += 2 * val;
+                    }
+                }
+                if (qSum < 1e-30) qSum = 1e-30;
+
+                // Compute gradients
+                grad.fill(0);
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < n; j++) {
+                        if (i === j) continue;
+                        const pij = P[i * n + j] * exagg;
+                        const qij = qNum[i * n + j] / qSum;
+                        const mult = 4 * (pij - qij) * qNum[i * n + j];
+                        for (let d = 0; d < dim; d++) {
+                            grad[i * dim + d] += mult * (Y[i * dim + d] - Y[j * dim + d]);
+                        }
+                    }
+                }
+
+                // Update with adaptive gains and momentum
+                for (let i = 0; i < n * dim; i++) {
+                    const sameSign = (grad[i] > 0) === (velocity[i] > 0);
+                    gains[i] = sameSign ? gains[i] * 0.8 : gains[i] + 0.2;
+                    if (gains[i] < 0.01) gains[i] = 0.01;
+                    velocity[i] = mom * velocity[i] - lr * gains[i] * grad[i];
+                    Y[i] += velocity[i];
+                }
+
+                // Center embedding
+                for (let d = 0; d < dim; d++) {
+                    let mean = 0;
+                    for (let i = 0; i < n; i++) mean += Y[i * dim + d];
+                    mean /= n;
+                    for (let i = 0; i < n; i++) Y[i * dim + d] -= mean;
+                }
+            }
+
+            // Return as array of [x, y] pairs
+            const result = [];
+            for (let i = 0; i < n; i++) {
+                result.push([Y[i * dim], Y[i * dim + 1]]);
+            }
+            return result;
+        }
+
+        let tsneRunning = false;
+
+        function runTsne() {
+            if (tsneRunning) return;
+            tsneRunning = true;
+
+            const dataType = document.getElementById('tsneDataType').value;
+            const perplexity = parseFloat(document.getElementById('tsnePerplexity').value) || 15;
+            const lr = parseFloat(document.getElementById('tsneLR').value) || 200;
+            const maxIter = parseInt(document.getElementById('tsneIter').value) || 500;
+            const earlyExagg = parseFloat(document.getElementById('tsneExagg').value) || 4;
+
+            const btn = document.getElementById('runTsneBtn');
+            const statusEl = document.getElementById('tsneStatus');
+            btn.textContent = 'Running...';
+            btn.style.opacity = '0.6';
+            statusEl.innerHTML = '<em>Computing t-SNE embedding... this may take a few seconds.</em>';
+
+            let sourceData, regionLabels;
+            if (dataType === 'gene') {
+                sourceData = geneExpressionData.map(row => metadata.gene_names.map(gene => row[gene] || 0));
+                regionLabels = geneExpressionData.map(row => row.Name);
+            } else if (dataType === 'dti') {
+                sourceData = dtiData.map(row => metadata.dti_regions.map(region => row[region] || 0));
+                regionLabels = dtiData.map(row => row.Row);
+            } else {
+                sourceData = fmriData.map(row => metadata.fmri_functions.map(func => row[func] || 0));
+                regionLabels = fmriData.map(row => row.Row);
+            }
+
+            // Standardize features before t-SNE (same as PCA)
+            const n = sourceData.length;
+            const m = sourceData[0].length;
+            const means = Array(m).fill(0);
+            const stds = Array(m).fill(0);
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < m; j++) means[j] += sourceData[i][j];
+            }
+            for (let j = 0; j < m; j++) means[j] /= n;
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < m; j++) stds[j] += Math.pow(sourceData[i][j] - means[j], 2);
+            }
+            for (let j = 0; j < m; j++) stds[j] = Math.sqrt(stds[j] / n) || 1;
+            const standardized = sourceData.map(row => row.map((x, j) => (x - means[j]) / stds[j]));
+
+            // Run t-SNE asynchronously so the UI doesn't freeze
+            setTimeout(() => {
+                try {
+                    const embedding = tsneEmbed(standardized, { perplexity, lr, maxIter, earlyExagg });
+
+                    const colors = regionLabels.map(name => {
+                        const meta = metadata.region_metadata.find(r => r.Name === name);
+                        const structName = meta ? meta.top_level_structure_name : 'brain';
+                        return nipySpectralColor(BRAIN_SCALE_DICT[structName] || 0.5);
+                    });
+
+                    const trace = {
+                        x: embedding.map(p => p[0]),
+                        y: embedding.map(p => p[1]),
+                        mode: 'markers+text',
+                        type: 'scatter',
+                        text: regionLabels,
+                        textposition: 'top center',
+                        textfont: { size: 9, color: '#e8eef5' },
+                        marker: {
+                            size: 9,
+                            color: colors,
+                            line: { color: '#e8eef5', width: 1 }
+                        },
+                        hovertemplate: '<b>%{text}</b><br>t-SNE 1: %{x:.2f}<br>t-SNE 2: %{y:.2f}<extra></extra>'
+                    };
+
+                    const layout = {
+                        ...PLOTLY_DARK_LAYOUT,
+                        height: 600,
+                        dragmode: 'zoom',
+                        xaxis: { title: 't-SNE 1', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
+                        yaxis: { title: 't-SNE 2', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
+                    };
+
+                    Plotly.newPlot('tsnePlot', [trace], layout, PLOTLY_CONFIG);
+
+                    statusEl.innerHTML = `t-SNE complete &mdash; perplexity=${perplexity}, lr=${lr}, ${maxIter} iterations, exaggeration=${earlyExagg}. Points colored by brain structure.`;
+                } catch (e) {
+                    statusEl.innerHTML = `<span style="color:#ff6666;">Error: ${e.message}</span>`;
+                }
+                btn.textContent = 'Run t-SNE';
+                btn.style.opacity = '1';
+                tsneRunning = false;
+            }, 50);
         }
 
         // ========== CLUSTERGRAM WITH DENDROGRAMS ==========
