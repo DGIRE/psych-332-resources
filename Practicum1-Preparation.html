@@ -1123,54 +1123,472 @@
       let system = '', hints = [];
       if (/amygdala/i.test(region)) {
         system = 'limbic';
-        hints = ['fear conditioning and emotional learning', 'the HPA axis and fight-or-flight response', 'social processing and facial cue interpretation', 'anxiety disorders and PTSD', 'amygdala-prefrontal regulatory circuits', 'stress hormone modulation of amygdala excitability'];
+        hints = [
+          'fear conditioning and emotional learning',
+          'the HPA axis and fight-or-flight response',
+          'social processing and facial cue interpretation',
+          'anxiety disorders and PTSD',
+          'amygdala-prefrontal regulatory circuits',
+          'stress hormone modulation of amygdala excitability',
+          'the role of the amygdala in reward vs. threat valuation',
+          'sex differences in amygdala volume and reactivity',
+          'amygdala kindling and temporal lobe epilepsy',
+          'how the basolateral vs. central amygdala contribute to distinct behavioral outputs',
+          'amygdala hyperactivation in social anxiety disorder',
+          'the effects of early-life stress on amygdala development',
+          'amygdala responses to ambiguous vs. clear emotional stimuli',
+          'how benzodiazepines dampen amygdala-driven anxiety',
+          'the role of the amygdala in appetitive Pavlovian conditioning',
+          'evolutionary conservation of the amygdala across vertebrates',
+          'contributions of the amygdala to emotional memory reconsolidation',
+          'amygdala involvement in autism and difficulties with social cognition'
+        ];
       } else if (/hippocampus/i.test(region)) {
         system = 'limbic';
-        hints = ['memory consolidation and spatial navigation', 'long-term potentiation (LTP)', 'Alzheimer\'s disease and neurodegeneration', 'neurogenesis in the dentate gyrus', 'place cells and grid cells', 'hippocampal sharp-wave ripples during sleep'];
+        hints = [
+          'memory consolidation and spatial navigation',
+          'long-term potentiation (LTP)',
+          'Alzheimer\'s disease and neurodegeneration',
+          'neurogenesis in the dentate gyrus',
+          'place cells and grid cells',
+          'hippocampal sharp-wave ripples during sleep',
+          'pattern separation vs. pattern completion in CA3',
+          'the hippocampal-entorhinal memory circuit',
+          'stress-related hippocampal volume reduction in depression',
+          'hippocampal sclerosis in temporal lobe epilepsy',
+          'sex differences in hippocampal-dependent spatial strategies',
+          'theta oscillations and their role in memory encoding',
+          'comparative hippocampal size in food-caching birds vs. mammals',
+          'the effect of chronic stress hormones (cortisol) on hippocampal neurons',
+          'contributions of the hippocampus to imagination and future thinking',
+          'hippocampal replay during rest and its role in memory stabilization',
+          'how London taxi drivers show enlarged posterior hippocampi',
+          'the distinction between hippocampal-dependent and hippocampal-independent memory systems'
+        ];
       } else if (/prefrontal|frontal/i.test(region)) {
         system = 'frontal executive';
-        hints = ['executive function and decision-making', 'working memory and cognitive control', 'ADHD and prefrontal hypoactivation', 'developmental maturation during adolescence', 'prefrontal-striatal reward valuation circuits', 'inhibitory control and impulsivity'];
+        hints = [
+          'executive function and decision-making',
+          'working memory and cognitive control',
+          'ADHD and prefrontal hypoactivation',
+          'developmental maturation during adolescence',
+          'prefrontal-striatal reward valuation circuits',
+          'inhibitory control and impulsivity',
+          'the role of dlPFC in goal-directed behavior vs. habit',
+          'how prefrontal lesions (e.g., Phineas Gage) informed our understanding of personality and planning',
+          'the orbitofrontal cortex and reversal learning',
+          'prefrontal contributions to moral reasoning and social norms',
+          'dorsomedial PFC and theory of mind / mentalizing',
+          'chronic stress effects on prefrontal dendritic architecture',
+          'transcranial magnetic stimulation (TMS) of prefrontal cortex as a treatment for depression',
+          'the role of the anterior cingulate in error monitoring and cognitive effort',
+          'prefrontal dopamine D1 signaling and the inverted-U model of working memory',
+          'developmental myelination of prefrontal tracts and risk-taking in teenagers',
+          'how alcohol and recreational drugs preferentially impair prefrontal function',
+          'the ventromedial PFC and somatic marker hypothesis of decision-making'
+        ];
       } else if (/visual|occipital|lingual|fusiform/i.test(region)) {
         system = 'visual';
-        hints = ['visual processing hierarchies (V1 through higher areas)', 'face and object recognition', 'visual agnosia and prosopagnosia', 'retinotopic mapping', 'ventral vs. dorsal visual streams', 'visual cortex plasticity in blindness'];
+        hints = [
+          'visual processing hierarchies (V1 through higher areas)',
+          'face and object recognition',
+          'visual agnosia and prosopagnosia',
+          'retinotopic mapping',
+          'ventral vs. dorsal visual streams',
+          'visual cortex plasticity in blindness',
+          'critical periods for visual development and amblyopia',
+          'the fusiform face area (FFA) and expertise-driven specialization',
+          'motion processing in area MT/V5',
+          'color perception and the role of V4',
+          'feedback connections from higher areas to V1 during top-down attention',
+          'Charles Bonnet syndrome and hallucinations from visual cortex deafferentation',
+          'visual crowding and its neural basis',
+          'how congenitally blind individuals repurpose visual cortex for language or touch',
+          'binocular rivalry and conscious visual awareness',
+          'the lateral occipital complex (LOC) and object shape processing',
+          'parahippocampal place area and scene processing',
+          'the extrastriate body area and perception of biological motion'
+        ];
       } else if (/insula/i.test(region)) {
         system = 'salience';
-        hints = ['interoception and bodily awareness', 'the salience network', 'pain processing and empathy', 'addiction and craving', 'disgust perception and taste', 'anterior vs. posterior insula functional specialization'];
+        hints = [
+          'interoception and bodily awareness',
+          'the salience network',
+          'pain processing and empathy',
+          'addiction and craving',
+          'disgust perception and taste',
+          'anterior vs. posterior insula functional specialization',
+          'the insular cortex as a hub for integrating emotion and cognition',
+          'insula contributions to sense of agency and body ownership',
+          'risk perception and uncertainty processing in the anterior insula',
+          'the insula in cardiac interoception (heartbeat detection tasks)',
+          'insular stroke and its effects on smoking cessation (loss of craving)',
+          'von Economo neurons in the anterior insula and their role in social cognition',
+          'the insula in inflammatory pain and chronic pain conditions',
+          'how meditation and mindfulness training alter insula activation',
+          'the insular cortex as a visceral sensory cortex for gut signals',
+          'insula involvement in speech motor planning (apraxia of speech)',
+          'bilateral insula activation during musical experience and emotional chills',
+          'the insula in somatosensory processing and thermosensation'
+        ];
       } else if (/cingulate/i.test(region)) {
         system = 'cingulate/salience';
-        hints = ['error monitoring and conflict detection', 'the default mode network (posterior) or salience network (anterior)', 'pain perception', 'depression and the subgenual cingulate', 'reward-based decision-making', 'cingulate contributions to motor planning'];
+        hints = [
+          'error monitoring and conflict detection',
+          'the default mode network (posterior) or salience network (anterior)',
+          'pain perception',
+          'depression and the subgenual cingulate',
+          'reward-based decision-making',
+          'cingulate contributions to motor planning',
+          'deep brain stimulation of the subgenual cingulate (BA 25) for treatment-resistant depression',
+          'the rostral cingulate zone and cognitive effort / foraging decisions',
+          'posterior cingulate and its deactivation during externally directed tasks',
+          'cingulate cortex contributions to empathy for pain',
+          'the cingulate as a component of the Papez circuit for emotion',
+          'ACC theta oscillations and their relationship to performance monitoring',
+          'cingulotomy as a historical treatment for obsessive-compulsive disorder',
+          'midcingulate cortex and its role in willpower, tenacity, and survival behavior',
+          'how the cingulate cortex tracks prediction errors during learning',
+          'the relationship between cingulate thickness and meditation experience',
+          'social pain (rejection) activating similar cingulate regions as physical pain',
+          'age-related changes in cingulate volume and their cognitive consequences'
+        ];
       } else if (/temporal/i.test(region)) {
         system = 'temporal';
-        hints = ['language processing (Wernicke\'s area)', 'auditory processing', 'semantic memory', 'temporal lobe epilepsy', 'voice and music perception', 'multisensory integration in superior temporal sulcus'];
+        hints = [
+          'language processing (Wernicke\'s area)',
+          'auditory processing',
+          'semantic memory',
+          'temporal lobe epilepsy',
+          'voice and music perception',
+          'multisensory integration in superior temporal sulcus',
+          'the temporal pole and social-semantic knowledge',
+          'auditory cortex tonotopic organization',
+          'how bilateral temporal lobe damage causes semantic dementia',
+          'the superior temporal sulcus in biological motion and social perception',
+          'amusia (tone deafness) and its neural basis in the temporal lobe',
+          'the anterior temporal lobe as a semantic hub in the hub-and-spoke model',
+          'temporal lobe asymmetry and left-hemisphere language dominance',
+          'how cochlear implants drive plasticity in the auditory temporal cortex',
+          'the middle temporal gyrus and lexical-semantic retrieval',
+          'right temporal lobe specialization for prosody and music',
+          'hippocampal-temporal interactions during autobiographical memory retrieval',
+          'temporal lobe contributions to social cognition and emotion recognition from voice'
+        ];
       } else if (/parietal/i.test(region)) {
         system = 'parietal';
-        hints = ['spatial attention and the dorsal attention network', 'sensory integration', 'hemispatial neglect', 'number processing and calculation', 'tool use and praxis', 'posterior parietal cortex in reaching and grasping'];
+        hints = [
+          'spatial attention and the dorsal attention network',
+          'sensory integration',
+          'hemispatial neglect',
+          'number processing and calculation',
+          'tool use and praxis',
+          'posterior parietal cortex in reaching and grasping',
+          'the intraparietal sulcus and numerical cognition (the number form area)',
+          'Balint syndrome from bilateral parietal damage',
+          'the parietal cortex in mental imagery and spatial transformation',
+          'somatosensory processing in the postcentral gyrus',
+          'the angular gyrus and reading / semantic association',
+          'Gerstmann syndrome (finger agnosia, agraphia, acalculia, left-right confusion)',
+          'the supramarginal gyrus and phonological processing',
+          'parietal cortex contributions to the perception of time',
+          'how the parietal cortex supports embodied cognition and body schema',
+          'mirror neuron-like activity in the inferior parietal lobule',
+          'parietal contributions to episodic memory retrieval (parietal old/new effects)',
+          'the precuneus as a hub of the default mode network'
+        ];
       } else if (/cerebellum|cerebellar/i.test(region)) {
         system = 'cerebellar';
-        hints = ['motor coordination and timing', 'cerebellar contributions to cognition', 'ataxia and motor learning', 'error-based learning', 'cerebellar-prefrontal loops', 'autism spectrum disorder and cerebellar pathology'];
+        hints = [
+          'motor coordination and timing',
+          'cerebellar contributions to cognition',
+          'ataxia and motor learning',
+          'error-based learning',
+          'cerebellar-prefrontal loops',
+          'autism spectrum disorder and cerebellar pathology',
+          'the cerebellar cognitive affective syndrome (Schmahmann syndrome)',
+          'Purkinje cell loss and its consequences for circuit computation',
+          'the cerebellum as an internal forward model for motor prediction',
+          'cerebellar contributions to language processing and verbal fluency',
+          'eyeblink conditioning as a model of cerebellar learning',
+          'cerebellar involvement in emotional regulation and the limbic cerebellum',
+          'how the cerebellum calibrates vestibulo-ocular reflexes',
+          'fetal alcohol syndrome and cerebellar developmental abnormalities',
+          'lobular organization of the cerebellum (anterior, posterior, flocculonodular)',
+          'the olivo-cerebellar climbing fiber system and complex spike signaling',
+          'cerebellar contributions to interval timing and rhythm perception',
+          'comparative cerebellar anatomy (large cerebellum in birds for flight coordination)'
+        ];
       } else if (/thalamus|thalamic/i.test(region)) {
         system = 'thalamic relay';
-        hints = ['sensory relay and gating functions', 'thalamocortical loops', 'consciousness and arousal', 'sleep spindles and thalamic oscillations', 'pulvinar contributions to attention', 'thalamic reticular nucleus and sensory filtering'];
+        hints = [
+          'sensory relay and gating functions',
+          'thalamocortical loops',
+          'consciousness and arousal',
+          'sleep spindles and thalamic oscillations',
+          'pulvinar contributions to attention',
+          'thalamic reticular nucleus and sensory filtering',
+          'the mediodorsal thalamus and its prefrontal connections in working memory',
+          'fatal familial insomnia and thalamic degeneration',
+          'thalamic lesions causing pure sensory stroke',
+          'the lateral geniculate nucleus (LGN) and visual relay',
+          'the medial geniculate nucleus (MGN) and auditory processing',
+          'higher-order thalamic nuclei as drivers (not just relays) of cortical activity',
+          'thalamocortical dysrhythmia theory of neuropsychiatric disorders',
+          'the anterior thalamic nuclei and the Papez memory circuit',
+          'how general anesthetics act partly through thalamic suppression',
+          'thalamic involvement in absence epilepsy (thalamocortical spike-wave discharges)',
+          'the role of the centromedian nucleus in arousal and deep brain stimulation for consciousness',
+          'thalamic contributions to language via ventral lateral nucleus projections to Broca\'s area'
+        ];
       } else if (/caudate|putamen|striatum|basal ganglia|nucleus accumbens|globus pallidus/i.test(region)) {
         system = 'basal ganglia';
-        hints = ['reward processing and reinforcement learning', 'motor planning and habit formation', 'Parkinson\'s disease and dopamine', 'addiction circuits', 'direct vs. indirect basal ganglia pathways', 'striatal cholinergic interneurons'];
+        hints = [
+          'reward processing and reinforcement learning',
+          'motor planning and habit formation',
+          'Parkinson\'s disease and dopamine',
+          'addiction circuits',
+          'direct vs. indirect basal ganglia pathways',
+          'striatal cholinergic interneurons',
+          'the transition from goal-directed to habitual behavior (dorsomedial to dorsolateral striatum)',
+          'how deep brain stimulation of the subthalamic nucleus treats Parkinson\'s symptoms',
+          'the nucleus accumbens in motivational salience and wanting vs. liking',
+          'Huntington\'s disease and striatal medium spiny neuron degeneration',
+          'the hyperdirect pathway through the subthalamic nucleus in response inhibition',
+          'dopamine D1 vs. D2 receptor-expressing neurons in the striatum',
+          'Tourette syndrome and basal ganglia-thalamocortical circuit dysfunction',
+          'the role of the ventral pallidum in hedonic processing',
+          'how opioids and alcohol affect nucleus accumbens dopamine release',
+          'the basal ganglia in procedural and implicit learning (e.g., probabilistic classification)',
+          'phasic vs. tonic dopamine signaling and reward prediction errors',
+          'striosomes vs. matrix compartments and their distinct connectivity'
+        ];
       } else {
-        hints = ['its anatomical connections via DTI white matter tracts', 'neurological disorders associated with the region', 'how it interacts with neighboring structures', 'its evolutionary history and comparative anatomy', 'its role within large-scale brain networks', 'clinical case studies involving lesions to this area'];
+        hints = [
+          'its anatomical connections via DTI white matter tracts',
+          'neurological disorders associated with the region',
+          'how it interacts with neighboring structures',
+          'its evolutionary history and comparative anatomy',
+          'its role within large-scale brain networks',
+          'clinical case studies involving lesions to this area',
+          'how this region is affected by aging and neurodegeneration',
+          'pharmacological interventions that target this region',
+          'its cytoarchitectonic boundaries and how they map to function',
+          'developmental changes in this region from childhood through adulthood',
+          'how neuroimaging studies have revised our understanding of its function',
+          'resting-state functional connectivity of this region',
+          'sex differences in the structure or function of this region',
+          'the role of this region in large-scale oscillatory dynamics (alpha, beta, gamma)',
+          'transcranial stimulation studies (TMS/tDCS) targeting this region',
+          'how this region contributes to multimodal sensory integration',
+          'comparative anatomy of this region across primate species',
+          'clinical biomarkers derived from imaging or electrophysiology of this region'
+        ];
       }
       return { system, hints };
     }
 
     function getGeneHints(gene) {
-      if (/^DRD/i.test(gene))            return ['dopamine signaling pathways', 'Parkinson\'s disease or schizophrenia', 'stimulant drugs (cocaine, amphetamine) and their receptor mechanisms', 'reward circuitry in the basal ganglia', 'dopamine hypothesis of psychosis', 'DRD polymorphisms and individual differences in impulsivity'];
-      if (/^HTR|^5HT/i.test(gene))       return ['serotonin signaling and mood regulation', 'SSRIs and antidepressant pharmacology', 'psychedelic drugs (psilocybin, LSD) and 5-HT2A', 'gut-brain serotonin axis', 'serotonin in sleep-wake regulation', 'serotonergic modulation of aggression'];
-      if (/^GABA|^GABR/i.test(gene))     return ['inhibitory neurotransmission', 'benzodiazepines and anesthetics', 'epilepsy and seizure disorders', 'excitatory/inhibitory balance in neural circuits', 'GABAergic interneuron subtypes', 'GABA in cortical development and critical periods'];
-      if (/^GRI|^GRIN|^GRM/i.test(gene)) return ['glutamate excitatory signaling', 'NMDA receptors and synaptic plasticity', 'excitotoxicity in stroke or neurodegeneration', 'ketamine and its antidepressant effects', 'metabotropic vs. ionotropic glutamate receptor functions', 'glutamate in learning and memory consolidation'];
-      if (/^CHRN|^CHRM/i.test(gene))     return ['cholinergic signaling', 'nicotine and nicotinic receptors', 'Alzheimer\'s disease and cholinesterase inhibitors', 'autonomic nervous system regulation', 'cholinergic modulation of attention', 'basal forebrain cholinergic projections'];
-      if (/^SCN/i.test(gene))            return ['sodium channel function and neuronal excitability', 'epilepsy and channelopathies', 'pain signaling pathways', 'local anesthetic mechanisms', 'action potential propagation speed', 'SCN mutations in cardiac and neural disease'];
-      if (/^CACNA/i.test(gene))          return ['calcium channel function and synaptic transmission', 'seizure predisposition', 'migraine and calcium channelopathies', 'synaptic plasticity and LTP', 'presynaptic calcium entry and vesicle release', 'calcium channel subtypes (L, N, P/Q, T type)'];
-      if (/^KCNH|^KCN/i.test(gene))      return ['potassium channel function and repolarization', 'cardiac-neural channel overlap', 'schizophrenia risk genes', 'neuronal firing rate regulation', 'afterhyperpolarization and spike frequency adaptation', 'potassium channelopathies in epilepsy'];
-      if (/^OPRM|^OPRK|^OPRD/i.test(gene)) return ['opioid signaling and pain modulation', 'opioid addiction and tolerance', 'endorphin and enkephalin pathways', 'mu, kappa, and delta receptor subtypes', 'opioid receptor desensitization and withdrawal', 'social bonding and the opioid system'];
-      return ['what gene family it belongs to and its known functions', 'whether it is a drug target for any condition', 'how its expression compares across brain regions', 'its role in synaptic signaling or neuronal excitability', 'published knockout or knockdown studies for this gene', 'evolutionary conservation of this receptor across species'];
+      if (/^DRD/i.test(gene)) return [
+        'dopamine signaling pathways',
+        'Parkinson\'s disease or schizophrenia',
+        'stimulant drugs (cocaine, amphetamine) and their receptor mechanisms',
+        'reward circuitry in the basal ganglia',
+        'dopamine hypothesis of psychosis',
+        'DRD polymorphisms and individual differences in impulsivity',
+        'dopamine receptor subtypes (D1-like vs. D2-like) and their opposing signaling cascades',
+        'how antipsychotics block D2 receptors and the side effects that result',
+        'the mesolimbic vs. mesocortical dopamine pathways',
+        'dopamine\'s role in effort-based decision-making',
+        'tonic vs. phasic dopamine firing and reward prediction errors',
+        'DRD4 7-repeat allele and its association with novelty seeking',
+        'how L-DOPA restores motor function in Parkinson\'s but can trigger compulsive behaviors',
+        'the nigrostriatal pathway and its degeneration in movement disorders',
+        'dopamine and the wanting vs. liking distinction in reward processing',
+        'methamphetamine neurotoxicity and dopamine terminal damage',
+        'dopamine receptor density changes in adolescence and aging',
+        'the role of D3 receptors in limbic circuits and their emergence as drug targets'
+      ];
+      if (/^HTR|^5HT/i.test(gene)) return [
+        'serotonin signaling and mood regulation',
+        'SSRIs and antidepressant pharmacology',
+        'psychedelic drugs (psilocybin, LSD) and 5-HT2A',
+        'gut-brain serotonin axis',
+        'serotonin in sleep-wake regulation',
+        'serotonergic modulation of aggression',
+        'the 14 serotonin receptor subtypes and their diverse brain roles',
+        'serotonin transporter (SERT) polymorphisms and stress vulnerability',
+        'the raphe nuclei as the brain\'s primary serotonin source',
+        'how MDMA causes massive serotonin release and its neurotoxic risk',
+        'serotonin\'s role in satiety and feeding behavior',
+        'the serotonin hypothesis of depression and its modern critics',
+        'psychedelic-assisted therapy and default mode network disruption via 5-HT2A',
+        'serotonin syndrome from drug interactions and its clinical presentation',
+        'tryptophan depletion studies and their effects on mood and cognition',
+        'how migraine drugs (triptans) act on serotonin 5-HT1B/1D receptors',
+        'serotonin in social hierarchy and dominance behavior across species',
+        'the role of serotonin in neuroplasticity and critical period reopening'
+      ];
+      if (/^GABA|^GABR/i.test(gene)) return [
+        'inhibitory neurotransmission',
+        'benzodiazepines and anesthetics',
+        'epilepsy and seizure disorders',
+        'excitatory/inhibitory balance in neural circuits',
+        'GABAergic interneuron subtypes',
+        'GABA in cortical development and critical periods',
+        'GABA-A receptor subunit composition and pharmacological specificity',
+        'the switch from excitatory to inhibitory GABA during development',
+        'GABA-B receptor metabotropic signaling and baclofen\'s clinical uses',
+        'how alcohol enhances GABA-A receptor function and the basis of tolerance',
+        'parvalbumin-positive interneurons and gamma oscillations',
+        'the role of GABA in anxiety and the benzodiazepine binding site',
+        'somatostatin-positive interneurons and dendritic inhibition',
+        'GABAergic projection neurons in the basal ganglia output pathway',
+        'how general anesthetics (propofol, barbiturates) potentiate GABA-A receptors',
+        'GABA and the regulation of cortical gain control',
+        'how vigabatrin treats epilepsy by blocking GABA transaminase',
+        'the role of tonic (extrasynaptic) GABA inhibition vs. phasic (synaptic) inhibition'
+      ];
+      if (/^GRI|^GRIN|^GRM/i.test(gene)) return [
+        'glutamate excitatory signaling',
+        'NMDA receptors and synaptic plasticity',
+        'excitotoxicity in stroke or neurodegeneration',
+        'ketamine and its antidepressant effects',
+        'metabotropic vs. ionotropic glutamate receptor functions',
+        'glutamate in learning and memory consolidation',
+        'NMDA receptor magnesium block and its voltage-dependent relief',
+        'AMPA receptor trafficking and its role in LTP expression',
+        'the glutamate hypothesis of schizophrenia (NMDA hypofunction model)',
+        'how PCP and ketamine produce psychotomimetic effects via NMDA blockade',
+        'mGluR5 and its interaction with NMDA receptors at the synapse',
+        'glutamate release probability and short-term synaptic plasticity',
+        'the role of kainate receptors in presynaptic modulation',
+        'memantine as an NMDA receptor antagonist in Alzheimer\'s treatment',
+        'NMDA receptor subunit composition (GluN2A vs. GluN2B) and developmental switching',
+        'excitotoxic cell death cascades: calcium overload, mitochondrial failure, and oxidative stress',
+        'silent synapses and the insertion of AMPA receptors during learning',
+        'mGluR-mediated long-term depression (LTD) and its role in forgetting'
+      ];
+      if (/^CHRN|^CHRM/i.test(gene)) return [
+        'cholinergic signaling',
+        'nicotine and nicotinic receptors',
+        'Alzheimer\'s disease and cholinesterase inhibitors',
+        'autonomic nervous system regulation',
+        'cholinergic modulation of attention',
+        'basal forebrain cholinergic projections',
+        'nicotinic receptor subtypes: alpha4-beta2 (high affinity) vs. alpha7 (fast desensitizing)',
+        'how donepezil and rivastigmine boost cholinergic signaling in dementia',
+        'the neuromuscular junction as the prototypical cholinergic synapse',
+        'muscarinic receptors (M1-M5) and their roles in cognition, secretion, and cardiac regulation',
+        'nicotine addiction and the mesolimbic dopamine pathway',
+        'cholinergic neurons in the pedunculopontine nucleus and REM sleep regulation',
+        'how nerve agents (sarin, VX) inhibit acetylcholinesterase',
+        'acetylcholine and cortical plasticity during sensory map reorganization',
+        'the role of cholinergic tone in switching between focused and exploratory behavior',
+        'alpha7 nicotinic receptors as targets for cognitive enhancement in schizophrenia',
+        'myasthenia gravis and autoimmune attack on nicotinic receptors',
+        'scopolamine as a rapid-acting antidepressant acting via muscarinic receptor blockade'
+      ];
+      if (/^SCN/i.test(gene)) return [
+        'sodium channel function and neuronal excitability',
+        'epilepsy and channelopathies',
+        'pain signaling pathways',
+        'local anesthetic mechanisms',
+        'action potential propagation speed',
+        'SCN mutations in cardiac and neural disease',
+        'Nav1.7 (SCN9A) and its role in inherited pain disorders (insensitivity and erythromelalgia)',
+        'how tetrodotoxin (TTX) blocks sodium channels and its use in research',
+        'sodium channel inactivation gates and their role in refractory periods',
+        'how carbamazepine and phenytoin treat epilepsy by prolonging sodium channel inactivation',
+        'Dravet syndrome from SCN1A mutations affecting inhibitory interneurons',
+        'ranvier node sodium channel clustering and saltatory conduction in myelinated axons',
+        'sodium channel beta subunits as cell adhesion molecules',
+        'how scorpion and spider toxins target specific sodium channel states',
+        'voltage-gated sodium channels in nociceptors and peripheral pain sensing',
+        'the relationship between sodium channel density and axonal conduction velocity',
+        'gain-of-function vs. loss-of-function mutations and their opposite clinical phenotypes',
+        'developmental expression patterns of sodium channel subtypes in the brain'
+      ];
+      if (/^CACNA/i.test(gene)) return [
+        'calcium channel function and synaptic transmission',
+        'seizure predisposition',
+        'migraine and calcium channelopathies',
+        'synaptic plasticity and LTP',
+        'presynaptic calcium entry and vesicle release',
+        'calcium channel subtypes (L, N, P/Q, T type)',
+        'how T-type calcium channels contribute to thalamocortical oscillations in absence epilepsy',
+        'L-type calcium channels (Cav1.2) and their role in gene transcription via CREB signaling',
+        'Timothy syndrome from CACNA1C gain-of-function mutations',
+        'N-type calcium channel blockers (ziconotide) for intractable pain',
+        'P/Q-type channels (CACNA1A) and episodic ataxia type 2',
+        'how calcium influx through NMDA receptors differs from voltage-gated channel calcium entry',
+        'familial hemiplegic migraine and CACNA1A mutations',
+        'the role of calcium-sensing proteins (synaptotagmin) at the presynaptic terminal',
+        'calcium channel auxiliary subunits (alpha2-delta) as targets for gabapentin and pregabalin',
+        'spinocerebellar ataxia type 6 and CACNA1A polyglutamine expansions',
+        'how dihydropyridine drugs (nifedipine) block L-type channels in cardiac and neural tissue',
+        'calcium-dependent gene expression and long-term memory formation'
+      ];
+      if (/^KCNH|^KCN/i.test(gene)) return [
+        'potassium channel function and repolarization',
+        'cardiac-neural channel overlap',
+        'schizophrenia risk genes',
+        'neuronal firing rate regulation',
+        'afterhyperpolarization and spike frequency adaptation',
+        'potassium channelopathies in epilepsy',
+        'Kv channel diversity and how different subtypes tune neuronal spiking properties',
+        'KCNQ2/3 channels and benign familial neonatal seizures',
+        'retigabine (ezogabine) as a potassium channel opener for epilepsy treatment',
+        'inward-rectifier potassium channels (Kir) and their role in resting membrane potential',
+        'calcium-activated potassium channels (BK, SK) and their roles in neuronal excitability',
+        'how HERG (KCNH2) mutations cause long QT syndrome and sudden cardiac death',
+        'the role of potassium leak channels (K2P family) in anesthetic sensitivity',
+        'ATP-sensitive potassium channels as metabolic sensors in hypothalamic neurons',
+        'A-type potassium currents and their role in spike timing and synaptic integration',
+        'how potassium channel density varies along the dendritic tree to shape signal integration',
+        'potassium channel modulation by phosphorylation and second messenger cascades',
+        'delayed rectifier potassium channels in action potential repolarization'
+      ];
+      if (/^OPRM|^OPRK|^OPRD/i.test(gene)) return [
+        'opioid signaling and pain modulation',
+        'opioid addiction and tolerance',
+        'endorphin and enkephalin pathways',
+        'mu, kappa, and delta receptor subtypes',
+        'opioid receptor desensitization and withdrawal',
+        'social bonding and the opioid system',
+        'how naloxone reverses opioid overdose by competitive antagonism at mu receptors',
+        'the periaqueductal gray and descending pain inhibition via endogenous opioids',
+        'kappa opioid receptors, dynorphin, and their role in stress-induced dysphoria',
+        'opioid-induced hyperalgesia and the paradox of increased pain sensitivity',
+        'how buprenorphine\'s partial agonism makes it useful for maintenance therapy',
+        'placebo analgesia and its dependence on endogenous opioid release',
+        'the opioid system in maternal-infant bonding and separation distress',
+        'how opioids suppress respiratory drive via brainstem mu receptors',
+        'OPRM1 A118G polymorphism and individual variation in pain sensitivity and addiction risk',
+        'delta opioid receptors as targets for anxiolytic and antidepressant drug development',
+        'the role of beta-endorphin in the "runner\'s high"',
+        'cross-tolerance between different opioid drugs and its clinical implications'
+      ];
+      return [
+        'what gene family it belongs to and its known functions',
+        'whether it is a drug target for any condition',
+        'how its expression compares across brain regions',
+        'its role in synaptic signaling or neuronal excitability',
+        'published knockout or knockdown studies for this gene',
+        'evolutionary conservation of this receptor across species',
+        'how mutations in this gene cause neurological or psychiatric disease',
+        'the receptor\'s crystal structure and what it reveals about drug binding',
+        'whether this gene shows sex-specific or age-dependent expression patterns',
+        'its role in neural development vs. mature brain function',
+        'second messenger cascades downstream of this receptor',
+        'allosteric modulation of this receptor as a therapeutic strategy',
+        'how this gene\'s expression correlates with other genes in co-expression networks',
+        'single nucleotide polymorphisms (SNPs) in this gene and their phenotypic associations',
+        'splice variants of this gene and their functional differences',
+        'this receptor\'s desensitization and internalization dynamics',
+        'animal models (knockout mice) that have revealed this gene\'s behavioral role',
+        'how this gene\'s promoter region is regulated by epigenetic mechanisms'
+      ];
     }
 
     // =====================================================================
