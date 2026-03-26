@@ -14,6 +14,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
@@ -26,6 +30,8 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            width: 100%;
+            padding: 0 10px;
         }
 
         /* Step Navigation Bar */
@@ -80,10 +86,6 @@
         .step-nav-arrow {
           color: #3a5a7a;
           font-size: 0.85rem;
-        }
-        @media (max-width: 680px) {
-          .step-nav { flex-direction: column; align-items: flex-start; }
-          .step-nav-steps { margin-left: 0; }
         }
 
         header {
@@ -156,7 +158,7 @@
 
         select, input {
             width: 100%;
-            max-width: 500px;
+            max-width: 100%;
             padding: 10px 15px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -181,12 +183,19 @@
             width: 100%;
             margin-top: 20px;
             min-height: 400px;
+            overflow: hidden;
+        }
+
+        .js-plotly-plot, .plotly {
+            max-width: 100% !important;
+            width: 100% !important;
         }
 
         .info-table {
             width: 100%;
             margin-top: 15px;
             border-collapse: collapse;
+            font-size: 14px;
         }
 
         .info-table tr {
@@ -196,6 +205,7 @@
         .info-table td {
             padding: 12px;
             font-size: 14px;
+            word-break: break-word;
         }
 
         .info-table td:first-child {
@@ -213,6 +223,7 @@
             height: auto;
             margin-top: 15px;
             border-radius: 6px;
+            display: block;
         }
 
         .loading {
@@ -238,22 +249,19 @@
             margin-top: 20px;
         }
 
-        @media (max-width: 1024px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .colorbar {
             display: flex;
             align-items: center;
             margin-top: 15px;
             font-size: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .colorbar-gradient {
             height: 20px;
             flex: 1;
+            min-width: 100px;
             margin: 0 10px;
             border-radius: 4px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -280,7 +288,8 @@
         /* Searchable dropdown */
         .search-select-wrapper {
             position: relative;
-            max-width: 500px;
+            width: 100%;
+            max-width: 100%;
         }
         .search-select-input {
             width: 100%;
@@ -313,7 +322,8 @@
             border: 1px solid rgba(255,255,255,0.2);
             border-top: none;
             border-radius: 0 0 6px 6px;
-            z-index: 100;
+            z-index: 1000;
+            width: 100%;
         }
         .search-select-dropdown.open {
             display: block;
@@ -323,9 +333,525 @@
             cursor: pointer;
             font-size: 14px;
             color: #e8eef5;
+            word-break: break-word;
         }
         .search-select-option:hover, .search-select-option.highlighted {
             background: rgba(7,121,190,0.3);
+        }
+
+        /* === RESPONSIVE BREAKPOINTS === */
+
+        /* 1024px and below: Tablet */
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 100%;
+                padding: 0 15px;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 25px 20px;
+                margin-bottom: 30px;
+            }
+
+            h1 {
+                font-size: 28px;
+                margin-bottom: 6px;
+            }
+
+            .subtitle {
+                font-size: 15px;
+            }
+
+            .section {
+                padding: 25px 20px;
+                margin-bottom: 30px;
+            }
+
+            h2 {
+                font-size: 21px;
+                margin-bottom: 15px;
+            }
+
+            .chart-container {
+                min-height: 350px;
+            }
+
+            .info-table td:first-child {
+                width: 150px;
+            }
+        }
+
+        /* 768px and below: Small tablets/landscape phones */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 0 8px;
+            }
+
+            .step-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 8px 12px;
+                margin-bottom: 10px;
+            }
+
+            .step-nav-steps {
+                margin-left: 0;
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .step-nav-item {
+                font-size: 0.75rem;
+                padding: 3px 10px;
+            }
+
+            .step-nav-arrow {
+                font-size: 0.75rem;
+                display: none;
+            }
+
+            header {
+                padding: 20px 15px;
+                margin-bottom: 25px;
+                border-radius: 8px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 5px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+            }
+
+            header a {
+                font-size: 13px;
+                margin-bottom: 12px;
+            }
+
+            .section {
+                padding: 20px 15px;
+                margin-bottom: 25px;
+                border-radius: 8px;
+            }
+
+            h2 {
+                font-size: 19px;
+                margin-bottom: 12px;
+            }
+
+            .section-label {
+                font-size: 11px;
+                letter-spacing: 0.8px;
+                margin-bottom: 6px;
+            }
+
+            label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            select, input {
+                padding: 9px 12px;
+                font-size: 13px;
+            }
+
+            .control-group {
+                margin-bottom: 15px;
+            }
+
+            .chart-container {
+                min-height: 300px;
+                margin-top: 15px;
+            }
+
+            .info-table {
+                font-size: 12px;
+                margin-top: 12px;
+            }
+
+            .info-table td {
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+
+            .info-table td:first-child {
+                width: 120px;
+            }
+
+            .save-btn {
+                padding: 7px 14px;
+                font-size: 12px;
+                margin-top: 8px;
+            }
+
+            .loading {
+                padding: 30px 15px;
+                font-size: 14px;
+            }
+
+            .error {
+                padding: 12px;
+                margin: 12px 0;
+            }
+
+            .colorbar {
+                font-size: 11px;
+                gap: 8px;
+                margin-top: 12px;
+            }
+
+            .colorbar-gradient {
+                height: 18px;
+                margin: 0 6px;
+            }
+
+            .search-select-input {
+                font-size: 13px;
+                padding: 9px 12px;
+            }
+
+            .search-select-dropdown {
+                max-height: 220px;
+                font-size: 13px;
+            }
+
+            .search-select-option {
+                padding: 7px 12px;
+                font-size: 13px;
+            }
+
+            canvas {
+                margin-top: 12px;
+            }
+        }
+
+        /* 480px and below: Portrait phones */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .container {
+                padding: 0 5px;
+            }
+
+            .step-nav {
+                gap: 8px;
+                padding: 6px 10px;
+                margin-bottom: 8px;
+                border-radius: 6px;
+            }
+
+            .step-nav-back {
+                font-size: 0.75rem;
+            }
+
+            .step-nav-item {
+                font-size: 0.7rem;
+                padding: 2px 8px;
+                border-radius: 4px;
+            }
+
+            header {
+                padding: 15px 12px;
+                margin-bottom: 20px;
+                border-radius: 6px;
+                border-width: 1px;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            header a {
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+
+            .section {
+                padding: 15px 12px;
+                margin-bottom: 20px;
+                border-radius: 6px;
+                border-width: 1px;
+            }
+
+            h2 {
+                font-size: 17px;
+                margin-bottom: 10px;
+            }
+
+            .section-label {
+                font-size: 10px;
+                letter-spacing: 0.6px;
+                margin-bottom: 5px;
+            }
+
+            label {
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+
+            select, input {
+                padding: 8px 10px;
+                font-size: 12px;
+                border-radius: 5px;
+            }
+
+            .control-group {
+                margin-bottom: 12px;
+            }
+
+            .chart-container {
+                min-height: 250px;
+                margin-top: 12px;
+            }
+
+            .info-table {
+                font-size: 11px;
+                margin-top: 10px;
+            }
+
+            .info-table td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+
+            .info-table td:first-child {
+                width: 100px;
+            }
+
+            .save-btn {
+                padding: 6px 12px;
+                font-size: 11px;
+                margin-top: 6px;
+                border-radius: 5px;
+            }
+
+            .loading {
+                padding: 25px 12px;
+                font-size: 13px;
+            }
+
+            .error {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+            }
+
+            .colorbar {
+                font-size: 10px;
+                gap: 6px;
+                margin-top: 10px;
+            }
+
+            .colorbar-gradient {
+                height: 16px;
+                margin: 0 5px;
+                border-radius: 3px;
+            }
+
+            .search-select-wrapper {
+                max-width: 100%;
+            }
+
+            .search-select-input {
+                font-size: 12px;
+                padding: 8px 10px;
+                border-radius: 5px;
+            }
+
+            .search-select-dropdown {
+                max-height: 200px;
+                font-size: 12px;
+                border-radius: 0 0 5px 5px;
+                z-index: 1000;
+            }
+
+            .search-select-option {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            canvas {
+                margin-top: 10px;
+                border-radius: 5px;
+            }
+        }
+
+        /* 380px and below: Extra-small phones */
+        @media (max-width: 380px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 0 3px;
+            }
+
+            .step-nav {
+                gap: 6px;
+                padding: 5px 8px;
+                margin-bottom: 6px;
+                border-radius: 4px;
+            }
+
+            .step-nav-back {
+                font-size: 0.7rem;
+            }
+
+            .step-nav-steps {
+                gap: 4px;
+            }
+
+            .step-nav-item {
+                font-size: 0.65rem;
+                padding: 2px 6px;
+                border-radius: 3px;
+            }
+
+            header {
+                padding: 12px 10px;
+                margin-bottom: 15px;
+                border-radius: 4px;
+                border-width: 1px;
+            }
+
+            h1 {
+                font-size: 18px;
+                margin-bottom: 3px;
+                line-height: 1.2;
+            }
+
+            .subtitle {
+                font-size: 12px;
+                line-height: 1.3;
+            }
+
+            header a {
+                font-size: 11px;
+                margin-bottom: 8px;
+            }
+
+            .section {
+                padding: 12px 10px;
+                margin-bottom: 15px;
+                border-radius: 4px;
+                border-width: 1px;
+            }
+
+            h2 {
+                font-size: 15px;
+                margin-bottom: 8px;
+            }
+
+            .section-label {
+                font-size: 9px;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+            }
+
+            label {
+                font-size: 11px;
+                margin-bottom: 4px;
+            }
+
+            select, input {
+                padding: 7px 8px;
+                font-size: 11px;
+                border-radius: 4px;
+            }
+
+            .control-group {
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                min-height: 220px;
+                margin-top: 10px;
+            }
+
+            .info-table {
+                font-size: 10px;
+                margin-top: 8px;
+            }
+
+            .info-table td {
+                padding: 6px 4px;
+                font-size: 10px;
+            }
+
+            .info-table td:first-child {
+                width: 85px;
+            }
+
+            .save-btn {
+                padding: 5px 10px;
+                font-size: 10px;
+                margin-top: 5px;
+                border-radius: 4px;
+            }
+
+            .loading {
+                padding: 20px 10px;
+                font-size: 12px;
+            }
+
+            .error {
+                padding: 8px;
+                margin: 8px 0;
+                border-radius: 4px;
+            }
+
+            .colorbar {
+                font-size: 9px;
+                gap: 5px;
+                margin-top: 8px;
+            }
+
+            .colorbar-gradient {
+                height: 14px;
+                margin: 0 4px;
+                border-radius: 2px;
+            }
+
+            .search-select-input {
+                font-size: 11px;
+                padding: 7px 8px;
+                border-radius: 4px;
+            }
+
+            .search-select-dropdown {
+                max-height: 180px;
+                font-size: 11px;
+                border-radius: 0 0 4px 4px;
+            }
+
+            .search-select-option {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+
+            canvas {
+                margin-top: 8px;
+                border-radius: 4px;
+            }
         }
     </style>
 </head>
@@ -395,7 +921,7 @@
                 <div class="section-label">Video Guide</div>
                 <h2>Understanding PCA</h2>
                 <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">These short videos explain how to interpret the PCA plots above and what the principal components reveal about brain region similarity.</p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                     <div>
                         <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
                             <iframe src="https://drive.google.com/file/d/1vb1vAPCRAH8G781YVnMdtGU2VD6u5aR0/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>

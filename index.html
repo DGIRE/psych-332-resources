@@ -12,6 +12,8 @@
       box-sizing: border-box;
     }
 
+    html { overflow-x: hidden; }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
@@ -147,10 +149,59 @@
     }
 
     /* Responsive */
-    @media (max-width: 600px) {
+    /* Very small phones (320-380px) */
+    @media (max-width: 380px) {
+      body { padding: 12px; }
+      header { padding: 12px 0; margin-bottom: 30px; }
+      header h1 { font-size: 1.5rem; }
+      header p { font-size: 0.95rem; }
+      .card-grid { grid-template-columns: 1fr; gap: 16px; }
+      .card { padding: 20px 16px; gap: 12px; }
+      .card-icon { width: 52px; height: 52px; font-size: 1.4rem; }
+      .card h2 { font-size: 1.1rem; }
+      .card p { font-size: 0.88rem; }
+      footer { margin-top: 30px; padding: 16px; font-size: 0.8rem; }
+    }
+
+    /* Small phones (380-480px) */
+    @media (max-width: 480px) and (min-width: 381px) {
+      body { padding: 14px; }
+      header { padding: 14px 0; margin-bottom: 35px; }
+      header h1 { font-size: 1.6rem; }
+      header p { font-size: 0.98rem; }
+      .card-grid { grid-template-columns: 1fr; gap: 18px; }
+      .card { padding: 24px 18px; gap: 12px; }
+      .card-icon { width: 56px; height: 56px; font-size: 1.5rem; }
+      .card h2 { font-size: 1.15rem; }
+      .card p { font-size: 0.9rem; }
+      footer { margin-top: 35px; padding: 16px; }
+    }
+
+    /* Phone landscape / small tablets (480-768px) */
+    @media (max-width: 768px) and (min-width: 481px) {
+      body { padding: 16px; }
+      header { padding: 16px 0; margin-bottom: 40px; }
       header h1 { font-size: 1.8rem; }
-      .card-grid { grid-template-columns: 1fr; }
-      .card { padding: 28px 20px; }
+      header p { font-size: 1.0rem; }
+      .card-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+      .card { padding: 28px 20px; gap: 13px; }
+      .card-icon { width: 60px; height: 60px; font-size: 1.55rem; }
+      .card h2 { font-size: 1.2rem; }
+      .card p { font-size: 0.92rem; }
+      footer { margin-top: 40px; padding: 18px; }
+    }
+
+    /* Tablets (768-1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      body { padding: 18px; }
+      header { padding: 18px 0; margin-bottom: 45px; }
+      header h1 { font-size: 2.2rem; }
+      header p { font-size: 1.05rem; }
+      .card-grid { grid-template-columns: repeat(3, 1fr); gap: 22px; }
+      .card { padding: 32px 24px; gap: 14px; }
+      .card-icon { width: 62px; height: 62px; font-size: 1.58rem; }
+      .card h2 { font-size: 1.23rem; }
+      footer { margin-top: 45px; padding: 18px; }
     }
   </style>
 </head>

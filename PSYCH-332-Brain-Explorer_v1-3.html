@@ -12,6 +12,10 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      overflow-x: hidden;
+    }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
@@ -24,6 +28,7 @@
     .container {
       max-width: 1200px;
       margin: 0 auto;
+      width: 100%;
     }
 
     /* Step Navigation Bar */
@@ -79,9 +84,28 @@
       color: #3a5a7a;
       font-size: 0.85rem;
     }
-    @media (max-width: 680px) {
-      .step-nav { flex-direction: column; align-items: flex-start; }
-      .step-nav-steps { margin-left: 0; }
+    @media (max-width: 768px) {
+      .step-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px 12px;
+        gap: 10px;
+      }
+      .step-nav-back {
+        font-size: 0.75rem;
+      }
+      .step-nav-steps {
+        margin-left: 0;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+      .step-nav-item {
+        font-size: 0.75rem;
+        padding: 3px 10px;
+      }
+      .step-nav-arrow {
+        display: none;
+      }
     }
 
     /* Header */
@@ -424,18 +448,112 @@
       }
     }
 
-    /* Responsive */
+    /* Tablet and Medium Screens */
     @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      header {
+        margin-bottom: 30px;
+        padding: 15px;
+      }
+
       header h1 {
         font-size: 1.8rem;
       }
 
+      header p {
+        font-size: 0.95rem;
+      }
+
       .results-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
       }
 
       .filter-chips {
-        justify-content: center;
+        justify-content: flex-start;
+        gap: 8px;
+      }
+
+      .chip {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+      }
+
+      .result-card {
+        padding: 15px;
+      }
+
+      .card-title {
+        font-size: 1rem;
+      }
+
+      .card-body {
+        font-size: 0.85rem;
+      }
+
+      .detail-label {
+        min-width: 60px;
+      }
+
+      .search-row {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      #searchInput,
+      .save-btn,
+      .back-btn {
+        font-size: 0.95rem;
+        padding: 12px 16px;
+      }
+
+      .back-btn {
+        white-space: normal;
+        flex: 0 0 auto;
+      }
+
+      .example-queries {
+        gap: 8px;
+      }
+
+      .example-btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+
+      .sidebar-panel {
+        padding: 15px;
+      }
+
+      .slot-input {
+        height: 32px;
+        font-size: 0.78rem;
+      }
+
+      .export-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+      }
+
+      .results-header {
+        padding: 12px;
+        margin-bottom: 15px;
+      }
+
+      .results-count {
+        font-size: 0.95rem;
+      }
+
+      .ctx-menu {
+        min-width: 180px;
+      }
+
+      .ctx-menu-item {
+        padding: 8px 12px;
+        font-size: 0.8rem;
       }
     }
   
@@ -742,14 +860,395 @@
       background: #6c757d;
     }
 
-    /* Responsive: stack sidebar below on small screens */
+    /* Large Tablets - Stack Sidebar */
     @media (max-width: 900px) {
       .app-layout {
         flex-direction: column;
+        gap: 20px;
       }
       .sidebar {
         width: 100%;
         position: static;
+        top: auto;
+      }
+      .main-content {
+        width: 100%;
+      }
+    }
+
+    /* Mobile Phones - 480px and below */
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+
+      .container {
+        width: 100%;
+      }
+
+      header {
+        margin-bottom: 20px;
+        padding: 10px;
+      }
+
+      header h1 {
+        font-size: 1.4rem;
+        margin-bottom: 5px;
+      }
+
+      header p {
+        font-size: 0.8rem;
+      }
+
+      .step-nav {
+        padding: 6px 10px;
+        gap: 8px;
+      }
+
+      .step-nav-back {
+        font-size: 0.7rem;
+      }
+
+      .step-nav-steps {
+        width: 100%;
+      }
+
+      .step-nav-item {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+      }
+
+      .search-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .back-btn {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+      }
+
+      #searchInput {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 0.9rem;
+      }
+
+      .save-btn {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+      }
+
+      .filter-chips {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        padding-bottom: 8px;
+      }
+
+      .filter-chips::-webkit-scrollbar {
+        height: 4px;
+      }
+
+      .filter-chips::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 2px;
+      }
+
+      .filter-chips::-webkit-scrollbar-thumb {
+        background: rgba(7, 121, 190, 0.3);
+        border-radius: 2px;
+      }
+
+      .chip {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .examples-section {
+        margin-bottom: 15px;
+        padding: 10px;
+      }
+
+      .examples-section p {
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+      }
+
+      .example-queries {
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+      }
+
+      .example-btn {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .result-card {
+        padding: 12px;
+      }
+
+      .card-header {
+        gap: 8px;
+      }
+
+      .category-badge {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+      }
+
+      .card-title {
+        font-size: 0.95rem;
+      }
+
+      .match-score {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+      }
+
+      .card-body {
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+      }
+
+      .card-detail {
+        font-size: 0.8rem;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .detail-label {
+        min-width: 50px;
+        font-size: 0.75rem;
+      }
+
+      .detail-value {
+        font-size: 0.75rem;
+      }
+
+      .xref-title {
+        font-size: 0.75rem;
+      }
+
+      .xref-item {
+        padding: 3px 6px;
+        font-size: 0.75rem;
+      }
+
+      .expand-btn {
+        font-size: 0.8rem;
+        margin-top: 8px;
+      }
+
+      .results-header {
+        padding: 10px;
+        margin-bottom: 12px;
+      }
+
+      .results-count {
+        font-size: 0.85rem;
+      }
+
+      .sidebar-panel {
+        padding: 12px;
+      }
+
+      .sidebar-title {
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+      }
+
+      .slot-label {
+        font-size: 0.65rem;
+      }
+
+      .slot-input {
+        height: 32px;
+        padding: 5px 8px;
+        font-size: 0.75rem;
+      }
+
+      .slot-input::placeholder {
+        font-size: 0.7rem;
+      }
+
+      .slot-clear {
+        font-size: 0.7rem;
+        padding: 1px 4px;
+      }
+
+      .export-btn {
+        padding: 8px 10px;
+        font-size: 0.78rem;
+      }
+
+      .drag-hint {
+        font-size: 0.65rem;
+        margin-top: 10px;
+      }
+
+      .ctx-menu {
+        min-width: 160px;
+        max-width: 90vw;
+      }
+
+      .ctx-menu-header {
+        padding: 6px 10px 4px;
+        font-size: 0.65rem;
+        max-width: 200px;
+      }
+
+      .ctx-menu-item {
+        padding: 7px 10px;
+        font-size: 0.75rem;
+        gap: 8px;
+      }
+
+      .ctx-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 0.6rem;
+      }
+
+      footer {
+        padding: 20px 10px;
+        margin-top: 30px;
+      }
+
+      footer p {
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Extra Small Phones - 380px and below */
+    @media (max-width: 380px) {
+      body {
+        padding: 10px;
+      }
+
+      header h1 {
+        font-size: 1.2rem;
+      }
+
+      header p {
+        font-size: 0.75rem;
+      }
+
+      .step-nav {
+        padding: 5px 8px;
+        gap: 6px;
+      }
+
+      .step-nav-back {
+        font-size: 0.65rem;
+      }
+
+      .step-nav-item {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+      }
+
+      .search-row {
+        gap: 6px;
+      }
+
+      .back-btn {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        gap: 2px;
+      }
+
+      #searchInput {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+      }
+
+      .save-btn {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+      }
+
+      .chip {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+      }
+
+      .example-btn {
+        padding: 3px 6px;
+        font-size: 0.7rem;
+      }
+
+      .result-card {
+        padding: 10px;
+      }
+
+      .card-title {
+        font-size: 0.9rem;
+      }
+
+      .card-body {
+        font-size: 0.75rem;
+      }
+
+      .card-detail {
+        font-size: 0.7rem;
+      }
+
+      .detail-label {
+        min-width: 45px;
+        font-size: 0.7rem;
+      }
+
+      .detail-value {
+        font-size: 0.7rem;
+      }
+
+      .sidebar-panel {
+        padding: 10px;
+      }
+
+      .slot-input {
+        height: 30px;
+        padding: 4px 6px;
+        font-size: 0.7rem;
+      }
+
+      .export-btn {
+        padding: 7px 10px;
+        font-size: 0.75rem;
+      }
+
+      .ctx-menu {
+        min-width: 140px;
+        max-width: 85vw;
+      }
+
+      .results-count {
+        font-size: 0.8rem;
+      }
+
+      footer {
+        padding: 15px 8px;
+      }
+
+      footer p {
+        font-size: 0.7rem;
       }
     }
 

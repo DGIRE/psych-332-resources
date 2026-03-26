@@ -94,10 +94,6 @@
       color: #3a5a7a;
       font-size: 0.85rem;
     }
-    @media (max-width: 680px) {
-      .step-nav { flex-direction: column; align-items: flex-start; }
-      .step-nav-steps { margin-left: 0; }
-    }
 
     /* Header */
     header {
@@ -408,10 +404,171 @@
     }
 
     /* Responsive */
-    @media (max-width: 680px) {
-      header h1 { font-size: 1.7rem; }
+
+    /* Tablet & below 768px */
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+
+      .step-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+      }
+      .step-nav-back { font-size: 0.75rem; }
+      .step-nav-steps {
+        margin-left: 0;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+      .step-nav-item { font-size: 0.75rem; }
+
+      header { margin-bottom: 28px; padding: 16px 0; }
+      header h1 { font-size: 2rem; }
+      header p { font-size: 0.98rem; }
+
+      .upload-area { padding: 28px 20px; }
+      .upload-area .upload-icon { font-size: 2rem; }
+      .upload-area h2 { font-size: 1.1rem; }
+
+      .selection-items { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+      .guide-section { padding: 24px 20px; }
+      .guide-section h2 { font-size: 1.15rem; }
+      .guide-section h3 { font-size: 0.95rem; }
+      .guide-section p, .guide-section li { font-size: 0.88rem; }
+
+      .accordion-toggle { min-height: 44px; padding: 8px 0; }
+      .accordion-toggle .arrow { font-size: 1rem; }
+
+      .checklist li { padding: 8px 0 8px 32px; font-size: 0.88rem; }
+      .checklist li::before { width: 18px; height: 18px; }
+    }
+
+    /* Small tablets & large phones 600px - 767px */
+    @media (max-width: 767px) {
       .selection-items { grid-template-columns: 1fr; }
-      .guide-section { padding: 20px 16px; }
+    }
+
+    /* Phones 480px - 599px */
+    @media (max-width: 599px) {
+      body { padding: 12px; }
+      .container { max-width: 100%; }
+
+      .back-link { font-size: 0.8rem; margin-bottom: 16px; }
+
+      .step-nav {
+        gap: 8px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+      }
+      .step-nav-back { font-size: 0.7rem; }
+      .step-nav-steps { gap: 6px; }
+      .step-nav-item { font-size: 0.65rem; padding: 3px 8px; }
+      .step-nav-arrow { font-size: 0.7rem; }
+
+      .module-label { font-size: 0.75rem; letter-spacing: 1px; }
+      header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+      header p { font-size: 0.9rem; }
+
+      .upload-area {
+        padding: 20px 16px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+      }
+      .upload-area .upload-icon { font-size: 1.8rem; margin-bottom: 8px; }
+      .upload-area h2 { font-size: 1rem; margin-bottom: 4px; }
+      .upload-area p { font-size: 0.8rem; }
+
+      .selection-card { padding: 16px 12px; margin-bottom: 20px; }
+      .selection-card h3 { font-size: 0.95rem; margin-bottom: 10px; }
+      .selection-items { gap: 10px; }
+      .sel-item { padding: 10px 12px; }
+      .sel-item .sel-label { font-size: 0.65rem; }
+      .sel-item .sel-value { font-size: 0.9rem; }
+      .sel-links { gap: 8px; margin-top: 10px; }
+      .sel-links a { font-size: 0.75rem; padding: 3px 8px; min-height: 32px; display: flex; align-items: center; }
+
+      .guide-section {
+        padding: 16px 12px;
+        margin-bottom: 16px;
+        border-radius: 10px;
+      }
+      .guide-section h2 { font-size: 1rem; margin-bottom: 10px; }
+      .guide-section h2 .sec-icon { width: 28px; height: 28px; font-size: 0.85rem; }
+      .guide-section h3 { font-size: 0.88rem; margin: 12px 0 6px 0; }
+      .guide-section p, .guide-section li { font-size: 0.8rem; }
+      .guide-section ul, .guide-section ol { padding-left: 18px; margin: 6px 0 10px 0; }
+      .guide-section li { margin-bottom: 4px; }
+      .guide-section .tip, .guide-section .warning { padding: 8px 12px; margin: 8px 0; font-size: 0.75rem; }
+
+      /* Rubric table horizontal scroll */
+      .rubric-table {
+        font-size: 0.75rem;
+        margin: 10px -12px;
+        width: calc(100% + 24px);
+        display: block;
+        overflow-x: auto;
+      }
+      .rubric-table thead, .rubric-table tbody, .rubric-table tr, .rubric-table th, .rubric-table td {
+        display: revert;
+      }
+      .rubric-table th, .rubric-table td {
+        padding: 8px 10px;
+        white-space: nowrap;
+      }
+
+      .accordion-toggle {
+        min-height: 44px;
+        font-size: 0.8rem;
+        padding: 6px 0;
+      }
+
+      .checklist li {
+        padding: 6px 0 6px 28px;
+        font-size: 0.8rem;
+      }
+      .checklist li::before { width: 16px; height: 16px; top: 8px; }
+
+      footer { font-size: 0.75rem; padding: 16px 0; margin-top: 24px; }
+    }
+
+    /* Small phones 380px - 479px */
+    @media (max-width: 479px) {
+      body { padding: 10px; }
+
+      .step-nav { gap: 6px; padding: 8px 10px; }
+      .step-nav-back { font-size: 0.65rem; }
+      .step-nav-item { font-size: 0.6rem; padding: 2px 6px; }
+
+      header h1 { font-size: 1.3rem; }
+      header p { font-size: 0.85rem; }
+      .module-label { font-size: 0.7rem; }
+
+      .upload-area { padding: 16px 12px; }
+      .upload-area .upload-icon { font-size: 1.5rem; }
+      .upload-area h2 { font-size: 0.95rem; }
+
+      .selection-card h3 { font-size: 0.9rem; }
+      .sel-item { padding: 8px 10px; }
+      .sel-item .sel-label { font-size: 0.6rem; }
+      .sel-item .sel-value { font-size: 0.85rem; }
+
+      .guide-section { padding: 12px 10px; }
+      .guide-section h2 { font-size: 0.95rem; gap: 6px; }
+      .guide-section h2 .sec-icon { width: 26px; height: 26px; font-size: 0.8rem; }
+      .guide-section h3 { font-size: 0.85rem; }
+      .guide-section p, .guide-section li { font-size: 0.75rem; }
+
+      .rubric-table { font-size: 0.7rem; margin: 8px -10px; width: calc(100% + 20px); }
+      .rubric-table th, .rubric-table td { padding: 6px 8px; }
+
+      .accordion-toggle { font-size: 0.75rem; min-height: 40px; }
+
+      .checklist li { padding: 4px 0 4px 26px; font-size: 0.75rem; }
+      .checklist li::before { width: 14px; height: 14px; top: 6px; }
+
+      footer { font-size: 0.7rem; }
     }
   </style>
 </head>

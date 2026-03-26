@@ -12,6 +12,8 @@
       box-sizing: border-box;
     }
 
+    html { overflow-x: hidden; }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
@@ -239,27 +241,92 @@
     }
 
     /* Responsive — stack vertically on small screens */
-    @media (max-width: 680px) {
-      header h1 { font-size: 1.8rem; }
+    /* Very small phones (320-380px) */
+    @media (max-width: 380px) {
+      body { padding: 12px; }
+      .back-link { font-size: 0.85rem; margin-bottom: 20px; }
+      header { padding: 12px 0; margin-bottom: 12px; }
+      .module-label { font-size: 0.75rem; letter-spacing: 1px; }
+      header h1 { font-size: 1.4rem; margin-bottom: 8px; }
+      header p { font-size: 0.92rem; }
+      .flow-label { margin-bottom: 18px; }
+      .flow-label span { font-size: 0.7rem; padding: 3px 10px; }
+      .flow-row { flex-direction: column; gap: 0; }
+      .card { padding: 20px 14px; gap: 11px; }
+      .step-badge { font-size: 0.6rem; padding: 2px 8px; top: -10px; }
+      .card-icon { width: 48px; height: 48px; font-size: 1.3rem; margin-top: 6px; }
+      .card h2 { font-size: 1.05rem; }
+      .card p { font-size: 0.85rem; }
+      .flow-arrow { flex-direction: row; padding: 4px 0; gap: 3px; }
+      .flow-arrow svg { width: 20px; height: 20px; transform: rotate(90deg); }
+      .flow-arrow-label { font-size: 0.55rem; }
+      footer { margin-top: 30px; padding: 12px; font-size: 0.8rem; }
+    }
 
-      .flow-row {
-        flex-direction: column;
-        gap: 0;
-      }
+    /* Small phones (380-480px) */
+    @media (max-width: 480px) and (min-width: 381px) {
+      body { padding: 14px; }
+      .back-link { font-size: 0.88rem; margin-bottom: 24px; }
+      header { padding: 14px 0; margin-bottom: 14px; }
+      .module-label { font-size: 0.78rem; letter-spacing: 1.2px; }
+      header h1 { font-size: 1.55rem; margin-bottom: 8px; }
+      header p { font-size: 0.95rem; }
+      .flow-label { margin-bottom: 20px; }
+      .flow-label span { font-size: 0.72rem; padding: 3px 11px; }
+      .flow-row { flex-direction: column; gap: 0; }
+      .card { padding: 24px 16px; gap: 12px; }
+      .step-badge { font-size: 0.62rem; padding: 2px 9px; top: -11px; }
+      .card-icon { width: 52px; height: 52px; font-size: 1.4rem; margin-top: 7px; }
+      .card h2 { font-size: 1.1rem; }
+      .card p { font-size: 0.88rem; }
+      .flow-arrow { flex-direction: row; padding: 5px 0; gap: 3px; }
+      .flow-arrow svg { width: 22px; height: 22px; transform: rotate(90deg); }
+      .flow-arrow-label { font-size: 0.58rem; }
+      footer { margin-top: 35px; padding: 14px; }
+    }
 
-      .flow-arrow {
-        flex-direction: row;
-        padding: 6px 0;
-        justify-content: center;
-      }
+    /* Phone landscape / small tablets (480-768px) */
+    @media (max-width: 768px) and (min-width: 481px) {
+      body { padding: 16px; }
+      .back-link { font-size: 0.9rem; margin-bottom: 28px; }
+      header { padding: 16px 0; margin-bottom: 16px; }
+      .module-label { font-size: 0.8rem; letter-spacing: 1.3px; }
+      header h1 { font-size: 1.75rem; margin-bottom: 8px; }
+      header p { font-size: 0.98rem; }
+      .flow-label { margin-bottom: 24px; }
+      .flow-label span { font-size: 0.75rem; padding: 4px 12px; }
+      .flow-row { flex-direction: column; gap: 0; }
+      .card { padding: 28px 20px; gap: 13px; }
+      .step-badge { font-size: 0.64rem; padding: 2px 10px; top: -11px; }
+      .card-icon { width: 56px; height: 56px; font-size: 1.5rem; margin-top: 8px; }
+      .card h2 { font-size: 1.15rem; }
+      .card p { font-size: 0.91rem; }
+      .flow-arrow { flex-direction: row; padding: 6px 0; gap: 4px; }
+      .flow-arrow svg { width: 24px; height: 24px; transform: rotate(90deg); }
+      .flow-arrow-label { font-size: 0.6rem; }
+      footer { margin-top: 40px; padding: 16px; }
+    }
 
-      .flow-arrow svg {
-        transform: rotate(90deg);
-      }
-
-      .card {
-        padding: 28px 20px;
-      }
+    /* Tablets (768-1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      body { padding: 18px; }
+      .back-link { font-size: 0.92rem; margin-bottom: 30px; }
+      header { padding: 18px 0; margin-bottom: 18px; }
+      .module-label { font-size: 0.82rem; letter-spacing: 1.4px; }
+      header h1 { font-size: 2.1rem; margin-bottom: 10px; }
+      header p { font-size: 1.02rem; }
+      .flow-label { margin-bottom: 26px; }
+      .flow-label span { font-size: 0.78rem; padding: 4px 13px; }
+      .flow-row { flex-direction: row; gap: 12px; align-items: stretch; }
+      .card { padding: 32px 22px; gap: 14px; }
+      .step-badge { font-size: 0.66rem; padding: 3px 11px; top: -13px; }
+      .card-icon { width: 60px; height: 60px; font-size: 1.55rem; margin-top: 8px; }
+      .card h2 { font-size: 1.2rem; }
+      .card p { font-size: 0.93rem; }
+      .flow-arrow { flex-direction: column; padding: 0 8px; gap: 4px; }
+      .flow-arrow svg { width: 26px; height: 26px; transform: none; }
+      .flow-arrow-label { font-size: 0.63rem; }
+      footer { margin-top: 45px; padding: 18px; }
     }
   </style>
 </head>
