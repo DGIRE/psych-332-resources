@@ -285,6 +285,35 @@
             background: rgba(7, 121, 190, 0.3);
         }
 
+        /* Clustergram autocomplete */
+        .cg-autocomplete-list {
+            display: none;
+            position: absolute;
+            left: 0; right: 0;
+            top: 100%;
+            z-index: 100;
+            max-height: 180px;
+            overflow-y: auto;
+            background: #1a2e42;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 0 0 6px 6px;
+            font-size: 13px;
+        }
+        .cg-autocomplete-list.open { display: block; }
+        .cg-ac-item {
+            padding: 6px 10px;
+            color: #e8eef5;
+            cursor: pointer;
+        }
+        .cg-ac-item:hover, .cg-ac-item.active {
+            background: rgba(7,121,190,0.3);
+        }
+        .cg-ac-item .cg-ac-type {
+            font-size: 10px;
+            color: #5a7d9e;
+            margin-left: 6px;
+        }
+
         /* Searchable dropdown */
         .search-select-wrapper {
             position: relative;
@@ -1038,27 +1067,31 @@
                     </div>
                 </div>
 
-                <p style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">Hierarchically clustered heatmap with dendrograms. Rows (brain regions) and columns (features) are reordered by similarity. Click any two labels on either dendrogram to trace the shortest path between them and see their distance.</p>
+                <p style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">Hierarchically clustered heatmap with dendrograms. Rows (brain regions) and columns (features) are reordered by similarity. Zoom into the heatmap and the dendrograms will follow. Use the inputs below to measure the distance between any two genes or brain areas.</p>
 
-                <!-- Path display -->
+                <!-- Distance calculator inputs -->
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+                    <div style="flex: 1; min-width: 160px; position: relative;">
+                        <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Item 1 (gene or brain area)</label>
+                        <input id="cgDistInput1" type="text" autocomplete="off" placeholder="e.g. Amygdala or DRD2" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                        <div id="cgDistAC1" class="cg-autocomplete-list"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 160px; position: relative;">
+                        <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Item 2 (gene or brain area)</label>
+                        <input id="cgDistInput2" type="text" autocomplete="off" placeholder="e.g. Hippocampus or HTR2A" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                        <div id="cgDistAC2" class="cg-autocomplete-list"></div>
+                    </div>
+                    <button onclick="calcCgItemDistance()" style="padding: 9px 18px; border-radius: 6px; border: 2px solid #0779be; background: rgba(7,121,190,0.25); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;">Calculate Distance</button>
+                </div>
+
+                <!-- Distance result display -->
                 <div id="cgPathDisplay" style="display: none; background: rgba(220,60,60,0.1); border: 1px solid rgba(220,60,60,0.4); border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; font-size: 13px; color: #f0b0b0;">
                     <span id="cgPathText"></span>
                     <button onclick="clearDendroPath()" style="float: right; background: none; border: 1px solid rgba(220,60,60,0.5); color: #f0b0b0; border-radius: 4px; padding: 2px 10px; cursor: pointer; font-size: 12px; font-family: inherit;">Clear</button>
                 </div>
 
-                <!-- Dendrogram + Heatmap composite -->
-                <div id="clustergramContainer" style="position: relative; overflow-x: auto; margin-bottom: 12px;">
-                    <!-- Top dendrogram (columns) -->
-                    <div style="display: flex;">
-                        <div id="cgRowDendroSpacer" style="flex-shrink: 0;"></div>
-                        <svg id="cgColDendro" style="display: block;"></svg>
-                    </div>
-                    <!-- Row dendrogram + Heatmap side by side -->
-                    <div style="display: flex;">
-                        <svg id="cgRowDendro" style="display: block; flex-shrink: 0;"></svg>
-                        <div id="clustergramPlot" style="flex: 1; min-height: 300px;"></div>
-                    </div>
-                </div>
+                <!-- Single Plotly div for heatmap + dendrograms (zoom-synced) -->
+                <div id="clustergramPlot" class="chart-container" style="min-height: 400px;"></div>
                 <button onclick="savePlotlyAsPNG('clustergramPlot', 'clustergram')" class="save-btn">&#128190; Save as Image</button>
             </section>
 
@@ -2231,95 +2264,75 @@
             dataType: 'gene'
         };
 
-        // --- SVG Dendrogram Rendering ---
-        function renderRowDendrogram(root, order, svgEl, heatmapHeight, dendroW) {
-            const DENDRO_W = dendroW || 120;
+        // --- Build dendrogram line segments for Plotly traces ---
+        // Row dendrogram: x = merge height (negative, so it extends left), y = row position
+        function buildRowDendroTraces(root, order) {
             const n = order.length;
-            const cellH = heatmapHeight / n;
             const maxH = root.height || 1;
-            const pad = 4; // padding from edge
-
-            svgEl.setAttribute('width', DENDRO_W);
-            svgEl.setAttribute('height', heatmapHeight);
-            svgEl.innerHTML = '';
-
-            // Map leaf index -> y center position
             const leafY = {};
-            order.forEach((leafIdx, pos) => { leafY[leafIdx] = (pos + 0.5) * cellH; });
+            order.forEach((leafIdx, pos) => { leafY[leafIdx] = pos; });
+
+            const xs = [], ys = [];
 
             function drawNode(node) {
                 if (node.leaves.length === 1) {
-                    return { y: leafY[node.leaves[0]], id: node.id };
+                    return { y: leafY[node.leaves[0]] };
                 }
                 const left = drawNode(node.left);
                 const right = drawNode(node.right);
-                const x = DENDRO_W - (node.height / maxH) * (DENDRO_W - pad);
-                const xL = node.left.leaves.length === 1 ? DENDRO_W : DENDRO_W - (node.left.height / maxH) * (DENDRO_W - pad);
-                const xR = node.right.leaves.length === 1 ? DENDRO_W : DENDRO_W - (node.right.height / maxH) * (DENDRO_W - pad);
-                const midY = (left.y + right.y) / 2;
+                const x = -(node.height / maxH);
+                const xL = node.left.leaves.length === 1 ? 0 : -(node.left.height / maxH);
+                const xR = node.right.leaves.length === 1 ? 0 : -(node.right.height / maxH);
 
-                addLine(svgEl, xL, left.y, x, left.y, node.left.id, node.right.id, node.id);
-                addLine(svgEl, xR, right.y, x, right.y, node.left.id, node.right.id, node.id);
-                addLine(svgEl, x, left.y, x, right.y, node.left.id, node.right.id, node.id);
+                // Horizontal from left child to merge point
+                xs.push(xL, x, null); ys.push(left.y, left.y, null);
+                // Horizontal from right child to merge point
+                xs.push(xR, x, null); ys.push(right.y, right.y, null);
+                // Vertical connecting
+                xs.push(x, x, null); ys.push(left.y, right.y, null);
 
-                return { y: midY, id: node.id };
+                return { y: (left.y + right.y) / 2 };
             }
 
             drawNode(root);
+            return { xs, ys };
         }
 
-        function renderColDendrogram(root, order, svgEl, heatmapWidth, dendroH) {
-            const DENDRO_H = dendroH || 100;
+        // Column dendrogram: x = col position, y = merge height (positive, extends upward)
+        function buildColDendroTraces(root, order) {
             const n = order.length;
-            const cellW = heatmapWidth / n;
             const maxH = root.height || 1;
-            const pad = 4;
-
-            svgEl.setAttribute('width', heatmapWidth);
-            svgEl.setAttribute('height', DENDRO_H);
-            svgEl.innerHTML = '';
-
             const leafX = {};
-            order.forEach((leafIdx, pos) => { leafX[leafIdx] = (pos + 0.5) * cellW; });
+            order.forEach((leafIdx, pos) => { leafX[leafIdx] = pos; });
+
+            const xs = [], ys = [];
 
             function drawNode(node) {
                 if (node.leaves.length === 1) {
-                    return { x: leafX[node.leaves[0]], id: node.id };
+                    return { x: leafX[node.leaves[0]] };
                 }
                 const left = drawNode(node.left);
                 const right = drawNode(node.right);
-                const y = DENDRO_H - (node.height / maxH) * (DENDRO_H - pad);
-                const yL = node.left.leaves.length === 1 ? DENDRO_H : DENDRO_H - (node.left.height / maxH) * (DENDRO_H - pad);
-                const yR = node.right.leaves.length === 1 ? DENDRO_H : DENDRO_H - (node.right.height / maxH) * (DENDRO_H - pad);
-                const midX = (left.x + right.x) / 2;
+                const y = node.height / maxH;
+                const yL = node.left.leaves.length === 1 ? 0 : node.left.height / maxH;
+                const yR = node.right.leaves.length === 1 ? 0 : node.right.height / maxH;
 
-                addLine(svgEl, left.x, yL, left.x, y, node.left.id, node.right.id, node.id);
-                addLine(svgEl, right.x, yR, right.x, y, node.left.id, node.right.id, node.id);
-                addLine(svgEl, left.x, y, right.x, y, node.left.id, node.right.id, node.id);
+                // Vertical from left child to merge point
+                xs.push(left.x, left.x, null); ys.push(yL, y, null);
+                // Vertical from right child to merge point
+                xs.push(right.x, right.x, null); ys.push(yR, y, null);
+                // Horizontal connecting
+                xs.push(left.x, right.x, null); ys.push(y, y, null);
 
-                return { x: midX, id: node.id };
+                return { x: (left.x + right.x) / 2 };
             }
 
             drawNode(root);
+            return { xs, ys };
         }
 
-        function addLine(svg, x1, y1, x2, y2, leftId, rightId, mergeId) {
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-            line.setAttribute('stroke', 'rgba(180,200,220,0.5)');
-            line.setAttribute('stroke-width', '1.2');
-            line.setAttribute('data-merge', mergeId);
-            line.setAttribute('data-left', leftId);
-            line.setAttribute('data-right', rightId);
-            line.classList.add('dendro-line');
-            svg.appendChild(line);
-        }
-
-        // --- Path tracing on dendrogram ---
-        // Find the path between two leaves through the tree
+        // --- Path tracing (find LCA on tree) ---
         function findPathBetweenLeaves(root, leafA, leafB) {
-            // Find lowest common ancestor (LCA) and paths from LCA to each leaf
             function findPath(node, targetLeaf) {
                 if (!node) return null;
                 if (node.leaves.length === 1 && node.leaves[0] === targetLeaf) return [node];
@@ -2334,140 +2347,118 @@
                 }
                 return null;
             }
-
             const pathA = findPath(root, leafA);
             const pathB = findPath(root, leafB);
             if (!pathA || !pathB) return null;
-
-            // Find LCA
             let lcaIdx = 0;
-            while (lcaIdx < pathA.length && lcaIdx < pathB.length && pathA[lcaIdx].id === pathB[lcaIdx].id) {
-                lcaIdx++;
-            }
-            lcaIdx--; // last common node
-
-            // Collect all merge node ids in the path
-            const pathNodeIds = new Set();
-            for (let i = lcaIdx; i < pathA.length; i++) pathNodeIds.add(pathA[i].id);
-            for (let i = lcaIdx; i < pathB.length; i++) pathNodeIds.add(pathB[i].id);
-
-            return { pathNodeIds, lcaNode: pathA[lcaIdx], distance: pathA[lcaIdx].height };
-        }
-
-        function highlightDendroPath(svgEl, pathNodeIds) {
-            svgEl.querySelectorAll('.dendro-line').forEach(line => {
-                const mergeId = parseInt(line.getAttribute('data-merge'));
-                const leftId = parseInt(line.getAttribute('data-left'));
-                const rightId = parseInt(line.getAttribute('data-right'));
-                if (pathNodeIds.has(mergeId) || pathNodeIds.has(leftId) || pathNodeIds.has(rightId)) {
-                    // Check if this line segment is part of the path
-                    if (pathNodeIds.has(mergeId) &&
-                        (pathNodeIds.has(leftId) || pathNodeIds.has(rightId))) {
-                        line.setAttribute('stroke', '#ff4444');
-                        line.setAttribute('stroke-width', '2.5');
-                        line.classList.add('dendro-path-highlight');
-                    }
-                }
-            });
+            while (lcaIdx < pathA.length && lcaIdx < pathB.length && pathA[lcaIdx].id === pathB[lcaIdx].id) lcaIdx++;
+            lcaIdx--;
+            return { lcaNode: pathA[lcaIdx], distance: pathA[lcaIdx].height };
         }
 
         function clearDendroPath() {
-            cgState.selectedLabels = [];
-            document.querySelectorAll('.dendro-path-highlight').forEach(el => {
-                el.setAttribute('stroke', 'rgba(180,200,220,0.5)');
-                el.setAttribute('stroke-width', '1.2');
-                el.classList.remove('dendro-path-highlight');
-            });
             document.getElementById('cgPathDisplay').style.display = 'none';
             document.getElementById('cgPathText').textContent = '';
-            // Remove any leaf highlights
-            document.querySelectorAll('.dendro-leaf-selected').forEach(el => {
-                el.setAttribute('fill', 'rgba(180,200,220,0.7)');
-                el.classList.remove('dendro-leaf-selected');
-            });
         }
 
-        // Add clickable leaf labels to SVG dendrograms
-        function addRowLeafLabels(svgEl, order, labels, heatmapHeight) {
-            const n = order.length;
-            const cellH = heatmapHeight / n;
-            order.forEach((leafIdx, pos) => {
-                const y = (pos + 0.5) * cellH;
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', 116);
-                circle.setAttribute('cy', y);
-                circle.setAttribute('r', Math.min(3, cellH / 3));
-                circle.setAttribute('fill', 'rgba(180,200,220,0.7)');
-                circle.setAttribute('data-leaf-idx', leafIdx);
-                circle.setAttribute('data-axis', 'row');
-                circle.style.cursor = 'pointer';
-                circle.classList.add('dendro-leaf');
-                circle.addEventListener('click', () => onDendroLeafClick(leafIdx, 'row'));
-                svgEl.appendChild(circle);
-            });
-        }
+        // --- Autocomplete for distance inputs ---
+        function setupCgAutocomplete(inputId, listId) {
+            const input = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+            let items = [];
 
-        function addColLeafLabels(svgEl, order, labels, heatmapWidth) {
-            const n = order.length;
-            const cellW = heatmapWidth / n;
-            order.forEach((leafIdx, pos) => {
-                const x = (pos + 0.5) * cellW;
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', x);
-                circle.setAttribute('cy', 96);
-                circle.setAttribute('r', Math.min(3, cellW / 3));
-                circle.setAttribute('fill', 'rgba(180,200,220,0.7)');
-                circle.setAttribute('data-leaf-idx', leafIdx);
-                circle.setAttribute('data-axis', 'col');
-                circle.style.cursor = 'pointer';
-                circle.classList.add('dendro-leaf');
-                circle.addEventListener('click', () => onDendroLeafClick(leafIdx, 'col'));
-                svgEl.appendChild(circle);
-            });
-        }
-
-        function onDendroLeafClick(leafIdx, axis) {
-            const sel = cgState.selectedLabels;
-            // If clicking a different axis than first selection, clear
-            if (sel.length === 1 && sel[0].axis !== axis) {
-                clearDendroPath();
+            function buildItems() {
+                items = [];
+                // Brain areas (rows)
+                cgState.rowLabels.forEach(name => items.push({ name, type: 'brain area', axis: 'row' }));
+                // Features (columns = genes/regions/functions)
+                cgState.colLabels.forEach(name => items.push({ name, type: cgState.dataType === 'gene' ? 'gene' : cgState.dataType === 'dti' ? 'DTI region' : 'fMRI function', axis: 'col' }));
             }
 
-            sel.push({ leafIdx, axis });
+            input.addEventListener('focus', () => { buildItems(); showSuggestions(); });
+            input.addEventListener('input', () => { buildItems(); showSuggestions(); });
+            input.addEventListener('blur', () => { setTimeout(() => list.classList.remove('open'), 200); });
 
-            // Highlight this leaf circle
-            document.querySelectorAll(`.dendro-leaf[data-leaf-idx="${leafIdx}"][data-axis="${axis}"]`).forEach(c => {
-                c.setAttribute('fill', '#ffcc00');
-                c.classList.add('dendro-leaf-selected');
-            });
-
-            if (sel.length === 2) {
-                // Trace path between the two selected leaves
-                const root = axis === 'row' ? cgState.rowRoot : cgState.colRoot;
-                const labels = axis === 'row' ? cgState.rowLabels : cgState.colLabels;
-                const svgEl = axis === 'row'
-                    ? document.getElementById('cgRowDendro')
-                    : document.getElementById('cgColDendro');
-
-                const result = findPathBetweenLeaves(root, sel[0].leafIdx, sel[1].leafIdx);
-                if (result) {
-                    highlightDendroPath(svgEl, result.pathNodeIds);
-                    const nameA = labels[sel[0].leafIdx];
-                    const nameB = labels[sel[1].leafIdx];
-                    const metric = document.getElementById('cgDistMetric').value;
-                    const pathDiv = document.getElementById('cgPathDisplay');
-                    pathDiv.style.display = 'block';
-                    document.getElementById('cgPathText').innerHTML =
-                        `<strong>Path:</strong> ${nameA} ↔ ${nameB} &nbsp;|&nbsp; ` +
-                        `<strong>Distance (LCA height):</strong> ${result.distance.toFixed(4)} &nbsp;|&nbsp; ` +
-                        `<strong>Metric:</strong> ${metric}`;
-                }
-                // Reset selection for next pair
-                cgState.selectedLabels = [];
+            function showSuggestions() {
+                const val = input.value.trim().toLowerCase();
+                list.innerHTML = '';
+                if (!val) { list.classList.remove('open'); return; }
+                const matches = items.filter(it => it.name.toLowerCase().includes(val)).slice(0, 12);
+                if (matches.length === 0) { list.classList.remove('open'); return; }
+                matches.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'cg-ac-item';
+                    div.innerHTML = `${m.name}<span class="cg-ac-type">${m.type}</span>`;
+                    div.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        input.value = m.name;
+                        list.classList.remove('open');
+                    });
+                    list.appendChild(div);
+                });
+                list.classList.add('open');
             }
         }
 
-        // --- Main clustergram render function ---
+        // --- Distance calculator ---
+        function calcCgItemDistance() {
+            const name1 = document.getElementById('cgDistInput1').value.trim();
+            const name2 = document.getElementById('cgDistInput2').value.trim();
+            if (!name1 || !name2) return;
+            if (!cgState.rowRoot) return;
+
+            const metric = document.getElementById('cgDistMetric').value;
+
+            // Determine which axis each name belongs to
+            function findItem(name) {
+                const rowIdx = cgState.rowLabels.indexOf(name);
+                if (rowIdx >= 0) return { axis: 'row', idx: rowIdx };
+                const colIdx = cgState.colLabels.indexOf(name);
+                if (colIdx >= 0) return { axis: 'col', idx: colIdx };
+                // Case-insensitive fallback
+                const rl = cgState.rowLabels.findIndex(r => r.toLowerCase() === name.toLowerCase());
+                if (rl >= 0) return { axis: 'row', idx: rl };
+                const cl = cgState.colLabels.findIndex(c => c.toLowerCase() === name.toLowerCase());
+                if (cl >= 0) return { axis: 'col', idx: cl };
+                return null;
+            }
+
+            const item1 = findItem(name1);
+            const item2 = findItem(name2);
+
+            if (!item1) { alert(`"${name1}" not found in current data.`); return; }
+            if (!item2) { alert(`"${name2}" not found in current data.`); return; }
+            if (item1.axis !== item2.axis) { alert(`"${name1}" is a ${item1.axis === 'row' ? 'brain area' : 'feature'} and "${name2}" is a ${item2.axis === 'row' ? 'brain area' : 'feature'}. Both must be the same type.`); return; }
+
+            // Compute direct distance between their data vectors
+            const zMatrix = cgState.matrix;
+            let vecA, vecB;
+            if (item1.axis === 'row') {
+                vecA = zMatrix[item1.idx];
+                vecB = zMatrix[item2.idx];
+            } else {
+                // Column vectors: transpose
+                vecA = zMatrix.map(row => row[item1.idx]);
+                vecB = zMatrix.map(row => row[item2.idx]);
+            }
+
+            const directDist = cgDistance(vecA, vecB, metric);
+
+            // Also find LCA distance in the dendrogram
+            const root = item1.axis === 'row' ? cgState.rowRoot : cgState.colRoot;
+            const result = findPathBetweenLeaves(root, item1.idx, item2.idx);
+            const lcaDist = result ? result.distance : null;
+
+            const pathDiv = document.getElementById('cgPathDisplay');
+            pathDiv.style.display = 'block';
+            const labels = item1.axis === 'row' ? cgState.rowLabels : cgState.colLabels;
+            let html = `<strong>${labels[item1.idx]}</strong> ↔ <strong>${labels[item2.idx]}</strong> &nbsp;|&nbsp; `;
+            html += `<strong>Direct ${metric} distance:</strong> ${directDist.toFixed(4)}`;
+            if (lcaDist !== null) html += ` &nbsp;|&nbsp; <strong>Dendrogram LCA height:</strong> ${lcaDist.toFixed(4)}`;
+            document.getElementById('cgPathText').innerHTML = html;
+        }
+
+        // --- Main clustergram render function (single Plotly figure with subplots) ---
         function recalcClustergram() {
             const dataType = document.getElementById('clustergramDataType').value;
             const metric = document.getElementById('cgDistMetric').value;
@@ -2489,7 +2480,7 @@
                 matrix = fmriData.map(r => colLabels.map(f => r[f] || 0));
             }
 
-            // Z-score normalize each column (feature), matching Python: (data - mean) / std
+            // Z-score normalize each column
             const nR = matrix.length;
             const nC = colLabels.length;
             const means = new Float64Array(nC);
@@ -2506,7 +2497,7 @@
             }
             const zMatrix = matrix.map(row => row.map((v, j) => (v - means[j]) / stds[j]));
 
-            // Cluster rows and columns on z-scored data
+            // Cluster rows and columns
             const rowResult = hierarchicalCluster(zMatrix, metric, linkage);
             const transposed = colLabels.map((_, ci) => zMatrix.map(row => row[ci]));
             const colResult = hierarchicalCluster(transposed, metric, linkage);
@@ -2528,6 +2519,8 @@
             const orderedRows = rowResult.order.map(i => rowLabels[i]);
             const orderedCols = colResult.order.map(i => colLabels[i]);
             const orderedZ = rowResult.order.map(ri => colResult.order.map(ci => zMatrix[ri][ci]));
+            const nRows = orderedRows.length;
+            const nCols = orderedCols.length;
 
             // Color rows by brain structure
             const rowColors = orderedRows.map(name => {
@@ -2536,111 +2529,129 @@
                 return nipySpectralColor(BRAIN_SCALE_DICT[structName] || 0.5);
             });
 
-            // BWR colorscale matching Python sns.clustermap cmap='bwr'
+            // BWR colorscale
             const colorscale = [
                 [0, '#0000ff'], [0.25, '#8080ff'], [0.5, '#ffffff'],
                 [0.75, '#ff8080'], [1, '#ff0000']
             ];
 
-            const nRows = orderedRows.length;
-            const nCols = orderedCols.length;
+            // --- Layout: heatmap on (xaxis, yaxis), row dendro on (xaxis2, yaxis), col dendro on (xaxis, yaxis3) ---
+            // Domain fractions: dendro_ratio = 0.1
+            const dr = 0.1;
+            // Row dendrogram on the left: xaxis2 domain [0, dr], heatmap xaxis domain [dr, 1]
+            // Col dendrogram on top: yaxis3 domain [1-dr, 1], heatmap yaxis domain [0, 1-dr]
 
-            // --- Sizing to match Python figsize=(15,15) with dendrogram_ratio=0.1 ---
-            // The heatmap data area should be square-ish, with cell size driving dimensions.
-            // Use a generous cell size so labels are readable.
-            const cellSize = Math.max(10, Math.min(18, 800 / Math.max(nRows, nCols)));
-            const plotAreaH = nRows * cellSize;
-            const plotAreaW = nCols * cellSize;
+            // Use numeric y (row index) for the heatmap so row dendro shares the same axis
+            // Use numeric x (col index) for the heatmap so col dendro shares the same axis
 
-            // Dendrogram dimensions: 10% of heatmap dimension (dendrogram_ratio=0.1)
-            const DENDRO_W = Math.max(60, Math.round(plotAreaH * 0.1));
-            const DENDRO_H = Math.max(50, Math.round(plotAreaW * 0.1));
-
-            // Plotly margins — labels on right and bottom
-            const marginL = 10;  // minimal left (dendrogram goes outside)
-            const marginR = Math.max(140, 7.5 * Math.max(...orderedRows.map(r => r.length)));
-            const marginT = 10;  // minimal top (dendrogram goes outside)
-            const marginB = Math.max(100, nCols * 5);
-
-            const totalPlotW = plotAreaW + marginL + marginR;
-            const totalPlotH = plotAreaH + marginT + marginB;
-
-            // Plotly heatmap — labels on right, bottom; no autorange reversal needed
-            // since we build orderedRows top-to-bottom to match dendrogram
-            const trace = {
+            // Heatmap trace using numeric axes, with tick labels
+            const heatTrace = {
                 z: orderedZ,
-                x: orderedCols,
-                y: orderedRows,
+                x: Array.from({ length: nCols }, (_, i) => i),
+                y: Array.from({ length: nRows }, (_, i) => i),
                 type: 'heatmap',
                 colorscale: colorscale,
-                zmid: 0,  // center white at zero for z-scored data
+                zmid: 0,
                 xgap: 0.5,
                 ygap: 0.5,
-                hovertemplate: '<b>Region:</b> %{y}<br><b>Feature:</b> %{x}<br><b>Z-score:</b> %{z:.3f}<extra></extra>'
+                xaxis: 'x',
+                yaxis: 'y',
+                colorbar: { len: 0.15, thickness: 12, x: 1.01, y: 0.5, tickfont: { color: '#b0c4de', size: 9 } },
+                hovertemplate: '<b>Region:</b> %{customdata[0]}<br><b>Feature:</b> %{customdata[1]}<br><b>Z-score:</b> %{z:.3f}<extra></extra>',
+                customdata: orderedRows.map((r, ri) => orderedCols.map((c, ci) => [r, c]))
             };
 
+            // Build dendrogram line traces
+            const rowDendro = buildRowDendroTraces(rowResult.root, rowResult.order);
+            const rowDendroTrace = {
+                x: rowDendro.xs,
+                y: rowDendro.ys,
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: 'rgba(180,200,220,0.6)', width: 1.2 },
+                xaxis: 'x2',
+                yaxis: 'y',
+                hoverinfo: 'skip',
+                showlegend: false
+            };
+
+            const colDendro = buildColDendroTraces(colResult.root, colResult.order);
+            const colDendroTrace = {
+                x: colDendro.xs,
+                y: colDendro.ys,
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: 'rgba(180,200,220,0.6)', width: 1.2 },
+                xaxis: 'x',
+                yaxis: 'y3',
+                hoverinfo: 'skip',
+                showlegend: false
+            };
+
+            // Sizing
+            const totalH = Math.max(600, nRows * 12 + 200);
+            const marginR = Math.max(140, 7.5 * Math.max(...orderedRows.map(r => r.length)));
+            const marginB = Math.max(100, nCols * 5);
+
             const plotDiv = document.getElementById('clustergramPlot');
-            plotDiv.style.width = totalPlotW + 'px';
+            plotDiv.style.width = '';
 
             const layout = {
                 ...PLOTLY_DARK_LAYOUT,
-                width: totalPlotW,
-                height: totalPlotH,
-                margin: { l: marginL, r: marginR, t: marginT, b: marginB },
+                height: totalH,
+                margin: { l: 10, r: marginR, t: 10, b: marginB },
+                dragmode: 'zoom',
+                // Heatmap x-axis (columns) — bottom
                 xaxis: {
+                    domain: [dr, 1],
+                    tickvals: Array.from({ length: nCols }, (_, i) => i),
+                    ticktext: orderedCols,
                     side: 'bottom',
                     tickangle: 90,
-                    tickfont: { size: Math.max(7, Math.min(10, 500 / nCols)), color: '#b0c4de' }
+                    tickfont: { size: Math.max(7, Math.min(10, 500 / nCols)), color: '#b0c4de' },
+                    showgrid: false,
+                    zeroline: false
                 },
+                // Heatmap y-axis (rows) — right side, reversed
                 yaxis: {
+                    domain: [0, 1 - dr],
+                    tickvals: Array.from({ length: nRows }, (_, i) => i),
+                    ticktext: orderedRows,
                     side: 'right',
                     tickfont: {
                         size: Math.max(7, Math.min(11, 700 / nRows)),
                         color: rowColors.map(c => `rgb(${c[0]},${c[1]},${c[2]})`)
                     },
-                    autorange: 'reversed'
+                    autorange: 'reversed',
+                    showgrid: false,
+                    zeroline: false
+                },
+                // Row dendrogram x-axis (left, separate)
+                xaxis2: {
+                    domain: [0, dr],
+                    showticklabels: false,
+                    showgrid: false,
+                    zeroline: false,
+                    autorange: true,
+                    anchor: 'y'
+                },
+                // Col dendrogram y-axis (top, separate)
+                yaxis3: {
+                    domain: [1 - dr, 1],
+                    showticklabels: false,
+                    showgrid: false,
+                    zeroline: false,
+                    autorange: true,
+                    anchor: 'x'
                 }
             };
 
-            Plotly.newPlot('clustergramPlot', [trace], layout, PLOTLY_CONFIG).then(() => {
-                // Read actual plot area from Plotly's internal layout for pixel-perfect alignment
-                const fullLayout = plotDiv._fullLayout || {};
-                let pW = plotAreaW, pH = plotAreaH, pL = marginL, pT = marginT;
-                if (fullLayout._size) {
-                    pW = fullLayout._size.w;
-                    pH = fullLayout._size.h;
-                    pL = fullLayout._size.l;
-                    pT = fullLayout._size.t;
-                }
+            Plotly.newPlot('clustergramPlot', [heatTrace, rowDendroTrace, colDendroTrace], layout, PLOTLY_CONFIG);
 
-                // Render row dendrogram (left side) — height matches data area
-                const rowSvg = document.getElementById('cgRowDendro');
-                rowSvg.style.marginTop = '0px';
-                rowSvg.style.marginBottom = '0px';
-                if (rowResult.root) {
-                    renderRowDendrogram(rowResult.root, rowResult.order, rowSvg, pH, DENDRO_W);
-                    addRowLeafLabels(rowSvg, rowResult.order, rowLabels, pH);
-                    rowSvg.style.marginTop = pT + 'px';
-                    rowSvg.style.marginBottom = (totalPlotH - pT - pH) + 'px';
-                }
-
-                // Render column dendrogram (top) — width matches data area
-                const colSvg = document.getElementById('cgColDendro');
-                colSvg.style.marginLeft = '0px';
-                if (colResult.root) {
-                    renderColDendrogram(colResult.root, colResult.order, colSvg, pW, DENDRO_H);
-                    addColLeafLabels(colSvg, colResult.order, colLabels, pW);
-                    colSvg.style.marginLeft = pL + 'px';
-                }
-
-                // Spacer: matches row dendrogram width × col dendrogram height
-                const spacer = document.getElementById('cgRowDendroSpacer');
-                spacer.style.width = DENDRO_W + 'px';
-                spacer.style.height = DENDRO_H + 'px';
-                spacer.style.flexShrink = '0';
-
-                clearDendroPath();
-            });
+            // Setup autocomplete for distance inputs
+            setupCgAutocomplete('cgDistInput1', 'cgDistAC1');
+            setupCgAutocomplete('cgDistInput2', 'cgDistAC2');
+            clearDendroPath();
         }
 
         // Wrapper for data type change
