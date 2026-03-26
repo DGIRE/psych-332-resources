@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syllabus – PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 820px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: #0779be; }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+      padding: 20px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .course-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #0779be;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    header .subtitle {
+      font-size: 1.2rem;
+      color: #b0c4de;
+      font-weight: 400;
+      margin-bottom: 14px;
+    }
+
+    header .quarter {
+      font-size: 1rem;
+      color: #8aacc8;
+    }
+
+    /* Action bar */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 40px;
+      animation: fadeInUp 0.6s ease-out 0.15s both;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 8px;
+      border: 2px solid #0779be;
+      background: rgba(7, 121, 190, 0.2);
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-weight: 600;
+      font-family: inherit;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+    .action-btn:hover {
+      background: #0779be;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(7, 121, 190, 0.3);
+    }
+    .action-btn .icon { font-size: 1.1rem; }
+
+    /* Sections */
+    .section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 28px 30px;
+      margin-bottom: 22px;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .section h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section p {
+      font-size: 0.92rem;
+      color: #b0c4de;
+      margin-bottom: 10px;
+    }
+    .section p:last-child { margin-bottom: 0; }
+
+    /* Info grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .info-item {
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      border-left: 3px solid #0779be;
+    }
+
+    .info-item .label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #5a7d9e;
+      margin-bottom: 4px;
+    }
+
+    .info-item .value {
+      font-size: 0.92rem;
+      color: #e8eef5;
+      font-weight: 500;
+    }
+
+    .info-item .value a {
+      color: #0779be;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .info-item .value a:hover { color: #60b0e0; }
+
+    /* Takeaway boxes */
+    .takeaway {
+      display: flex;
+      gap: 14px;
+      padding: 16px 18px;
+      background: rgba(7, 121, 190, 0.08);
+      border: 1px solid rgba(7, 121, 190, 0.2);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .takeaway:last-child { margin-bottom: 0; }
+
+    .takeaway .icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .takeaway .text {
+      font-size: 0.9rem;
+      color: #b0c4de;
+    }
+    .takeaway .text strong {
+      color: #e8eef5;
+    }
+
+    /* Module cards */
+    .module-card {
+      padding: 18px 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+    .module-card:last-child { margin-bottom: 0; }
+
+    .module-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .module-card .dates {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #0779be;
+      margin-bottom: 6px;
+    }
+
+    .module-card p {
+      font-size: 0.88rem;
+      color: #8aacc8;
+      margin-bottom: 8px;
+    }
+
+    .module-card .deadline {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #e8a45c;
+    }
+
+    /* Day schedule */
+    .day-row {
+      display: flex;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .day-row:last-child { border-bottom: none; }
+
+    .day-label {
+      width: 100px;
+      flex-shrink: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #0779be;
+    }
+
+    .day-desc {
+      font-size: 0.88rem;
+      color: #b0c4de;
+    }
+
+    /* Office hours table */
+    .oh-row {
+      display: flex;
+      gap: 14px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .oh-row:last-child { border-bottom: none; }
+    .oh-name {
+      width: 130px;
+      flex-shrink: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e8eef5;
+    }
+    .oh-time {
+      font-size: 0.88rem;
+      color: #8aacc8;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: #5a7d9e;
+      font-size: 0.85rem;
+      animation: fadeIn 0.6s ease-out 0.4s both;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      header { padding: 12px 0; margin-bottom: 24px; }
+      header h1 { font-size: 1.6rem; }
+      header .subtitle { font-size: 1rem; }
+      .info-grid { grid-template-columns: 1fr; }
+      .section { padding: 20px 18px; }
+      .action-bar { flex-direction: column; align-items: center; }
+      .day-row { flex-direction: column; gap: 2px; }
+      .day-label { width: auto; }
+      .oh-row { flex-direction: column; gap: 2px; }
+      .oh-name { width: auto; }
+    }
+    @media (max-width: 768px) and (min-width: 481px) {
+      header h1 { font-size: 1.9rem; }
+      .section { padding: 24px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <a class="back-link" href="general-information.html">&#8592; Back to General Information</a>
+
+    <header>
+      <div class="course-label">PSYCH 332</div>
+      <h1>Neurobehavioral Laboratory</h1>
+      <div class="subtitle">Course Syllabus</div>
+      <div class="quarter">Spring 2026 &middot; University of Washington</div>
+    </header>
+
+    <!-- Action buttons -->
+    <div class="action-bar">
+      <a class="action-btn" href="Psychology-332-Spring-2026-Syllabus.docx" download>
+        <span class="icon">&#128196;</span> Download Full Syllabus
+      </a>
+      <a class="action-btn" href="https://canvas.uw.edu/courses/1884930" target="_blank" rel="noopener">
+        <span class="icon">&#127891;</span> Open Canvas Site
+      </a>
+    </div>
+
+    <!-- At a Glance -->
+    <div class="section">
+      <h2>At a Glance</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="label">Instructor</div>
+          <div class="value">David H. Gire, Ph.D.</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Teaching Assistant</div>
+          <div class="value">Willem Weertman, M.S.</div>
+        </div>
+        <div class="info-item">
+          <div class="label">496 TAs</div>
+          <div class="value">JT Cahill &amp; Prisha Tiwari</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Class Sessions</div>
+          <div class="value">TuTh 12:30 &ndash; 2:20 PM</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Canvas</div>
+          <div class="value"><a href="https://canvas.uw.edu/courses/1884930" target="_blank" rel="noopener">canvas.uw.edu/courses/1884930</a></div>
+        </div>
+        <div class="info-item">
+          <div class="label">Zoom (Tuesdays)</div>
+          <div class="value"><a href="https://washington.zoom.us/j/93220693190" target="_blank" rel="noopener">Join Zoom session</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section">
+      <h2>Key Takeaways</h2>
+
+      <div class="takeaway">
+        <div class="icon">&#128187;</div>
+        <div class="text"><strong>No coding required.</strong> All computational tools run through a web-based interface. No software downloads needed &mdash; you will learn to interpret the brain science behind the visualizations, not write code.</div>
+      </div>
+
+      <div class="takeaway">
+        <div class="icon">&#128203;</div>
+        <div class="text"><strong>Two major practicums determine your grade.</strong> One practicum per module. Bonus points are available through optional surveys completed during the quarter.</div>
+      </div>
+
+      <div class="takeaway">
+        <div class="icon">&#128197;</div>
+        <div class="text"><strong>Tuesdays are remote, Thursdays are in-person.</strong> Tuesday sessions are held on Zoom and focus on data analysis and literature. Thursday sessions are in-person for demonstrations, discussion, and experiments.</div>
+      </div>
+
+      <div class="takeaway">
+        <div class="icon">&#129657;</div>
+        <div class="text"><strong>If you feel sick, stay home.</strong> Follow UW illness policies. Do not return within 24 hours of a fever. Contact your TA to arrange access to in-class resources outside of regular sessions.</div>
+      </div>
+    </div>
+
+    <!-- Course Goal -->
+    <div class="section">
+      <h2>Course Goal</h2>
+      <p>This course gives students an understanding of modern approaches for analyzing the structure and function of the brain. Through hands-on work with real neuroscience data, students learn to map the brain using contemporary neuroanatomical techniques and to interpret its genetic and functional organization.</p>
+    </div>
+
+    <!-- Modules -->
+    <div class="section">
+      <h2>Modules</h2>
+
+      <div class="module-card">
+        <h3>Module 1: The Functional Neuroanatomy of the Human Brain</h3>
+        <div class="dates">Dates: Jan 7 &ndash; Jan 23</div>
+        <p>Map the brain using transcriptomics from the Allen Institute for Brain Science, white matter connectomics, and fMRI data compiled from thousands of studies. Understand the genetic and functional organization of human brain regions.</p>
+        <div class="deadline">Practicum prompts due: April 10 &nbsp;&middot;&nbsp; Practicum due: April 20</div>
+      </div>
+
+      <div class="module-card">
+        <h3>Module 2: The Neurophysiology of the Human Brain</h3>
+        <div class="dates">Dates: Jan 28 &ndash; Mar 13</div>
+        <p>Non-invasively record and analyze EEG (electroencephalogram) signals from the human brain and compare them to ongoing behavior of subjects.</p>
+        <div class="deadline">Practicum prompts due: May 18 &nbsp;&middot;&nbsp; Practicum due: June 8 (Monday of finals week)</div>
+      </div>
+    </div>
+
+    <!-- Weekly Format -->
+    <div class="section">
+      <h2>Weekly Format</h2>
+
+      <div class="day-row">
+        <div class="day-label">Tuesdays</div>
+        <div class="day-desc">Remote via Zoom. Lectures and computer work with data resources and literature. Designed to help you make progress on your module practicum.</div>
+      </div>
+      <div class="day-row">
+        <div class="day-label">Thursdays</div>
+        <div class="day-desc">In-person. Interactive lectures, live demonstrations, discussions, and hands-on experiments. Please plan to attend in person.</div>
+      </div>
+    </div>
+
+    <!-- Office Hours -->
+    <div class="section">
+      <h2>Office Hours</h2>
+      <p style="margin-bottom: 14px;">Zoom options are available for all office hours.</p>
+
+      <div class="oh-row">
+        <div class="oh-name">David</div>
+        <div class="oh-time">Mondays, 1:30 &ndash; 2:30 PM</div>
+      </div>
+      <div class="oh-row">
+        <div class="oh-name">Prisha</div>
+        <div class="oh-time">Mondays, 1:30 &ndash; 3:30 PM</div>
+      </div>
+      <div class="oh-row">
+        <div class="oh-name">Willem &amp; JT</div>
+        <div class="oh-time">TBA</div>
+      </div>
+    </div>
+
+    <!-- Important Policies -->
+    <div class="section">
+      <h2>Important Policies</h2>
+      <p><strong>Illness:</strong> If you are not feeling well, stay home. Do not return within 24 hours of a fever. If you need to access in-class resources outside of your session, contact your TA. See the <a href="https://www.washington.edu/coronavirus/" target="_blank" rel="noopener" style="color: #0779be;">UW health guidelines</a> for full details.</p>
+      <p><strong>Religious accommodations:</strong> Submit your request through the <a href="https://registrar.washington.edu/students/religious-accommodations-request/" target="_blank" rel="noopener" style="color: #0779be;">Office of the University Registrar</a> within the first two weeks of the quarter.</p>
+    </div>
+
+    <footer>
+      PSYCH 332 &mdash; University of Washington
+    </footer>
+
+  </div>
+</body>
+</html>
