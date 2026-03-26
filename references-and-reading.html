@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>References &amp; Reading – PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 880px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: #0779be; }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+      padding: 20px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .course-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #0779be;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    header .subtitle {
+      font-size: 1.05rem;
+      color: #b0c4de;
+      font-weight: 400;
+    }
+
+    /* Section containers */
+    .section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 28px 30px;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .section h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section p {
+      font-size: 0.92rem;
+      color: #b0c4de;
+      margin-bottom: 12px;
+    }
+    .section p:last-child { margin-bottom: 0; }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #0779be;
+      margin-bottom: 10px;
+    }
+
+    /* Topic group */
+    .topic-group {
+      margin-bottom: 28px;
+    }
+    .topic-group:last-child { margin-bottom: 0; }
+
+    .topic-group h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .topic-group h3 .icon { font-size: 1.1rem; }
+
+    /* NotebookLM cards */
+    .nlm-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.25s ease;
+    }
+    .nlm-card:hover {
+      border-color: #0779be;
+      background: rgba(7, 121, 190, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+    .nlm-card .nlm-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(7, 121, 190, 0.2);
+      border: 1px solid rgba(7, 121, 190, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .nlm-card:hover .nlm-icon { background: rgba(7, 121, 190, 0.35); }
+
+    .nlm-card .nlm-body { flex: 1; }
+    .nlm-card .nlm-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 3px;
+    }
+    .nlm-card .nlm-desc {
+      font-size: 0.84rem;
+      color: #8aacc8;
+      line-height: 1.5;
+    }
+    .nlm-card .nlm-link {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #0779be;
+      margin-top: 4px;
+    }
+
+    /* Video container */
+    .video-item {
+      margin-bottom: 18px;
+    }
+    .video-item:last-child { margin-bottom: 0; }
+
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .video-caption {
+      color: #b0c4de;
+      font-size: 0.82rem;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* Callout */
+    .callout {
+      padding: 16px 18px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .callout-info {
+      background: rgba(7, 121, 190, 0.08);
+      border: 1px solid rgba(7, 121, 190, 0.2);
+    }
+    .callout-info p { color: #8aacc8; }
+    .callout-info strong { color: #e8eef5; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: #5a7d9e;
+      font-size: 0.85rem;
+      animation: fadeIn 0.6s ease-out 0.4s both;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      header { padding: 12px 0; margin-bottom: 24px; }
+      header h1 { font-size: 1.6rem; }
+      .section { padding: 20px 18px; }
+      .nlm-card { flex-direction: column; gap: 10px; }
+      .nlm-card .nlm-icon { width: 36px; height: 36px; font-size: 1rem; }
+      .video-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) and (min-width: 481px) {
+      header h1 { font-size: 1.9rem; }
+      .section { padding: 24px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <a class="back-link" href="general-information.html">&#8592; Back to General Information</a>
+
+    <header>
+      <div class="course-label">PSYCH 332</div>
+      <h1>References &amp; Reading</h1>
+      <div class="subtitle">AI study tools, video tutorials, and supplementary resources for Module 1</div>
+    </header>
+
+    <!-- ====== NotebookLM Section ====== -->
+    <div class="section">
+      <div class="section-label">AI Study Tool</div>
+      <h2>Google NotebookLM</h2>
+
+      <p>NotebookLM is an AI-powered research assistant built by Google. Each notebook below has been pre-loaded with curated scientific literature on a specific topic from Module 1. You can ask it questions in plain language and it will synthesize answers grounded in the source papers, citing specific passages so you can verify everything it says.</p>
+
+      <div class="callout callout-info">
+        <p><strong>How to use NotebookLM for this course:</strong> Open a notebook, then type a question in the chat. For example, you might ask "What does UMAP preserve that PCA does not?" or "How is gene expression measured across brain regions?" NotebookLM will answer using the research literature loaded into that notebook and point you to the exact sources. Use it to deepen your understanding of concepts, prepare for your practicum, or explore questions that go beyond lecture material.</p>
+      </div>
+
+      <!-- UMAP -->
+      <div class="topic-group">
+        <h3><span class="icon">&#127760;</span> UMAP &mdash; Dimensionality Reduction</h3>
+        <a class="nlm-card" href="https://notebooklm.google.com/notebook/6ab27a58-2abe-4015-8cd2-15abe2499f24" target="_blank" rel="noopener">
+          <div class="nlm-icon">&#129302;</div>
+          <div class="nlm-body">
+            <div class="nlm-title">UMAP NotebookLM</div>
+            <div class="nlm-desc">Explore the literature on Uniform Manifold Approximation and Projection. Ask about how UMAP handles high-dimensional data, what the parameters control, and how to interpret embeddings of brain region similarity.</div>
+            <div class="nlm-link">Open in NotebookLM &rarr;</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Transcriptomics -->
+      <div class="topic-group">
+        <h3><span class="icon">&#129516;</span> Transcriptomics &mdash; Gene Expression</h3>
+        <a class="nlm-card" href="https://notebooklm.google.com/notebook/76e1223b-d9fc-4e07-b259-d64d23dbd315" target="_blank" rel="noopener">
+          <div class="nlm-icon">&#129302;</div>
+          <div class="nlm-body">
+            <div class="nlm-title">Transcriptomics NotebookLM</div>
+            <div class="nlm-desc">Discuss the science behind gene expression mapping across the brain. Ask about the Allen Human Brain Atlas, how transcriptomic data is collected, and what gene expression patterns reveal about brain organization.</div>
+            <div class="nlm-link">Open in NotebookLM &rarr;</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- fMRI -->
+      <div class="topic-group">
+        <h3><span class="icon">&#129504;</span> fMRI &mdash; Functional Imaging</h3>
+        <a class="nlm-card" href="https://notebooklm.google.com/notebook/48509ce3-1ddd-47a4-807c-0056159bbe34" target="_blank" rel="noopener">
+          <div class="nlm-icon">&#129302;</div>
+          <div class="nlm-body">
+            <div class="nlm-title">fMRI NotebookLM</div>
+            <div class="nlm-desc">Explore the literature on functional magnetic resonance imaging. Ask about the BOLD signal, how fMRI maps brain function during tasks, and how activation meta-analyses aggregate thousands of studies.</div>
+            <div class="nlm-link">Open in NotebookLM &rarr;</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- PCA -->
+      <div class="topic-group">
+        <h3><span class="icon">&#128202;</span> PCA &mdash; Principal Component Analysis</h3>
+        <a class="nlm-card" href="https://notebooklm.google.com/notebook/3c987501-051b-4ed6-9997-383af32bdb61" target="_blank" rel="noopener">
+          <div class="nlm-icon">&#129302;</div>
+          <div class="nlm-body">
+            <div class="nlm-title">PCA NotebookLM</div>
+            <div class="nlm-desc">Discuss principal component analysis and how it reveals the major axes of variation in brain data. Ask about variance explained, loadings, and how PCA compares to other dimensionality reduction methods.</div>
+            <div class="nlm-link">Open in NotebookLM &rarr;</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Hierarchical Clustering -->
+      <div class="topic-group">
+        <h3><span class="icon">&#127795;</span> Hierarchical Clustering</h3>
+        <a class="nlm-card" href="https://notebooklm.google.com/notebook/b1f8d4df-9fa0-4898-9403-cec02b54b52d" target="_blank" rel="noopener">
+          <div class="nlm-icon">&#129302;</div>
+          <div class="nlm-body">
+            <div class="nlm-title">Hierarchical Clustering NotebookLM</div>
+            <div class="nlm-desc">Explore the literature on hierarchical clustering and dendrograms. Ask about linkage methods, distance metrics, and how clustergrams reveal relationships between brain regions and their molecular or functional profiles.</div>
+            <div class="nlm-link">Open in NotebookLM &rarr;</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ====== Video Tutorials Section ====== -->
+    <div class="section">
+      <div class="section-label">Video Tutorials</div>
+      <h2>Module 1 Tutorial Videos</h2>
+      <p>These videos walk through the computational methods used in Module 1, explaining how each visualization works and how to interpret the results in the context of brain organization data.</p>
+
+      <!-- PCA Videos -->
+      <div class="topic-group">
+        <h3><span class="icon">&#128202;</span> PCA (Principal Component Analysis)</h3>
+        <div class="video-grid">
+          <div class="video-item">
+            <div class="video-wrapper">
+              <iframe src="https://drive.google.com/file/d/1vb1vAPCRAH8G781YVnMdtGU2VD6u5aR0/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            <p class="video-caption">The "Big Five" of Biology: Decoding PCA</p>
+          </div>
+          <div class="video-item">
+            <div class="video-wrapper">
+              <iframe src="https://drive.google.com/file/d/1jyVUXQXcshX98U4grZixN0n9JIshm5xL/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            <p class="video-caption">Demystifying PCA Loadings: The Personality Recipe</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- UMAP Video -->
+      <div class="topic-group">
+        <h3><span class="icon">&#127760;</span> UMAP (Uniform Manifold Approximation and Projection)</h3>
+        <div style="max-width: 640px;">
+          <div class="video-item">
+            <div class="video-wrapper">
+              <iframe src="https://drive.google.com/file/d/1F5f7T-TBW0ZosBq9brXZ7cjfYHN-HTHf/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            <p class="video-caption">UMAP: Mapping Brain Organization in 2D</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clustergram Video -->
+      <div class="topic-group">
+        <h3><span class="icon">&#127795;</span> Hierarchical Clustering &amp; Clustergrams</h3>
+        <div style="max-width: 640px;">
+          <div class="video-item">
+            <div class="video-wrapper">
+              <iframe src="https://drive.google.com/file/d/1mXHKjJEYRFncIpMcKEzSwrj1QkdPIWsj/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            <p class="video-caption">The Biological Personality Test</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      PSYCH 332 &mdash; University of Washington
+    </footer>
+
+  </div>
+</body>
+</html>
