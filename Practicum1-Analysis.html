@@ -2567,34 +2567,50 @@
             };
 
             Plotly.newPlot('clustergramPlot', [trace], layout, PLOTLY_CONFIG).then(() => {
-                // After Plotly renders, get actual plot area dimensions for dendrogram alignment
-                const plotArea = plotDiv.querySelector('.plot-container .subplot .plot');
-                let actualW = heatmapWidth - layout.margin.l - layout.margin.r;
-                let actualH = heatmapHeight - layout.margin.t - layout.margin.b;
+                // Compute actual plot-area dimensions from Plotly's internal layout
+                // Try to read the actual rendered plot area from Plotly's internal state
+                const fullLayout = plotDiv._fullLayout || {};
+                const xaxis = fullLayout.xaxis || {};
+                const yaxis = fullLayout.yaxis || {};
 
-                if (plotArea) {
-                    const rect = plotArea.getBoundingClientRect();
-                    if (rect.width > 0) actualW = rect.width;
-                    if (rect.height > 0) actualH = rect.height;
+                // Plotly stores the plot area in _size or we can derive from axis pixel ranges
+                let plotAreaW, plotAreaH, plotAreaL, plotAreaT;
+
+                if (fullLayout._size) {
+                    // Plotly stores the actual plot area dimensions
+                    plotAreaW = fullLayout._size.w;
+                    plotAreaH = fullLayout._size.h;
+                    plotAreaL = fullLayout._size.l;
+                    plotAreaT = fullLayout._size.t;
+                } else {
+                    // Fallback: compute from margins
+                    plotAreaW = heatmapWidth - layout.margin.l - layout.margin.r;
+                    plotAreaH = heatmapHeight - layout.margin.t - layout.margin.b;
+                    plotAreaL = layout.margin.l;
+                    plotAreaT = layout.margin.t;
                 }
 
-                // Render row dendrogram (left side)
+                // Render row dendrogram (left side) — height must match the heatmap data area exactly
                 const rowSvg = document.getElementById('cgRowDendro');
                 if (rowResult.root) {
-                    renderRowDendrogram(rowResult.root, rowResult.order, rowSvg, heatmapHeight);
-                    addRowLeafLabels(rowSvg, rowResult.order, rowLabels, heatmapHeight);
-                    // Offset the row SVG to align with the plotly plot area
-                    rowSvg.style.marginTop = (layout.margin.t) + 'px';
+                    renderRowDendrogram(rowResult.root, rowResult.order, rowSvg, plotAreaH);
+                    addRowLeafLabels(rowSvg, rowResult.order, rowLabels, plotAreaH);
+                    // Offset vertically so dendrogram top aligns with heatmap data area top
+                    rowSvg.style.marginTop = plotAreaT + 'px';
                 }
 
-                // Render column dendrogram (top)
+                // Render column dendrogram (top) — width must match the heatmap data area exactly
                 const colSvg = document.getElementById('cgColDendro');
                 if (colResult.root) {
-                    renderColDendrogram(colResult.root, colResult.order, colSvg, actualW);
-                    addColLeafLabels(colSvg, colResult.order, colLabels, actualW);
-                    // Offset to align with heatmap columns
-                    colSvg.style.marginLeft = (layout.margin.l) + 'px';
+                    renderColDendrogram(colResult.root, colResult.order, colSvg, plotAreaW);
+                    addColLeafLabels(colSvg, colResult.order, colLabels, plotAreaW);
+                    // Offset horizontally so dendrogram left aligns with heatmap data area left
+                    colSvg.style.marginLeft = plotAreaL + 'px';
                 }
+
+                // Update spacer to align col dendrogram with heatmap
+                document.getElementById('cgRowDendroSpacer').style.width = DENDRO_W + 'px';
+                document.getElementById('cgRowDendroSpacer').style.height = DENDRO_H + 'px';
 
                 // Clear any old path display
                 clearDendroPath();
