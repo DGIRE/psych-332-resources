@@ -2232,11 +2232,12 @@
         };
 
         // --- SVG Dendrogram Rendering ---
-        function renderRowDendrogram(root, order, svgEl, heatmapHeight) {
-            const DENDRO_W = 120;
+        function renderRowDendrogram(root, order, svgEl, heatmapHeight, dendroW) {
+            const DENDRO_W = dendroW || 120;
             const n = order.length;
             const cellH = heatmapHeight / n;
             const maxH = root.height || 1;
+            const pad = 4; // padding from edge
 
             svgEl.setAttribute('width', DENDRO_W);
             svgEl.setAttribute('height', heatmapHeight);
@@ -2252,15 +2253,13 @@
                 }
                 const left = drawNode(node.left);
                 const right = drawNode(node.right);
-                const x = DENDRO_W - (node.height / maxH) * (DENDRO_W - 10);
-                const xL = node.left.leaves.length === 1 ? DENDRO_W : DENDRO_W - (node.left.height / maxH) * (DENDRO_W - 10);
-                const xR = node.right.leaves.length === 1 ? DENDRO_W : DENDRO_W - (node.right.height / maxH) * (DENDRO_W - 10);
+                const x = DENDRO_W - (node.height / maxH) * (DENDRO_W - pad);
+                const xL = node.left.leaves.length === 1 ? DENDRO_W : DENDRO_W - (node.left.height / maxH) * (DENDRO_W - pad);
+                const xR = node.right.leaves.length === 1 ? DENDRO_W : DENDRO_W - (node.right.height / maxH) * (DENDRO_W - pad);
                 const midY = (left.y + right.y) / 2;
 
-                // Horizontal lines from children to merge x
                 addLine(svgEl, xL, left.y, x, left.y, node.left.id, node.right.id, node.id);
                 addLine(svgEl, xR, right.y, x, right.y, node.left.id, node.right.id, node.id);
-                // Vertical line connecting children
                 addLine(svgEl, x, left.y, x, right.y, node.left.id, node.right.id, node.id);
 
                 return { y: midY, id: node.id };
@@ -2269,11 +2268,12 @@
             drawNode(root);
         }
 
-        function renderColDendrogram(root, order, svgEl, heatmapWidth) {
-            const DENDRO_H = 100;
+        function renderColDendrogram(root, order, svgEl, heatmapWidth, dendroH) {
+            const DENDRO_H = dendroH || 100;
             const n = order.length;
             const cellW = heatmapWidth / n;
             const maxH = root.height || 1;
+            const pad = 4;
 
             svgEl.setAttribute('width', heatmapWidth);
             svgEl.setAttribute('height', DENDRO_H);
@@ -2288,9 +2288,9 @@
                 }
                 const left = drawNode(node.left);
                 const right = drawNode(node.right);
-                const y = DENDRO_H - (node.height / maxH) * (DENDRO_H - 10);
-                const yL = node.left.leaves.length === 1 ? DENDRO_H : DENDRO_H - (node.left.height / maxH) * (DENDRO_H - 10);
-                const yR = node.right.leaves.length === 1 ? DENDRO_H : DENDRO_H - (node.right.height / maxH) * (DENDRO_H - 10);
+                const y = DENDRO_H - (node.height / maxH) * (DENDRO_H - pad);
+                const yL = node.left.leaves.length === 1 ? DENDRO_H : DENDRO_H - (node.left.height / maxH) * (DENDRO_H - pad);
+                const yR = node.right.leaves.length === 1 ? DENDRO_H : DENDRO_H - (node.right.height / maxH) * (DENDRO_H - pad);
                 const midX = (left.x + right.x) / 2;
 
                 addLine(svgEl, left.x, yL, left.x, y, node.left.id, node.right.id, node.id);
@@ -2489,10 +2489,26 @@
                 matrix = fmriData.map(r => colLabels.map(f => r[f] || 0));
             }
 
-            // Cluster rows
-            const rowResult = hierarchicalCluster(matrix, metric, linkage);
-            // Cluster columns (transpose)
-            const transposed = colLabels.map((_, ci) => matrix.map(row => row[ci]));
+            // Z-score normalize each column (feature), matching Python: (data - mean) / std
+            const nR = matrix.length;
+            const nC = colLabels.length;
+            const means = new Float64Array(nC);
+            const stds  = new Float64Array(nC);
+            for (let j = 0; j < nC; j++) {
+                let s = 0;
+                for (let i = 0; i < nR; i++) s += matrix[i][j];
+                means[j] = s / nR;
+            }
+            for (let j = 0; j < nC; j++) {
+                let s = 0;
+                for (let i = 0; i < nR; i++) { const d = matrix[i][j] - means[j]; s += d * d; }
+                stds[j] = Math.sqrt(s / nR) || 1;
+            }
+            const zMatrix = matrix.map(row => row.map((v, j) => (v - means[j]) / stds[j]));
+
+            // Cluster rows and columns on z-scored data
+            const rowResult = hierarchicalCluster(zMatrix, metric, linkage);
+            const transposed = colLabels.map((_, ci) => zMatrix.map(row => row[ci]));
             const colResult = hierarchicalCluster(transposed, metric, linkage);
 
             // Store state
@@ -2504,14 +2520,14 @@
             cgState.colOrder = colResult.order;
             cgState.rowLabels = rowLabels;
             cgState.colLabels = colLabels;
-            cgState.matrix = matrix;
+            cgState.matrix = zMatrix;
             cgState.dataType = dataType;
             cgState.selectedLabels = [];
 
             // Reorder data
             const orderedRows = rowResult.order.map(i => rowLabels[i]);
             const orderedCols = colResult.order.map(i => colLabels[i]);
-            const orderedZ = rowResult.order.map(ri => colResult.order.map(ci => matrix[ri][ci]));
+            const orderedZ = rowResult.order.map(ri => colResult.order.map(ci => zMatrix[ri][ci]));
 
             // Color rows by brain structure
             const rowColors = orderedRows.map(name => {
@@ -2520,42 +2536,62 @@
                 return nipySpectralColor(BRAIN_SCALE_DICT[structName] || 0.5);
             });
 
-            const colorscale = dataType === 'gene' ? [[0, '#2166ac'], [0.5, '#f7f7f7'], [1, '#b2182b']] :
-                               dataType === 'dti' ? [[0, '#fff5f0'], [0.5, '#fb6a4a'], [1, '#67000d']] :
-                                                     [[0, '#f7fbff'], [0.5, '#6baed6'], [1, '#08306b']];
+            // BWR colorscale matching Python sns.clustermap cmap='bwr'
+            const colorscale = [
+                [0, '#0000ff'], [0.25, '#8080ff'], [0.5, '#ffffff'],
+                [0.75, '#ff8080'], [1, '#ff0000']
+            ];
 
             const nRows = orderedRows.length;
             const nCols = orderedCols.length;
 
-            // Calculate heatmap dimensions
-            const heatmapHeight = Math.max(500, nRows * 12);
-            const heatmapWidth = Math.max(500, nCols * 14 + 200);
-            const DENDRO_W = 120; // row dendrogram width
-            const DENDRO_H = 100; // col dendrogram height
+            // --- Sizing to match Python figsize=(15,15) with dendrogram_ratio=0.1 ---
+            // The heatmap data area should be square-ish, with cell size driving dimensions.
+            // Use a generous cell size so labels are readable.
+            const cellSize = Math.max(10, Math.min(18, 800 / Math.max(nRows, nCols)));
+            const plotAreaH = nRows * cellSize;
+            const plotAreaW = nCols * cellSize;
 
-            // Set spacer width to match row dendrogram
-            document.getElementById('cgRowDendroSpacer').style.width = DENDRO_W + 'px';
-            document.getElementById('cgRowDendroSpacer').style.height = DENDRO_H + 'px';
+            // Dendrogram dimensions: 10% of heatmap dimension (dendrogram_ratio=0.1)
+            const DENDRO_W = Math.max(60, Math.round(plotAreaH * 0.1));
+            const DENDRO_H = Math.max(50, Math.round(plotAreaW * 0.1));
 
-            // Plotly heatmap — labels on right (yaxis side:'right') and bottom (xaxis side:'bottom')
+            // Plotly margins — labels on right and bottom
+            const marginL = 10;  // minimal left (dendrogram goes outside)
+            const marginR = Math.max(140, 7.5 * Math.max(...orderedRows.map(r => r.length)));
+            const marginT = 10;  // minimal top (dendrogram goes outside)
+            const marginB = Math.max(100, nCols * 5);
+
+            const totalPlotW = plotAreaW + marginL + marginR;
+            const totalPlotH = plotAreaH + marginT + marginB;
+
+            // Plotly heatmap — labels on right, bottom; no autorange reversal needed
+            // since we build orderedRows top-to-bottom to match dendrogram
             const trace = {
                 z: orderedZ,
                 x: orderedCols,
                 y: orderedRows,
                 type: 'heatmap',
                 colorscale: colorscale,
-                hovertemplate: '<b>Region:</b> %{y}<br><b>Feature:</b> %{x}<br><b>Value:</b> %{z:.3f}<extra></extra>'
+                zmid: 0,  // center white at zero for z-scored data
+                xgap: 0.5,
+                ygap: 0.5,
+                hovertemplate: '<b>Region:</b> %{y}<br><b>Feature:</b> %{x}<br><b>Z-score:</b> %{z:.3f}<extra></extra>'
             };
 
             const plotDiv = document.getElementById('clustergramPlot');
-            plotDiv.style.width = heatmapWidth + 'px';
+            plotDiv.style.width = totalPlotW + 'px';
 
             const layout = {
                 ...PLOTLY_DARK_LAYOUT,
-                width: heatmapWidth,
-                height: heatmapHeight,
-                margin: { l: 10, r: Math.max(140, 8 * Math.max(...orderedRows.map(r => r.length))), t: 10, b: Math.max(100, nCols * 5) },
-                xaxis: { side: 'bottom', tickangle: 45, tickfont: { size: Math.max(7, Math.min(10, 600 / nCols)) } },
+                width: totalPlotW,
+                height: totalPlotH,
+                margin: { l: marginL, r: marginR, t: marginT, b: marginB },
+                xaxis: {
+                    side: 'bottom',
+                    tickangle: 90,
+                    tickfont: { size: Math.max(7, Math.min(10, 500 / nCols)), color: '#b0c4de' }
+                },
                 yaxis: {
                     side: 'right',
                     tickfont: {
@@ -2567,52 +2603,42 @@
             };
 
             Plotly.newPlot('clustergramPlot', [trace], layout, PLOTLY_CONFIG).then(() => {
-                // Compute actual plot-area dimensions from Plotly's internal layout
-                // Try to read the actual rendered plot area from Plotly's internal state
+                // Read actual plot area from Plotly's internal layout for pixel-perfect alignment
                 const fullLayout = plotDiv._fullLayout || {};
-                const xaxis = fullLayout.xaxis || {};
-                const yaxis = fullLayout.yaxis || {};
-
-                // Plotly stores the plot area in _size or we can derive from axis pixel ranges
-                let plotAreaW, plotAreaH, plotAreaL, plotAreaT;
-
+                let pW = plotAreaW, pH = plotAreaH, pL = marginL, pT = marginT;
                 if (fullLayout._size) {
-                    // Plotly stores the actual plot area dimensions
-                    plotAreaW = fullLayout._size.w;
-                    plotAreaH = fullLayout._size.h;
-                    plotAreaL = fullLayout._size.l;
-                    plotAreaT = fullLayout._size.t;
-                } else {
-                    // Fallback: compute from margins
-                    plotAreaW = heatmapWidth - layout.margin.l - layout.margin.r;
-                    plotAreaH = heatmapHeight - layout.margin.t - layout.margin.b;
-                    plotAreaL = layout.margin.l;
-                    plotAreaT = layout.margin.t;
+                    pW = fullLayout._size.w;
+                    pH = fullLayout._size.h;
+                    pL = fullLayout._size.l;
+                    pT = fullLayout._size.t;
                 }
 
-                // Render row dendrogram (left side) — height must match the heatmap data area exactly
+                // Render row dendrogram (left side) — height matches data area
                 const rowSvg = document.getElementById('cgRowDendro');
+                rowSvg.style.marginTop = '0px';
+                rowSvg.style.marginBottom = '0px';
                 if (rowResult.root) {
-                    renderRowDendrogram(rowResult.root, rowResult.order, rowSvg, plotAreaH);
-                    addRowLeafLabels(rowSvg, rowResult.order, rowLabels, plotAreaH);
-                    // Offset vertically so dendrogram top aligns with heatmap data area top
-                    rowSvg.style.marginTop = plotAreaT + 'px';
+                    renderRowDendrogram(rowResult.root, rowResult.order, rowSvg, pH, DENDRO_W);
+                    addRowLeafLabels(rowSvg, rowResult.order, rowLabels, pH);
+                    rowSvg.style.marginTop = pT + 'px';
+                    rowSvg.style.marginBottom = (totalPlotH - pT - pH) + 'px';
                 }
 
-                // Render column dendrogram (top) — width must match the heatmap data area exactly
+                // Render column dendrogram (top) — width matches data area
                 const colSvg = document.getElementById('cgColDendro');
+                colSvg.style.marginLeft = '0px';
                 if (colResult.root) {
-                    renderColDendrogram(colResult.root, colResult.order, colSvg, plotAreaW);
-                    addColLeafLabels(colSvg, colResult.order, colLabels, plotAreaW);
-                    // Offset horizontally so dendrogram left aligns with heatmap data area left
-                    colSvg.style.marginLeft = plotAreaL + 'px';
+                    renderColDendrogram(colResult.root, colResult.order, colSvg, pW, DENDRO_H);
+                    addColLeafLabels(colSvg, colResult.order, colLabels, pW);
+                    colSvg.style.marginLeft = pL + 'px';
                 }
 
-                // Update spacer to align col dendrogram with heatmap
-                document.getElementById('cgRowDendroSpacer').style.width = DENDRO_W + 'px';
-                document.getElementById('cgRowDendroSpacer').style.height = DENDRO_H + 'px';
+                // Spacer: matches row dendrogram width × col dendrogram height
+                const spacer = document.getElementById('cgRowDendroSpacer');
+                spacer.style.width = DENDRO_W + 'px';
+                spacer.style.height = DENDRO_H + 'px';
+                spacer.style.flexShrink = '0';
 
-                // Clear any old path display
                 clearDendroPath();
             });
         }
