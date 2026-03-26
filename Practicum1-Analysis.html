@@ -3401,15 +3401,38 @@
 
         // Export a Plotly chart as JPG with white background and enhanced lines/text
         function savePlotlyAsJPG(divId, filename) {
-            // First render at high res with white background via Plotly's SVG exporter
             const plotDiv = document.getElementById(divId);
             if (!plotDiv || !plotDiv.data) return;
 
-            // Build a modified layout with presentation-friendly colors
             const currentLayout = plotDiv.layout || {};
-            const enhancedLayout = {};
 
-            // Override axis colors: make gridlines, tick text, and titles dark
+            // ---- Deep-clone all original values BEFORE any mutation ----
+            const savedLayout = {};
+            for (const key of Object.keys(currentLayout)) {
+                if (key.startsWith('xaxis') || key.startsWith('yaxis')) {
+                    const ax = currentLayout[key] || {};
+                    savedLayout[key] = {
+                        tickfont: ax.tickfont ? JSON.parse(JSON.stringify(ax.tickfont)) : {},
+                        titlefont: ax.titlefont ? JSON.parse(JSON.stringify(ax.titlefont)) : {},
+                        linecolor: ax.linecolor || null,
+                        gridcolor: ax.gridcolor || null
+                    };
+                }
+            }
+            if (currentLayout.title) {
+                savedLayout._title = { font: currentLayout.title.font ? JSON.parse(JSON.stringify(currentLayout.title.font)) : {} };
+            }
+
+            const savedTraces = (plotDiv.data || []).map(trace => {
+                return {
+                    line: trace.line ? JSON.parse(JSON.stringify(trace.line)) : null,
+                    textfont: trace.textfont ? JSON.parse(JSON.stringify(trace.textfont)) : null,
+                    marker: trace.marker ? JSON.parse(JSON.stringify(trace.marker)) : null
+                };
+            });
+
+            // ---- Build enhanced layout for white-bg export ----
+            const enhancedLayout = {};
             for (const key of Object.keys(currentLayout)) {
                 if (key.startsWith('xaxis') || key.startsWith('yaxis')) {
                     enhancedLayout[key] = {
@@ -3418,10 +3441,9 @@
                         linecolor: '#333333',
                         gridcolor: 'rgba(0,0,0,0.12)'
                     };
-                    // Preserve per-tick colors for clustergram row labels
-                    const orig = currentLayout[key];
+                    // Darken per-tick spectral colors for clustergram row labels
+                    const orig = savedLayout[key];
                     if (orig && orig.tickfont && Array.isArray(orig.tickfont.color)) {
-                        // Darken spectral colors for white bg
                         enhancedLayout[key].tickfont.color = orig.tickfont.color.map(c => {
                             const m = c.match(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\)/);
                             if (m) {
@@ -3435,24 +3457,20 @@
                     }
                 }
             }
-
-            // Override title color
             if (currentLayout.title) {
-                enhancedLayout.title = { font: { color: '#1a1a1a', size: (currentLayout.title.font || {}).size || 14 } };
+                enhancedLayout.title = { font: { color: '#1a1a1a', size: (savedLayout._title.font.size) || 14 } };
             }
 
-            // Enhance trace line widths for all scatter/line traces
+            // ---- Build enhanced traces ----
             const enhancedTraces = (plotDiv.data || []).map((trace, i) => {
                 const update = {};
                 if (trace.type === 'scatter' && trace.mode && trace.mode.includes('lines')) {
                     const origWidth = (trace.line || {}).width || 1.2;
                     const origColor = (trace.line || {}).color || 'rgba(180,200,220,0.6)';
-                    // Darken semi-transparent colors and thicken lines
                     let darkColor = origColor;
-                    if (origColor.includes('rgba') && origColor.includes('0.6')) {
+                    if (typeof origColor === 'string' && origColor.includes('rgba') && origColor.includes('0.6')) {
                         darkColor = origColor.replace(/[\d.]+\)$/, '0.9)');
                     }
-                    // Make red path lines bolder
                     if (origColor === '#ff3333') {
                         update.line = { color: '#cc0000', width: Math.max(origWidth, 3.5) };
                     } else {
@@ -3463,35 +3481,30 @@
                     update.textfont = { color: '#1a1a1a', size: ((trace.textfont || {}).size || 9) + 1 };
                 }
                 if (trace.type === 'scatter' && trace.mode && trace.mode.includes('markers')) {
-                    const origMarker = trace.marker || {};
-                    if (origMarker.line) {
+                    if ((trace.marker || {}).line) {
                         update.marker = { line: { color: '#333333', width: 1.2 } };
                     }
                 }
                 return update;
             });
 
-            // Apply updates temporarily, export, then revert
-            const traceUpdates = enhancedTraces.map((_, i) => i);
-
+            // ---- Apply, capture, revert ----
             Plotly.update(divId, enhancedTraces, enhancedLayout).then(() => {
                 return Plotly.toImage(divId, {
                     format: 'png', width: 1200, height: 800, scale: 2,
                     setBackground: function() { return 'white'; }
                 });
             }).then(dataUrl => {
-                // Convert the PNG data URL to JPG via canvas
+                // Convert PNG to JPG via canvas
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
-                    // White background
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0);
-                    // Export as JPEG
                     const jpgUrl = canvas.toDataURL('image/jpeg', 0.95);
                     const link = document.createElement('a');
                     link.download = (filename || 'chart') + '.jpg';
@@ -3500,38 +3513,29 @@
                 };
                 img.src = dataUrl;
 
-                // Revert to original dark-theme layout
-                // Re-render with original data (simplest: just call the function that built the plot)
-                // But since Plotly.update is in-place, we need to restore
+                // ---- Revert using the deep-cloned originals ----
                 const revertLayout = {};
                 for (const key of Object.keys(enhancedLayout)) {
                     if (key.startsWith('xaxis') || key.startsWith('yaxis')) {
-                        const orig = currentLayout[key] || {};
-                        revertLayout[key] = {
-                            tickfont: orig.tickfont || {},
-                            titlefont: orig.titlefont || {},
-                            linecolor: orig.linecolor || null,
-                            gridcolor: orig.gridcolor || null
-                        };
-                    } else if (key === 'title' && currentLayout.title) {
-                        revertLayout.title = { font: currentLayout.title.font || {} };
+                        revertLayout[key] = savedLayout[key];
+                    } else if (key === 'title') {
+                        revertLayout.title = savedLayout._title;
                     }
                 }
-                const revertTraces = (plotDiv.data || []).map((trace, i) => {
-                    const orig = {};
-                    const srcTrace = plotDiv._fullData ? plotDiv._fullData[i] : trace;
-                    if (enhancedTraces[i].line) {
-                        orig.line = { color: (trace.line || {}).color, width: (trace.line || {}).width };
+                const revertTraces = savedTraces.map((saved, i) => {
+                    const revert = {};
+                    if (enhancedTraces[i].line && saved.line) {
+                        revert.line = saved.line;
                     }
-                    if (enhancedTraces[i].textfont) {
-                        orig.textfont = trace.textfont || {};
+                    if (enhancedTraces[i].textfont && saved.textfont) {
+                        revert.textfont = saved.textfont;
                     }
-                    if (enhancedTraces[i].marker) {
-                        orig.marker = { line: (trace.marker || {}).line || {} };
+                    if (enhancedTraces[i].marker && saved.marker) {
+                        revert.marker = saved.marker;
                     }
-                    return orig;
+                    return revert;
                 });
-                Plotly.update(divId, revertTraces, revertLayout);
+                return Plotly.update(divId, revertTraces, revertLayout);
             });
         }
 
