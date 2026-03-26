@@ -6,7 +6,6 @@
     <title>PSYCH 332 Module 1 Practicum — Data Analysis</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -944,8 +943,8 @@
                 <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">Z-score normalized expression levels across all brain regions and genes. Rows sorted by anatomical hierarchy.</p>
                 <div id="geneExpressionHeatmap" class="chart-container"></div>
                 <div class="export-group">
-                    <button class="export-btn" onclick="savePlotlyAsPNG('geneExpressionHeatmap', 'gene_expression_heatmap')">&#128190; Save as Image</button>
-                    <button class="export-btn" onclick="exportPlotlyToSlide('geneExpressionHeatmap', 'Gene Expression Heatmap', 'gene_expression_heatmap')">&#128196; Save as Slide</button>
+                    <button class="export-btn" onclick="savePlotlyAsPNG('geneExpressionHeatmap', 'gene_expression_heatmap')">&#128190; Save as PNG</button>
+                    <button class="export-btn" onclick="savePlotlyAsJPG('geneExpressionHeatmap', 'gene_expression_heatmap')">&#128247; Save as JPG</button>
                 </div>
             </section>
 
@@ -956,8 +955,8 @@
                 <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">Diffusion Tensor Imaging connectivity between brain regions. Both axes sorted by anatomical hierarchy.</p>
                 <div id="dtiHeatmap" class="chart-container"></div>
                 <div class="export-group">
-                    <button class="export-btn" onclick="savePlotlyAsPNG('dtiHeatmap', 'dti_connectivity_matrix')">&#128190; Save as Image</button>
-                    <button class="export-btn" onclick="exportPlotlyToSlide('dtiHeatmap', 'DTI Connectivity Matrix', 'dti_connectivity_matrix')">&#128196; Save as Slide</button>
+                    <button class="export-btn" onclick="savePlotlyAsPNG('dtiHeatmap', 'dti_connectivity_matrix')">&#128190; Save as PNG</button>
+                    <button class="export-btn" onclick="savePlotlyAsJPG('dtiHeatmap', 'dti_connectivity_matrix')">&#128247; Save as JPG</button>
                 </div>
             </section>
 
@@ -985,8 +984,8 @@
                 <p id="pcaDescription" style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">PCA of brain areas in gene expression space. Points colored by brain structure.</p>
                 <div id="dimredPlot" class="chart-container"></div>
                 <div class="export-group">
-                    <button class="export-btn" onclick="exportPCA()">&#128190; Save as Image</button>
-                    <button class="export-btn" onclick="exportPCASlide()">&#128196; Save as Slide</button>
+                    <button class="export-btn" onclick="exportPCA()">&#128190; Save as PNG</button>
+                    <button class="export-btn" onclick="exportPCAJPG()">&#128247; Save as JPG</button>
                 </div>
             </section>
 
@@ -1067,8 +1066,8 @@
                 <p id="umapStatus" style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">UMAP embedding of brain regions into 2D. Points colored by brain structure. Press <strong>Run UMAP</strong> to compute.</p>
                 <div id="umapPlot" class="chart-container"></div>
                 <div class="export-group">
-                    <button class="export-btn" onclick="exportUMAP()">&#128190; Save as Image</button>
-                    <button class="export-btn" onclick="exportUMAPSlide()">&#128196; Save as Slide</button>
+                    <button class="export-btn" onclick="exportUMAP()">&#128190; Save as PNG</button>
+                    <button class="export-btn" onclick="exportUMAPJPG()">&#128247; Save as JPG</button>
                 </div>
             </section>
 
@@ -1150,8 +1149,8 @@
                 <!-- Single Plotly div for heatmap + dendrograms (zoom-synced) -->
                 <div id="clustergramPlot" class="chart-container" style="min-height: 200px;"></div>
                 <div class="export-group">
-                    <button class="export-btn" onclick="savePlotlyAsPNG('clustergramPlot', 'clustergram')">&#128190; Save as Image</button>
-                    <button class="export-btn" onclick="exportClustergramSlide()">&#128196; Save as Slide</button>
+                    <button class="export-btn" onclick="savePlotlyAsPNG('clustergramPlot', 'clustergram')">&#128190; Save as PNG</button>
+                    <button class="export-btn" onclick="exportClustergramJPG()">&#128247; Save as JPG</button>
                 </div>
             </section>
 
@@ -1969,14 +1968,12 @@
             savePlotlyAsPNG('dimredPlot', filename);
         }
 
-        function exportPCASlide() {
+        function exportPCAJPG() {
             const dataType = document.getElementById('dimredDataType').value;
             const pointsType = document.getElementById('pcaPointsType').value;
-            const pointsLabel = pointsType === 'features' ? getFeatureLabel(dataType) : 'Brain Areas';
-            const modalityLabel = getModalityLabel(dataType);
-            const title = `PCA — ${pointsLabel} — ${modalityLabel}`;
-            const filename = `PCA_${pointsLabel.replace(/\s+/g, '')}_${modalityLabel.replace(/\s+/g, '')}`;
-            exportPlotlyToSlide('dimredPlot', title, filename);
+            const pointsLabel = pointsType === 'features' ? getFeatureLabel(dataType) : 'BrainAreas';
+            const filename = `PCA_${pointsLabel}_${getModalityLabel(dataType).replace(/\s+/g, '')}`;
+            savePlotlyAsJPG('dimredPlot', filename);
         }
 
         // ========== UMAP ==========
@@ -2306,14 +2303,12 @@
             savePlotlyAsPNG('umapPlot', filename);
         }
 
-        function exportUMAPSlide() {
+        function exportUMAPJPG() {
             const dataType = document.getElementById('umapDataType').value;
             const pointsType = document.getElementById('umapPointsType').value;
-            const pointsLabel = pointsType === 'features' ? getFeatureLabel(dataType) : 'Brain Areas';
-            const modalityLabel = getModalityLabel(dataType);
-            const title = `UMAP — ${pointsLabel} — ${modalityLabel}`;
-            const filename = `UMAP_${pointsLabel.replace(/\s+/g, '')}_${modalityLabel.replace(/\s+/g, '')}`;
-            exportPlotlyToSlide('umapPlot', title, filename);
+            const pointsLabel = pointsType === 'features' ? getFeatureLabel(dataType) : 'BrainAreas';
+            const filename = `UMAP_${pointsLabel}_${getModalityLabel(dataType).replace(/\s+/g, '')}`;
+            savePlotlyAsJPG('umapPlot', filename);
         }
 
         // ========== CLUSTERGRAM WITH DENDROGRAMS ==========
@@ -3131,14 +3126,13 @@
             recalcClustergram();
         }
 
-        function exportClustergramSlide() {
+        function exportClustergramJPG() {
             const dataType = document.getElementById('clustergramDataType').value;
             const metric = document.getElementById('cgDistMetric').value;
             const linkage = document.getElementById('cgLinkage').value;
             const modalityLabel = getModalityLabel(dataType);
-            const title = `Clustergram — ${modalityLabel} — ${metric} / ${linkage}`;
             const filename = `Clustergram_${modalityLabel.replace(/\s+/g, '')}_${metric}_${linkage}`;
-            exportPlotlyToSlide('clustergramPlot', title, filename);
+            savePlotlyAsJPG('clustergramPlot', filename);
         }
 
         // ========== STRUCTURE SELECTOR ==========
@@ -3161,7 +3155,7 @@
 
             // Gene expression bar plot
             html += `<div id="structureGeneBar" class="chart-container"></div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('structureGeneBar', 'gene_bar_${region.Name.replace(/\s+/g, '_')}')">&#128190; Save as Image</button><button class="export-btn" onclick="exportPlotlyToSlide('structureGeneBar', 'Gene Expression — ${region.Name}', 'gene_bar_${region.Name.replace(/\s+/g, '_')}')">&#128196; Save as Slide</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('structureGeneBar', 'gene_bar_${region.Name.replace(/\s+/g, '_')}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('structureGeneBar', 'gene_bar_${region.Name.replace(/\s+/g, '_')}')">&#128247; Save as JPG</button></div>`;
 
             document.getElementById('structureContent').innerHTML = html;
 
@@ -3241,9 +3235,9 @@
 
             const safeName = geneName.replace(/\s+/g, '_');
             let html = `<div id="geneHistogram" class="chart-container"></div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('geneHistogram', 'gene_histogram_${safeName}')">&#128190; Save as Image</button><button class="export-btn" onclick="exportPlotlyToSlide('geneHistogram', '${geneName} — Expression Histogram', 'gene_histogram_${safeName}')">&#128196; Save as Slide</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('geneHistogram', 'gene_histogram_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('geneHistogram', 'gene_histogram_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<div id="geneBarPlot" class="chart-container"></div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('geneBarPlot', 'gene_barplot_${safeName}')">&#128190; Save as Image</button><button class="export-btn" onclick="exportPlotlyToSlide('geneBarPlot', '${geneName} — Expression by Region', 'gene_barplot_${safeName}')">&#128196; Save as Slide</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('geneBarPlot', 'gene_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('geneBarPlot', 'gene_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<canvas id="geneBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
 
             document.getElementById('geneContent').innerHTML = html;
@@ -3303,9 +3297,9 @@
 
             const safeName = targetRegion.replace(/\s+/g, '_');
             let html = `<div id="dtiHistogram" class="chart-container"></div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('dtiHistogram', 'dti_histogram_${safeName}')">&#128190; Save as Image</button><button class="export-btn" onclick="exportPlotlyToSlide('dtiHistogram', 'DTI — ${targetRegion} Histogram', 'dti_histogram_${safeName}')">&#128196; Save as Slide</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('dtiHistogram', 'dti_histogram_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('dtiHistogram', 'dti_histogram_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<div id="dtiBarPlot" class="chart-container"></div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('dtiBarPlot', 'dti_barplot_${safeName}')">&#128190; Save as Image</button><button class="export-btn" onclick="exportPlotlyToSlide('dtiBarPlot', 'DTI — ${targetRegion} Connectivity', 'dti_barplot_${safeName}')">&#128196; Save as Slide</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('dtiBarPlot', 'dti_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('dtiBarPlot', 'dti_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<canvas id="dtiBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
 
             document.getElementById('dtiContent').innerHTML = html;
@@ -3366,9 +3360,9 @@
 
             const safeName = funcName.replace(/\s+/g, '_');
             let html = `<div id="fmriHistogram" class="chart-container"></div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('fmriHistogram', 'fmri_histogram_${safeName}')">&#128190; Save as Image</button><button class="export-btn" onclick="exportPlotlyToSlide('fmriHistogram', 'fMRI — ${funcName} Histogram', 'fmri_histogram_${safeName}')">&#128196; Save as Slide</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('fmriHistogram', 'fmri_histogram_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('fmriHistogram', 'fmri_histogram_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<div id="fmriBarPlot" class="chart-container"></div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('fmriBarPlot', 'fmri_barplot_${safeName}')">&#128190; Save as Image</button><button class="export-btn" onclick="exportPlotlyToSlide('fmriBarPlot', 'fMRI — ${funcName} by Region', 'fmri_barplot_${safeName}')">&#128196; Save as Slide</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('fmriBarPlot', 'fmri_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('fmriBarPlot', 'fmri_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<canvas id="fmriBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
 
             document.getElementById('fmriContent').innerHTML = html;
@@ -3405,73 +3399,140 @@
             link.click();
         }
 
-        // Export a Plotly chart as a single PPTX slide
-        function exportPlotlyToSlide(divId, title, filename) {
-            Plotly.toImage(divId, { format: 'png', width: 1200, height: 800, scale: 2 }).then(function(dataUrl) {
-                const pres = new PptxGenJS();
-                pres.layout = 'LAYOUT_16x9';
-                pres.author = 'PSYCH 332';
-                pres.title = title;
+        // Export a Plotly chart as JPG with white background and enhanced lines/text
+        function savePlotlyAsJPG(divId, filename) {
+            // First render at high res with white background via Plotly's SVG exporter
+            const plotDiv = document.getElementById(divId);
+            if (!plotDiv || !plotDiv.data) return;
 
-                const slide = pres.addSlide();
-                slide.background = { color: '0A1628' };
+            // Build a modified layout with presentation-friendly colors
+            const currentLayout = plotDiv.layout || {};
+            const enhancedLayout = {};
 
-                // Title at top
-                slide.addText(title, {
-                    x: 0.3, y: 0.15, w: 9.4, h: 0.5,
-                    fontSize: 16, fontFace: 'Calibri', color: 'B0C4DE', bold: true,
-                    align: 'left', valign: 'middle'
+            // Override axis colors: make gridlines, tick text, and titles dark
+            for (const key of Object.keys(currentLayout)) {
+                if (key.startsWith('xaxis') || key.startsWith('yaxis')) {
+                    enhancedLayout[key] = {
+                        tickfont: { color: '#1a1a1a' },
+                        titlefont: { color: '#1a1a1a' },
+                        linecolor: '#333333',
+                        gridcolor: 'rgba(0,0,0,0.12)'
+                    };
+                    // Preserve per-tick colors for clustergram row labels
+                    const orig = currentLayout[key];
+                    if (orig && orig.tickfont && Array.isArray(orig.tickfont.color)) {
+                        // Darken spectral colors for white bg
+                        enhancedLayout[key].tickfont.color = orig.tickfont.color.map(c => {
+                            const m = c.match(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\)/);
+                            if (m) {
+                                const r = Math.round(parseInt(m[1]) * 0.6);
+                                const g = Math.round(parseInt(m[2]) * 0.6);
+                                const b = Math.round(parseInt(m[3]) * 0.6);
+                                return `rgb(${r},${g},${b})`;
+                            }
+                            return '#1a1a1a';
+                        });
+                    }
+                }
+            }
+
+            // Override title color
+            if (currentLayout.title) {
+                enhancedLayout.title = { font: { color: '#1a1a1a', size: (currentLayout.title.font || {}).size || 14 } };
+            }
+
+            // Enhance trace line widths for all scatter/line traces
+            const enhancedTraces = (plotDiv.data || []).map((trace, i) => {
+                const update = {};
+                if (trace.type === 'scatter' && trace.mode && trace.mode.includes('lines')) {
+                    const origWidth = (trace.line || {}).width || 1.2;
+                    const origColor = (trace.line || {}).color || 'rgba(180,200,220,0.6)';
+                    // Darken semi-transparent colors and thicken lines
+                    let darkColor = origColor;
+                    if (origColor.includes('rgba') && origColor.includes('0.6')) {
+                        darkColor = origColor.replace(/[\d.]+\)$/, '0.9)');
+                    }
+                    // Make red path lines bolder
+                    if (origColor === '#ff3333') {
+                        update.line = { color: '#cc0000', width: Math.max(origWidth, 3.5) };
+                    } else {
+                        update.line = { color: darkColor, width: Math.max(origWidth * 1.5, 1.8) };
+                    }
+                }
+                if (trace.type === 'scatter' && trace.mode && trace.mode.includes('text')) {
+                    update.textfont = { color: '#1a1a1a', size: ((trace.textfont || {}).size || 9) + 1 };
+                }
+                if (trace.type === 'scatter' && trace.mode && trace.mode.includes('markers')) {
+                    const origMarker = trace.marker || {};
+                    if (origMarker.line) {
+                        update.marker = { line: { color: '#333333', width: 1.2 } };
+                    }
+                }
+                return update;
+            });
+
+            // Apply updates temporarily, export, then revert
+            const traceUpdates = enhancedTraces.map((_, i) => i);
+
+            Plotly.update(divId, enhancedTraces, enhancedLayout).then(() => {
+                return Plotly.toImage(divId, {
+                    format: 'png', width: 1200, height: 800, scale: 2,
+                    setBackground: function() { return 'white'; }
                 });
+            }).then(dataUrl => {
+                // Convert the PNG data URL to JPG via canvas
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    // White background
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    // Export as JPEG
+                    const jpgUrl = canvas.toDataURL('image/jpeg', 0.95);
+                    const link = document.createElement('a');
+                    link.download = (filename || 'chart') + '.jpg';
+                    link.href = jpgUrl;
+                    link.click();
+                };
+                img.src = dataUrl;
 
-                // Chart image centered below title
-                slide.addImage({
-                    data: dataUrl,
-                    x: 0.25, y: 0.7, w: 9.5, h: 4.7,
-                    sizing: { type: 'contain', w: 9.5, h: 4.7 }
+                // Revert to original dark-theme layout
+                // Re-render with original data (simplest: just call the function that built the plot)
+                // But since Plotly.update is in-place, we need to restore
+                const revertLayout = {};
+                for (const key of Object.keys(enhancedLayout)) {
+                    if (key.startsWith('xaxis') || key.startsWith('yaxis')) {
+                        const orig = currentLayout[key] || {};
+                        revertLayout[key] = {
+                            tickfont: orig.tickfont || {},
+                            titlefont: orig.titlefont || {},
+                            linecolor: orig.linecolor || null,
+                            gridcolor: orig.gridcolor || null
+                        };
+                    } else if (key === 'title' && currentLayout.title) {
+                        revertLayout.title = { font: currentLayout.title.font || {} };
+                    }
+                }
+                const revertTraces = (plotDiv.data || []).map((trace, i) => {
+                    const orig = {};
+                    const srcTrace = plotDiv._fullData ? plotDiv._fullData[i] : trace;
+                    if (enhancedTraces[i].line) {
+                        orig.line = { color: (trace.line || {}).color, width: (trace.line || {}).width };
+                    }
+                    if (enhancedTraces[i].textfont) {
+                        orig.textfont = trace.textfont || {};
+                    }
+                    if (enhancedTraces[i].marker) {
+                        orig.marker = { line: (trace.marker || {}).line || {} };
+                    }
+                    return orig;
                 });
-
-                // Footer
-                slide.addText('PSYCH 332 — Practicum Analysis', {
-                    x: 0.3, y: 5.2, w: 9.4, h: 0.35,
-                    fontSize: 9, fontFace: 'Calibri', color: '7A9AB8',
-                    align: 'right', valign: 'middle'
-                });
-
-                pres.writeFile({ fileName: (filename || title.replace(/[^a-zA-Z0-9]/g, '_')) + '.pptx' });
+                Plotly.update(divId, revertTraces, revertLayout);
             });
-        }
-
-        // Export a canvas element as a single PPTX slide
-        function exportCanvasToSlide(canvasId, title, filename) {
-            const canvas = document.getElementById(canvasId);
-            const dataUrl = canvas.toDataURL('image/png');
-            const pres = new PptxGenJS();
-            pres.layout = 'LAYOUT_16x9';
-            pres.author = 'PSYCH 332';
-            pres.title = title;
-
-            const slide = pres.addSlide();
-            slide.background = { color: '0A1628' };
-
-            slide.addText(title, {
-                x: 0.3, y: 0.15, w: 9.4, h: 0.5,
-                fontSize: 16, fontFace: 'Calibri', color: 'B0C4DE', bold: true,
-                align: 'left', valign: 'middle'
-            });
-
-            slide.addImage({
-                data: dataUrl,
-                x: 0.25, y: 0.7, w: 9.5, h: 4.7,
-                sizing: { type: 'contain', w: 9.5, h: 4.7 }
-            });
-
-            slide.addText('PSYCH 332 — Practicum Analysis', {
-                x: 0.3, y: 5.2, w: 9.4, h: 0.35,
-                fontSize: 9, fontFace: 'Calibri', color: '7A9AB8',
-                align: 'right', valign: 'middle'
-            });
-
-            pres.writeFile({ fileName: (filename || title.replace(/[^a-zA-Z0-9]/g, '_')) + '.pptx' });
         }
 
         /**
