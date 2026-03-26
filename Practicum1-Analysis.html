@@ -394,7 +394,7 @@
             34:'inferior temporal gyrus',35:'occipito-temporal gyrus',36:'inferior occipital gyrus',
             38:'superior occipital gyrus',39:'occipital pole',43:'lingual gyrus',44:'cuneus',
             47:'precuneus',50:'cingulate gyrus parietal part',52:'cingulate gyrus retrosplenial part',
-            53:'paracentral lobule',55:'fusiform gyrus',56:'parahippocampal gyrus',
+            53:'superior frontal gyrus',55:'fusiform gyrus',56:'parahippocampal gyrus',
             58:'superior frontal gyrus',59:'cingulate gyrus frontal part',64:'paraterminal gyrus',
             66:'parolfactory gyri',67:'piriform cortex',68:'subcallosal cingulate gyrus',
             69:'superior rostral gyrus',70:'gyrus rectus',71:'gyrus rectus',
@@ -452,6 +452,23 @@
             297:'cerebellar cortex',298:'cerebellar cortex',299:'cerebellar cortex',
             300:'cerebellar cortex'
         };
+
+        // Cerebellum bounding box — ID 0 pixels within this area are cerebellar cortex
+        const CEREBELLUM_BBOX = { minX: 1792, maxX: 2006, minY: 226, maxY: 459 };
+        const CEREBELLUM_PROXY_ID = 223; // a known cerebellar cortex ID
+
+        /**
+         * Returns the effective pixel ID, mapping ID 0 pixels within the
+         * cerebellum bounding box to cerebellar cortex.
+         */
+        function effectivePixelId(rid, x, y) {
+            if (rid === 0 &&
+                x >= CEREBELLUM_BBOX.minX && x <= CEREBELLUM_BBOX.maxX &&
+                y >= CEREBELLUM_BBOX.minY && y <= CEREBELLUM_BBOX.maxY) {
+                return CEREBELLUM_PROXY_ID;
+            }
+            return rid;
+        }
 
         const PLOTLY_CONFIG = {
             responsive: true,
@@ -1287,12 +1304,12 @@
             const values = new Float32Array(total);
             const status = new Uint8Array(total); // 0=bg, 1=mapped
 
-            // Direct pixel mapping only — no BFS gap-fill
+            // Direct pixel mapping with cerebellum fill for ID 0 gaps
             for (let y = 0; y < height; y++) {
                 const row = decodedBrainMap[y];
                 if (!row) continue;
                 for (let x = 0; x < Math.min(row.length, width); x++) {
-                    const rid = row[x];
+                    const rid = effectivePixelId(row[x], x, y);
                     const idx = y * width + x;
                     if (rid !== -100 && rid !== undefined && valueMap[rid] !== undefined) {
                         status[idx] = 1;
@@ -1441,7 +1458,7 @@
                 const row = decodedBrainMap[y];
                 if (!row) continue;
                 for (let x = 0; x < Math.min(row.length, bmW); x++) {
-                    const rid = row[x];
+                    const rid = effectivePixelId(row[x], x, y);
                     if (targetIds.has(rid)) {
                         isTarget[y * bmW + x] = 1;
                     }
