@@ -928,21 +928,30 @@
                 <button onclick="savePlotlyAsPNG('dtiHeatmap', 'dti_connectivity_matrix')" class="save-btn">&#128190; Save as Image</button>
             </section>
 
-            <!-- Dimensionality Reduction -->
+            <!-- Dimensionality Reduction — PCA -->
             <section class="section">
                 <div class="section-label">Interactive Visualization</div>
-                <h2>Dimensionality Reduction</h2>
-                <div class="control-group">
-                    <label for="dimredDataType">Data Type:</label>
-                    <select id="dimredDataType">
-                        <option value="gene">Gene Expression</option>
-                        <option value="dti">DTI Connectivity</option>
-                        <option value="fmri">fMRI Functions</option>
-                    </select>
+                <h2>PCA (Principal Component Analysis)</h2>
+                <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <label for="dimredDataType">Data Type:</label>
+                        <select id="dimredDataType">
+                            <option value="gene">Gene Expression</option>
+                            <option value="dti">DTI Connectivity</option>
+                            <option value="fmri">fMRI Functions</option>
+                        </select>
+                    </div>
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <label for="pcaPointsType">Points represent:</label>
+                        <select id="pcaPointsType">
+                            <option value="regions">Brain Areas</option>
+                            <option value="features">Genes / Features</option>
+                        </select>
+                    </div>
                 </div>
-                <p style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">Principal Component Analysis with 2 components. Points colored by brain structure.</p>
+                <p id="pcaDescription" style="color: #8aacc8; font-size: 14px; margin-bottom: 20px;">PCA of brain areas in gene expression space. Points colored by brain structure.</p>
                 <div id="dimredPlot" class="chart-container"></div>
-                <button onclick="savePlotlyAsPNG('dimredPlot', 'pca_dimred')" class="save-btn">&#128190; Save as Image</button>
+                <button onclick="exportPCA()" class="save-btn">&#128190; Save as Image</button>
             </section>
 
             <!-- PCA Video Guides -->
@@ -971,13 +980,22 @@
                 <div class="section-label">Interactive Visualization</div>
                 <h2>UMAP (Uniform Manifold Approximation and Projection)</h2>
 
-                <div class="control-group">
-                    <label for="umapDataType">Data Type:</label>
-                    <select id="umapDataType">
-                        <option value="gene">Gene Expression</option>
-                        <option value="dti">DTI Connectivity</option>
-                        <option value="fmri">fMRI Functions</option>
-                    </select>
+                <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <label for="umapDataType">Data Type:</label>
+                        <select id="umapDataType">
+                            <option value="gene">Gene Expression</option>
+                            <option value="dti">DTI Connectivity</option>
+                            <option value="fmri">fMRI Functions</option>
+                        </select>
+                    </div>
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <label for="umapPointsType">Points represent:</label>
+                        <select id="umapPointsType">
+                            <option value="regions">Brain Areas</option>
+                            <option value="features">Genes / Features</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- UMAP Settings -->
@@ -1012,7 +1030,7 @@
 
                 <p id="umapStatus" style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">UMAP embedding of brain regions into 2D. Points colored by brain structure. Press <strong>Run UMAP</strong> to compute.</p>
                 <div id="umapPlot" class="chart-container"></div>
-                <button onclick="savePlotlyAsPNG('umapPlot', 'umap_plot')" class="save-btn">&#128190; Save as Image</button>
+                <button onclick="exportUMAP()" class="save-btn">&#128190; Save as Image</button>
             </section>
 
             <!-- Clustergram with Dendrograms -->
@@ -1091,7 +1109,7 @@
                 </div>
 
                 <!-- Single Plotly div for heatmap + dendrograms (zoom-synced) -->
-                <div id="clustergramPlot" class="chart-container" style="min-height: 400px;"></div>
+                <div id="clustergramPlot" class="chart-container" style="min-height: 200px;"></div>
                 <button onclick="savePlotlyAsPNG('clustergramPlot', 'clustergram')" class="save-btn">&#128190; Save as Image</button>
             </section>
 
@@ -1648,8 +1666,10 @@
             );
 
             // Dimensionality reduction (only 3 options, keep as regular select)
-            document.getElementById('dimredDataType').addEventListener('change', (e) => updateDimRed(e.target.value));
+            document.getElementById('dimredDataType').addEventListener('change', () => updateDimRed());
+            document.getElementById('pcaPointsType').addEventListener('change', () => updateDimRed());
             document.getElementById('umapDataType').addEventListener('change', () => runUmap());
+            document.getElementById('umapPointsType').addEventListener('change', () => runUmap());
             document.getElementById('clustergramDataType').addEventListener('change', (e) => updateClustergram(e.target.value));
 
             // Check URL params for pre-population from Brain Explorer or Preparation page
@@ -1698,7 +1718,7 @@
             updateDTIView(initDTI);
             fmriCtrl.setValue(initFunc);
             updateFMRIView(initFunc);
-            updateDimRed('gene');
+            updateDimRed();
             runUmap();
             updateClustergram('gene');
         }
@@ -1807,38 +1827,76 @@
         }
 
         // ========== DIMENSIONALITY REDUCTION ==========
-        function updateDimRed(dataType) {
-            let sourceData;
-            let regionLabels;
+        // Helper: get modality label for display
+        function getModalityLabel(dataType) {
+            return dataType === 'gene' ? 'Gene Expression' : dataType === 'dti' ? 'DTI Connectivity' : 'fMRI Functions';
+        }
+        function getFeatureLabel(dataType) {
+            return dataType === 'gene' ? 'Genes' : dataType === 'dti' ? 'DTI Regions' : 'fMRI Functions';
+        }
 
+        // Helper: prepare data in both orientations
+        function prepareDimRedData(dataType, pointsType) {
+            let matrix, rowLabels, colLabels;
             if (dataType === 'gene') {
-                sourceData = geneExpressionData.map(row => metadata.gene_names.map(gene => row[gene] || 0));
-                regionLabels = geneExpressionData.map(row => row.Name);
+                colLabels = metadata.gene_names;
+                rowLabels = geneExpressionData.map(row => row.Name);
+                matrix = geneExpressionData.map(row => colLabels.map(gene => row[gene] || 0));
             } else if (dataType === 'dti') {
-                sourceData = dtiData.map(row => metadata.dti_regions.map(region => row[region] || 0));
-                regionLabels = dtiData.map(row => row.Row);
+                colLabels = metadata.dti_regions;
+                rowLabels = dtiData.map(row => row.Row);
+                matrix = dtiData.map(row => colLabels.map(region => row[region] || 0));
             } else {
-                sourceData = fmriData.map(row => metadata.fmri_functions.map(func => row[func] || 0));
-                regionLabels = fmriData.map(row => row.Row);
+                colLabels = metadata.fmri_functions;
+                rowLabels = fmriData.map(row => row.Row);
+                matrix = fmriData.map(row => colLabels.map(func => row[func] || 0));
             }
 
-            const pca = simplePCA(sourceData, 2);
+            if (pointsType === 'features') {
+                // Transpose: each column (gene/feature) becomes a point, brain areas are the dimensions
+                const transposed = colLabels.map((_, ci) => matrix.map(row => row[ci]));
+                return { sourceData: transposed, pointLabels: colLabels, isRegions: false };
+            } else {
+                return { sourceData: matrix, pointLabels: rowLabels, isRegions: true };
+            }
+        }
 
-            // Map each region label to its structure color
-            const colors = regionLabels.map(name => {
-                const meta = metadata.region_metadata.find(r => r.Name === name);
-                const structName = meta ? meta.top_level_structure_name : 'brain';
-                return nipySpectralColor(BRAIN_SCALE_DICT[structName] || 0.5);
-            });
+        // Color points: brain areas use structure colors; features get a uniform accent color
+        function colorDimRedPoints(labels, isRegions) {
+            if (isRegions) {
+                return labels.map(name => {
+                    const meta = metadata.region_metadata.find(r => r.Name === name);
+                    const structName = meta ? meta.top_level_structure_name : 'brain';
+                    return nipySpectralColor(BRAIN_SCALE_DICT[structName] || 0.5);
+                });
+            } else {
+                return labels.map(() => '#5dade2');
+            }
+        }
+
+        function updateDimRed() {
+            const dataType = document.getElementById('dimredDataType').value;
+            const pointsType = document.getElementById('pcaPointsType').value;
+            const { sourceData, pointLabels, isRegions } = prepareDimRedData(dataType, pointsType);
+
+            const pca = simplePCA(sourceData, 2);
+            const colors = colorDimRedPoints(pointLabels, isRegions);
+
+            const pointsLabel = isRegions ? 'Brain Areas' : getFeatureLabel(dataType);
+            const modalityLabel = getModalityLabel(dataType);
+            const descEl = document.getElementById('pcaDescription');
+            descEl.textContent = isRegions
+                ? `PCA of brain areas in ${modalityLabel.toLowerCase()} space. Points colored by brain structure.`
+                : `PCA of ${pointsLabel.toLowerCase()} with brain areas as dimensions (${modalityLabel.toLowerCase()} data).`;
 
             const trace = {
                 x: pca.map(p => p[0]),
                 y: pca.map(p => p[1]),
                 mode: 'markers+text',
                 type: 'scatter',
-                text: regionLabels,
+                text: pointLabels,
                 textposition: 'top center',
-                textfont: { size: 10, color: '#e8eef5' },
+                textfont: { size: isRegions ? 10 : 9, color: '#e8eef5' },
                 marker: {
                     size: 8,
                     color: colors,
@@ -1847,15 +1905,26 @@
                 hovertemplate: '<b>%{text}</b><br>PC1: %{x:.2f}<br>PC2: %{y:.2f}<extra></extra>'
             };
 
+            const titleText = `PCA — ${pointsLabel} — ${modalityLabel}`;
+
             const layout = {
                 ...PLOTLY_DARK_LAYOUT,
                 height: 600,
                 dragmode: 'zoom',
+                title: { text: titleText, font: { color: '#b0c4de', size: 14 }, x: 0.5 },
                 xaxis: { title: 'PC1', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
                 yaxis: { title: 'PC2', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
             };
 
             Plotly.newPlot('dimredPlot', [trace], layout, PLOTLY_CONFIG);
+        }
+
+        function exportPCA() {
+            const dataType = document.getElementById('dimredDataType').value;
+            const pointsType = document.getElementById('pcaPointsType').value;
+            const pointsLabel = pointsType === 'features' ? getFeatureLabel(dataType) : 'BrainAreas';
+            const filename = `PCA_${pointsLabel}_${getModalityLabel(dataType).replace(/\s+/g, '')}`;
+            savePlotlyAsPNG('dimredPlot', filename);
         }
 
         // ========== UMAP ==========
@@ -2098,6 +2167,7 @@
             umapRunning = true;
 
             const dataType = document.getElementById('umapDataType').value;
+            const pointsType = document.getElementById('umapPointsType').value;
             const nNeighbors = parseInt(document.getElementById('umapNeighbors').value) || 15;
             const minDist = parseFloat(document.getElementById('umapMinDist').value);
             const nEpochs = parseInt(document.getElementById('umapEpochs').value) || 500;
@@ -2109,19 +2179,9 @@
             btn.style.opacity = '0.6';
             statusEl.innerHTML = '<em>Computing UMAP embedding... this may take a few seconds.</em>';
 
-            let sourceData, regionLabels;
-            if (dataType === 'gene') {
-                sourceData = geneExpressionData.map(row => metadata.gene_names.map(gene => row[gene] || 0));
-                regionLabels = geneExpressionData.map(row => row.Name);
-            } else if (dataType === 'dti') {
-                sourceData = dtiData.map(row => metadata.dti_regions.map(region => row[region] || 0));
-                regionLabels = dtiData.map(row => row.Row);
-            } else {
-                sourceData = fmriData.map(row => metadata.fmri_functions.map(func => row[func] || 0));
-                regionLabels = fmriData.map(row => row.Row);
-            }
+            const { sourceData, pointLabels, isRegions } = prepareDimRedData(dataType, pointsType);
 
-            // Standardize features before UMAP (same as PCA)
+            // Standardize features before UMAP
             const ns = sourceData.length;
             const m = sourceData[0].length;
             const means = Array(m).fill(0);
@@ -2136,23 +2196,22 @@
             for (let j = 0; j < m; j++) stds[j] = Math.sqrt(stds[j] / ns) || 1;
             const standardized = sourceData.map(row => row.map((x, j) => (x - means[j]) / stds[j]));
 
+            const pointsLabel = isRegions ? 'Brain Areas' : getFeatureLabel(dataType);
+            const modalityLabel = getModalityLabel(dataType);
+
             // Run UMAP asynchronously so the UI doesn't freeze
             setTimeout(() => {
                 try {
                     const embedding = umapEmbed(standardized, { nNeighbors, minDist, nEpochs, spread });
 
-                    const colors = regionLabels.map(name => {
-                        const meta = metadata.region_metadata.find(r => r.Name === name);
-                        const structName = meta ? meta.top_level_structure_name : 'brain';
-                        return nipySpectralColor(BRAIN_SCALE_DICT[structName] || 0.5);
-                    });
+                    const colors = colorDimRedPoints(pointLabels, isRegions);
 
                     const trace = {
                         x: embedding.map(p => p[0]),
                         y: embedding.map(p => p[1]),
                         mode: 'markers+text',
                         type: 'scatter',
-                        text: regionLabels,
+                        text: pointLabels,
                         textposition: 'top center',
                         textfont: { size: 9, color: '#e8eef5' },
                         marker: {
@@ -2163,17 +2222,21 @@
                         hovertemplate: '<b>%{text}</b><br>UMAP 1: %{x:.2f}<br>UMAP 2: %{y:.2f}<extra></extra>'
                     };
 
+                    const titleText = `UMAP — ${pointsLabel} — ${modalityLabel}`;
+
                     const layout = {
                         ...PLOTLY_DARK_LAYOUT,
                         height: 600,
                         dragmode: 'zoom',
+                        title: { text: titleText, font: { color: '#b0c4de', size: 14 }, x: 0.5 },
                         xaxis: { title: 'UMAP 1', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' },
                         yaxis: { title: 'UMAP 2', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
                     };
 
                     Plotly.newPlot('umapPlot', [trace], layout, PLOTLY_CONFIG);
 
-                    statusEl.innerHTML = `UMAP complete &mdash; n_neighbors=${nNeighbors}, min_dist=${minDist}, ${nEpochs} epochs, spread=${spread}. Points colored by brain structure.`;
+                    const ptDesc = isRegions ? 'Points colored by brain structure.' : `Each point is a ${getFeatureLabel(dataType).toLowerCase().replace(/s$/, '')}.`;
+                    statusEl.innerHTML = `UMAP complete &mdash; n_neighbors=${nNeighbors}, min_dist=${minDist}, ${nEpochs} epochs, spread=${spread}. ${ptDesc}`;
                 } catch (e) {
                     statusEl.innerHTML = `<span style="color:#ff6666;">Error: ${e.message}</span>`;
                 }
@@ -2181,6 +2244,14 @@
                 btn.style.opacity = '1';
                 umapRunning = false;
             }, 50);
+        }
+
+        function exportUMAP() {
+            const dataType = document.getElementById('umapDataType').value;
+            const pointsType = document.getElementById('umapPointsType').value;
+            const pointsLabel = pointsType === 'features' ? getFeatureLabel(dataType) : 'BrainAreas';
+            const filename = `UMAP_${pointsLabel}_${getModalityLabel(dataType).replace(/\s+/g, '')}`;
+            savePlotlyAsPNG('umapPlot', filename);
         }
 
         // ========== CLUSTERGRAM WITH DENDROGRAMS ==========
@@ -2883,7 +2954,7 @@
             };
 
             // Sizing
-            const totalH = Math.max(600, nRows * 12 + 200);
+            const totalH = Math.max(400, Math.min(nRows * 14 + 80, 2400));
             const longestLabel = Math.max(...orderedRows.map(r => r.length));
             const marginR = Math.max(200, 7.5 * longestLabel + 80);
             const marginB = Math.max(100, nCols * 5);
@@ -2894,7 +2965,7 @@
             const layout = {
                 ...PLOTLY_DARK_LAYOUT,
                 height: totalH,
-                margin: { l: 10, r: marginR, t: 10, b: marginB },
+                margin: { l: 10, r: marginR, t: 10, b: Math.min(marginB, 200) },
                 dragmode: 'zoom',
                 // Heatmap x-axis (columns) — bottom
                 xaxis: {
