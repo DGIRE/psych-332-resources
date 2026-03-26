@@ -2353,13 +2353,173 @@
             let lcaIdx = 0;
             while (lcaIdx < pathA.length && lcaIdx < pathB.length && pathA[lcaIdx].id === pathB[lcaIdx].id) lcaIdx++;
             lcaIdx--;
-            return { lcaNode: pathA[lcaIdx], distance: pathA[lcaIdx].height };
+            return { lcaNode: pathA[lcaIdx], distance: pathA[lcaIdx].height, pathA, pathB, lcaIdx };
+        }
+
+        // --- Build red highlight path through dendrogram between two leaves ---
+        // Returns {xs, ys} for the path from leafA up to LCA and back down to leafB
+        function buildRowPathTrace(root, order, leafA, leafB) {
+            const maxH = root.height || 1;
+            const leafY = {};
+            order.forEach((leafIdx, pos) => { leafY[leafIdx] = pos; });
+
+            // Get node positions: for each node, compute its y (midpoint) and x (height)
+            function getNodePos(node) {
+                if (node.leaves.length === 1) {
+                    return { x: 0, y: leafY[node.leaves[0]] };
+                }
+                const lp = getNodePos(node.left);
+                const rp = getNodePos(node.right);
+                return { x: -(node.height / maxH), y: (lp.y + rp.y) / 2 };
+            }
+
+            const result = findPathBetweenLeaves(root, leafA, leafB);
+            if (!result) return null;
+            const { pathA, pathB, lcaIdx } = result;
+
+            // Build coords: walk from leafA up to LCA, then from LCA down to leafB
+            const xs = [], ys = [];
+
+            // Helper: get position for a tree node
+            function nodePos(node) {
+                if (node.leaves.length === 1) return { x: 0, y: leafY[node.leaves[0]] };
+                const lp = nodePos(node.left);
+                const rp = nodePos(node.right);
+                return { x: -(node.height / maxH), y: (lp.y + rp.y) / 2 };
+            }
+
+            // Path from leaf A up to LCA: at each step, go horizontal to parent's x, then vertical to parent's y
+            for (let i = pathA.length - 1; i > lcaIdx; i--) {
+                const child = nodePos(pathA[i]);
+                const parent = nodePos(pathA[i - 1]);
+                // Horizontal segment: child.y stays, x goes from child.x to parent.x
+                xs.push(child.x, parent.x); ys.push(child.y, child.y);
+                // Vertical segment: x stays at parent.x, y goes to parent.y
+                xs.push(parent.x, parent.x); ys.push(child.y, parent.y);
+            }
+            // Path from LCA down to leaf B
+            const lcaPos = nodePos(pathB[lcaIdx]);
+            for (let i = lcaIdx + 1; i < pathB.length; i++) {
+                const parent = nodePos(pathB[i - 1]);
+                const child = nodePos(pathB[i]);
+                // Vertical from parent.y to child.y at parent.x
+                xs.push(parent.x, parent.x); ys.push(parent.y, child.y);
+                // Horizontal from parent.x to child.x at child.y
+                xs.push(parent.x, child.x); ys.push(child.y, child.y);
+            }
+
+            return { xs, ys };
+        }
+
+        function buildColPathTrace(root, order, leafA, leafB) {
+            const maxH = root.height || 1;
+            const leafX = {};
+            order.forEach((leafIdx, pos) => { leafX[leafIdx] = pos; });
+
+            const result = findPathBetweenLeaves(root, leafA, leafB);
+            if (!result) return null;
+            const { pathA, pathB, lcaIdx } = result;
+
+            const xs = [], ys = [];
+
+            function nodePos(node) {
+                if (node.leaves.length === 1) return { x: leafX[node.leaves[0]], y: 0 };
+                const lp = nodePos(node.left);
+                const rp = nodePos(node.right);
+                return { x: (lp.x + rp.x) / 2, y: node.height / maxH };
+            }
+
+            // Path from leaf A up to LCA
+            for (let i = pathA.length - 1; i > lcaIdx; i--) {
+                const child = nodePos(pathA[i]);
+                const parent = nodePos(pathA[i - 1]);
+                // Vertical: child.x stays, y from child.y to parent.y
+                xs.push(child.x, child.x); ys.push(child.y, parent.y);
+                // Horizontal: y stays at parent.y, x from child.x to parent.x
+                xs.push(child.x, parent.x); ys.push(parent.y, parent.y);
+            }
+            // Path from LCA down to leaf B
+            for (let i = lcaIdx + 1; i < pathB.length; i++) {
+                const parent = nodePos(pathB[i - 1]);
+                const child = nodePos(pathB[i]);
+                // Horizontal from parent.x to child.x at parent.y
+                xs.push(parent.x, child.x); ys.push(parent.y, parent.y);
+                // Vertical from parent.y to child.y at child.x
+                xs.push(child.x, child.x); ys.push(parent.y, child.y);
+            }
+
+            return { xs, ys };
+        }
+
+        // Remove existing red path traces from the plot (base traces: 0-4, path traces: 5+)
+        const CG_BASE_TRACES = 5;
+        function removePathTraces() {
+            const plotDiv = document.getElementById('clustergramPlot');
+            if (!plotDiv || !plotDiv.data) return;
+            const nTraces = plotDiv.data.length;
+            if (nTraces > CG_BASE_TRACES) {
+                const toRemove = [];
+                for (let i = CG_BASE_TRACES; i < nTraces; i++) toRemove.push(CG_BASE_TRACES);
+                Plotly.deleteTraces('clustergramPlot', toRemove);
+            }
+        }
+
+        // Draw the red path on the appropriate dendrogram
+        function drawDendroPath(axis, idxA, idxB) {
+            removePathTraces();
+            if (axis === 'row') {
+                const pathData = buildRowPathTrace(cgState.rowRoot, cgState.rowOrder, idxA, idxB);
+                if (!pathData) return;
+                Plotly.addTraces('clustergramPlot', {
+                    x: pathData.xs, y: pathData.ys,
+                    type: 'scatter', mode: 'lines',
+                    line: { color: '#ff3333', width: 2.8 },
+                    xaxis: 'x2', yaxis: 'y',
+                    hoverinfo: 'none', showlegend: false
+                });
+            } else {
+                const pathData = buildColPathTrace(cgState.colRoot, cgState.colOrder, idxA, idxB);
+                if (!pathData) return;
+                Plotly.addTraces('clustergramPlot', {
+                    x: pathData.xs, y: pathData.ys,
+                    type: 'scatter', mode: 'lines',
+                    line: { color: '#ff3333', width: 2.8 },
+                    xaxis: 'x', yaxis: 'y3',
+                    hoverinfo: 'none', showlegend: false
+                });
+            }
+        }
+
+        // Build invisible marker points at each leaf node in a dendrogram for click targets
+        function buildDendroNodePoints(root, order, axis) {
+            const maxH = root.height || 1;
+            const xs = [], ys = [], labels = [];
+            if (axis === 'row') {
+                const leafY = {};
+                order.forEach((leafIdx, pos) => { leafY[leafIdx] = pos; });
+                // Add a point at each leaf position (x=0 for leaves)
+                order.forEach((leafIdx, pos) => {
+                    xs.push(0);
+                    ys.push(pos);
+                    labels.push(cgState.rowLabels[leafIdx] || `Row ${leafIdx}`);
+                });
+            } else {
+                const leafX = {};
+                order.forEach((leafIdx, pos) => { leafX[leafIdx] = pos; });
+                order.forEach((leafIdx, pos) => {
+                    xs.push(pos);
+                    ys.push(0);
+                    labels.push(cgState.colLabels[leafIdx] || `Col ${leafIdx}`);
+                });
+            }
+            return { xs, ys, labels };
         }
 
         let cgClickCount = 0;
         function clearDendroPath() {
             document.getElementById('cgPathDisplay').style.display = 'none';
             document.getElementById('cgPathText').textContent = '';
+            removePathTraces();
             cgClickCount = 0;
         }
 
@@ -2403,6 +2563,18 @@
         }
 
         // --- Distance calculator ---
+        function cgFindItem(name) {
+            const rowIdx = cgState.rowLabels.indexOf(name);
+            if (rowIdx >= 0) return { axis: 'row', idx: rowIdx };
+            const colIdx = cgState.colLabels.indexOf(name);
+            if (colIdx >= 0) return { axis: 'col', idx: colIdx };
+            const rl = cgState.rowLabels.findIndex(r => r.toLowerCase() === name.toLowerCase());
+            if (rl >= 0) return { axis: 'row', idx: rl };
+            const cl = cgState.colLabels.findIndex(c => c.toLowerCase() === name.toLowerCase());
+            if (cl >= 0) return { axis: 'col', idx: cl };
+            return null;
+        }
+
         function calcCgItemDistance() {
             const name1 = document.getElementById('cgDistInput1').value.trim();
             const name2 = document.getElementById('cgDistInput2').value.trim();
@@ -2411,22 +2583,8 @@
 
             const metric = document.getElementById('cgDistMetric').value;
 
-            // Determine which axis each name belongs to
-            function findItem(name) {
-                const rowIdx = cgState.rowLabels.indexOf(name);
-                if (rowIdx >= 0) return { axis: 'row', idx: rowIdx };
-                const colIdx = cgState.colLabels.indexOf(name);
-                if (colIdx >= 0) return { axis: 'col', idx: colIdx };
-                // Case-insensitive fallback
-                const rl = cgState.rowLabels.findIndex(r => r.toLowerCase() === name.toLowerCase());
-                if (rl >= 0) return { axis: 'row', idx: rl };
-                const cl = cgState.colLabels.findIndex(c => c.toLowerCase() === name.toLowerCase());
-                if (cl >= 0) return { axis: 'col', idx: cl };
-                return null;
-            }
-
-            const item1 = findItem(name1);
-            const item2 = findItem(name2);
+            const item1 = cgFindItem(name1);
+            const item2 = cgFindItem(name2);
 
             if (!item1) { alert(`"${name1}" not found in current data.`); return; }
             if (!item2) { alert(`"${name2}" not found in current data.`); return; }
@@ -2439,18 +2597,18 @@
                 vecA = zMatrix[item1.idx];
                 vecB = zMatrix[item2.idx];
             } else {
-                // Column vectors: transpose
                 vecA = zMatrix.map(row => row[item1.idx]);
                 vecB = zMatrix.map(row => row[item2.idx]);
             }
 
             const directDist = cgDistance(vecA, vecB, metric);
 
-            // Also find LCA distance in the dendrogram
+            // Find LCA distance in the dendrogram
             const root = item1.axis === 'row' ? cgState.rowRoot : cgState.colRoot;
             const result = findPathBetweenLeaves(root, item1.idx, item2.idx);
             const lcaDist = result ? result.distance : null;
 
+            // Show distance info
             const pathDiv = document.getElementById('cgPathDisplay');
             pathDiv.style.display = 'block';
             const labels = item1.axis === 'row' ? cgState.rowLabels : cgState.colLabels;
@@ -2458,6 +2616,9 @@
             html += `<strong>Direct ${metric} distance:</strong> ${directDist.toFixed(4)}`;
             if (lcaDist !== null) html += ` &nbsp;|&nbsp; <strong>Dendrogram LCA height:</strong> ${lcaDist.toFixed(4)}`;
             document.getElementById('cgPathText').innerHTML = html;
+
+            // Draw the red path on the dendrogram
+            drawDendroPath(item1.axis, item1.idx, item2.idx);
         }
 
         // --- Click-to-select handler for axis labels and dendrograms ---
@@ -2579,8 +2740,8 @@
                 xaxis: 'x',
                 yaxis: 'y',
                 colorbar: {
-                    len: 0.3, thickness: 12,
-                    x: 1.12, y: 0.4,
+                    len: 0.25, thickness: 10,
+                    x: 1.22, y: 0.45, yanchor: 'middle',
                     title: { text: 'Z-score', side: 'right', font: { color: '#8aacc8', size: 10 } },
                     tickmode: 'auto', nticks: 5,
                     tickfont: { color: '#b0c4de', size: 9 },
@@ -2604,6 +2765,19 @@
                 showlegend: false
             };
 
+            // Invisible marker points at row dendrogram nodes for click targets
+            const rowNodePts = buildDendroNodePoints(rowResult.root, rowResult.order, 'row');
+            const rowDendroMarkers = {
+                x: rowNodePts.xs, y: rowNodePts.ys,
+                text: rowNodePts.labels,
+                type: 'scatter', mode: 'markers',
+                marker: { size: 12, color: 'rgba(0,0,0,0)', line: { width: 0 } },
+                xaxis: 'x2', yaxis: 'y',
+                hoverinfo: 'text',
+                hovertemplate: '<b>%{text}</b><extra>click to select</extra>',
+                showlegend: false
+            };
+
             const colDendro = buildColDendroTraces(colResult.root, colResult.order);
             const colDendroTrace = {
                 x: colDendro.xs,
@@ -2617,9 +2791,23 @@
                 showlegend: false
             };
 
+            // Invisible marker points at col dendrogram nodes for click targets
+            const colNodePts = buildDendroNodePoints(colResult.root, colResult.order, 'col');
+            const colDendroMarkers = {
+                x: colNodePts.xs, y: colNodePts.ys,
+                text: colNodePts.labels,
+                type: 'scatter', mode: 'markers',
+                marker: { size: 12, color: 'rgba(0,0,0,0)', line: { width: 0 } },
+                xaxis: 'x', yaxis: 'y3',
+                hoverinfo: 'text',
+                hovertemplate: '<b>%{text}</b><extra>click to select</extra>',
+                showlegend: false
+            };
+
             // Sizing
             const totalH = Math.max(600, nRows * 12 + 200);
-            const marginR = Math.max(180, 7.5 * Math.max(...orderedRows.map(r => r.length)) + 50);
+            const longestLabel = Math.max(...orderedRows.map(r => r.length));
+            const marginR = Math.max(200, 7.5 * longestLabel + 80);
             const marginB = Math.max(100, nCols * 5);
 
             const plotDiv = document.getElementById('clustergramPlot');
@@ -2675,7 +2863,8 @@
                 }
             };
 
-            Plotly.newPlot('clustergramPlot', [heatTrace, rowDendroTrace, colDendroTrace], layout, PLOTLY_CONFIG);
+            // Traces: 0=heatmap, 1=rowDendroLines, 2=rowDendroMarkers, 3=colDendroLines, 4=colDendroMarkers
+            Plotly.newPlot('clustergramPlot', [heatTrace, rowDendroTrace, rowDendroMarkers, colDendroTrace, colDendroMarkers], layout, PLOTLY_CONFIG);
 
             // Setup autocomplete for distance inputs
             setupCgAutocomplete('cgDistInput1', 'cgDistAC1');
@@ -2706,18 +2895,18 @@
                 });
             }, 300);
 
-            // --- Make dendrogram clickable: click near a branch to select its closest leaf ---
+            // --- Make dendrogram clickable: click any dendrogram node/branch to select ---
+            // Traces: 0=heatmap, 1=rowDendroLines, 2=rowDendroMarkers, 3=colDendroLines, 4=colDendroMarkers, 5+=path
             plotDiv.on('plotly_click', function(data) {
                 if (!data || !data.points || data.points.length === 0) return;
                 const pt = data.points[0];
-                // Row dendrogram trace (index 1) or col dendrogram trace (index 2)
-                if (pt.curveNumber === 1) {
-                    // Row dendro click — find nearest row label by y coordinate
+                if (pt.curveNumber === 1 || pt.curveNumber === 2) {
+                    // Row dendro (lines or markers) — find nearest row label by y coordinate
                     const yVal = pt.y;
                     const nearestIdx = Math.round(Math.max(0, Math.min(nRows - 1, yVal)));
                     cgTickClicked(orderedRows[nearestIdx]);
-                } else if (pt.curveNumber === 2) {
-                    // Col dendro click — find nearest col label by x coordinate
+                } else if (pt.curveNumber === 3 || pt.curveNumber === 4) {
+                    // Col dendro (lines or markers) — find nearest col label by x coordinate
                     const xVal = pt.x;
                     const nearestIdx = Math.round(Math.max(0, Math.min(nCols - 1, xVal)));
                     cgTickClicked(orderedCols[nearestIdx]);
