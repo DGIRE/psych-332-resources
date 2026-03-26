@@ -28,6 +28,64 @@
             margin: 0 auto;
         }
 
+        /* Step Navigation Bar */
+        .step-nav {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 12px;
+          padding: 10px 16px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 10px;
+          animation: fadeIn 0.4s ease-out;
+        }
+        .step-nav-back {
+          color: #5a7d9e;
+          text-decoration: none;
+          font-size: 0.82rem;
+          font-weight: 500;
+          white-space: nowrap;
+          transition: color 0.2s;
+        }
+        .step-nav-back:hover { color: #0779be; }
+        .step-nav-steps {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-left: auto;
+          flex-wrap: wrap;
+        }
+        .step-nav-item {
+          font-size: 0.8rem;
+          font-weight: 500;
+          color: #5a7d9e;
+          text-decoration: none;
+          padding: 4px 12px;
+          border-radius: 6px;
+          border: 1px solid transparent;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+        .step-nav-item:hover:not(.active) {
+          color: #0779be;
+          border-color: rgba(7,121,190,0.3);
+          background: rgba(7,121,190,0.08);
+        }
+        .step-nav-item.active {
+          color: #fff;
+          background: rgba(7,121,190,0.2);
+          border-color: #0779be;
+        }
+        .step-nav-arrow {
+          color: #3a5a7a;
+          font-size: 0.85rem;
+        }
+        @media (max-width: 680px) {
+          .step-nav { flex-direction: column; align-items: flex-start; }
+          .step-nav-steps { margin-left: 0; }
+        }
+
         header {
             margin-bottom: 40px;
             padding: 30px;
@@ -273,9 +331,19 @@
 </head>
 <body>
     <div class="container">
+        <nav class="step-nav">
+          <a href="module1-practicum.html" class="step-nav-back">&#8592; Module 1</a>
+          <div class="step-nav-steps">
+            <a href="PSYCH-332-Brain-Explorer_v1-3.html" class="step-nav-item">&#128161; Step 1: Explore Ideas</a>
+            <span class="step-nav-arrow">&#8594;</span>
+            <a href="Practicum1-Preparation.html" class="step-nav-item">&#128196; Step 2: Prepare Report</a>
+            <span class="step-nav-arrow">&#8594;</span>
+            <span class="step-nav-item active">&#128202; Step 3: Analyze Data</span>
+          </div>
+        </nav>
+
         <!-- Header -->
         <header>
-            <a href="module1-practicum.html">← Back to Module 1 Practicum</a>
             <h1>Module 1 Practicum — Data Analysis</h1>
             <p class="subtitle">Interactive visualizations of Allen Brain Atlas data</p>
         </header>
@@ -840,22 +908,22 @@
 
         // ========== UI INITIALIZATION ==========
         function initializeUI() {
-            createSearchableSelect(
+            const structureCtrl = createSearchableSelect(
                 document.getElementById('structureSelect'),
                 metadata.region_metadata.map(r => r.Name),
                 updateStructureView
             );
-            createSearchableSelect(
+            const geneCtrl = createSearchableSelect(
                 document.getElementById('geneSelect'),
                 metadata.gene_names,
                 updateGeneView
             );
-            createSearchableSelect(
+            const dtiCtrl = createSearchableSelect(
                 document.getElementById('dtiTargetSelect'),
                 metadata.dti_regions,
                 updateDTIView
             );
-            createSearchableSelect(
+            const fmriCtrl = createSearchableSelect(
                 document.getElementById('fmriSelect'),
                 metadata.fmri_functions,
                 updateFMRIView
@@ -864,11 +932,27 @@
             // Dimensionality reduction (only 3 options, keep as regular select)
             document.getElementById('dimredDataType').addEventListener('change', (e) => updateDimRed(e.target.value));
 
-            // Initialize first views
-            updateStructureView(metadata.region_metadata[0].Name);
-            updateGeneView(metadata.gene_names[0]);
-            updateDTIView(metadata.dti_regions[0]);
-            updateFMRIView(metadata.fmri_functions[0]);
+            // Check URL params for pre-population from Brain Explorer or Preparation page
+            const params = new URLSearchParams(window.location.search);
+            const urlRegion = params.get('region');
+            const urlGene   = params.get('gene');
+            const urlFunc   = params.get('func');
+
+            const regionNames = metadata.region_metadata.map(r => r.Name);
+            const initRegion = (urlRegion && regionNames.includes(urlRegion)) ? urlRegion : regionNames[0];
+            const initGene   = (urlGene && metadata.gene_names.includes(urlGene)) ? urlGene : metadata.gene_names[0];
+            const initDTI    = (urlRegion && metadata.dti_regions.includes(urlRegion)) ? urlRegion : metadata.dti_regions[0];
+            const initFunc   = (urlFunc && metadata.fmri_functions.includes(urlFunc)) ? urlFunc : metadata.fmri_functions[0];
+
+            // Set values and initialize views
+            structureCtrl.setValue(initRegion);
+            updateStructureView(initRegion);
+            geneCtrl.setValue(initGene);
+            updateGeneView(initGene);
+            dtiCtrl.setValue(initDTI);
+            updateDTIView(initDTI);
+            fmriCtrl.setValue(initFunc);
+            updateFMRIView(initFunc);
             updateDimRed('gene');
         }
 

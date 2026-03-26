@@ -26,6 +26,64 @@
       margin: 0 auto;
     }
 
+    /* Step Navigation Bar */
+    .step-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      animation: fadeIn 0.4s ease-out;
+    }
+    .step-nav-back {
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+    .step-nav-back:hover { color: #0779be; }
+    .step-nav-steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+    .step-nav-item {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #5a7d9e;
+      text-decoration: none;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .step-nav-item:hover:not(.active) {
+      color: #0779be;
+      border-color: rgba(7,121,190,0.3);
+      background: rgba(7,121,190,0.08);
+    }
+    .step-nav-item.active {
+      color: #fff;
+      background: rgba(7,121,190,0.2);
+      border-color: #0779be;
+    }
+    .step-nav-arrow {
+      color: #3a5a7a;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 680px) {
+      .step-nav { flex-direction: column; align-items: flex-start; }
+      .step-nav-steps { margin-left: 0; }
+    }
+
     /* Header */
     header {
       text-align: center;
@@ -813,6 +871,16 @@
 </head>
 <body>
   <div class="container">
+    <nav class="step-nav">
+      <a href="module1-practicum.html" class="step-nav-back">&#8592; Module 1</a>
+      <div class="step-nav-steps">
+        <span class="step-nav-item active">&#128161; Step 1: Explore Ideas</span>
+        <span class="step-nav-arrow">&#8594;</span>
+        <a href="#" class="step-nav-item" id="navToPrepLink" onclick="navigateToPrep(); return false;">&#128196; Step 2: Prepare Report</a>
+        <span class="step-nav-arrow">&#8594;</span>
+        <a href="#" class="step-nav-item" onclick="window.location.href='Practicum1-Analysis.html'+(buildSelectionParams()?'?'+buildSelectionParams():''); return false;">&#128202; Step 3: Analyze Data</a>
+      </div>
+    </nav>
     <header>
       <h1>PSYCH 332 Brain Explorer</h1>
       <p>Cross-Reference Tool for Functions, Regions, Disorders & Genes</p>
@@ -846,6 +914,7 @@
           </div>
           <div class="export-section">
             <button class="export-btn" id="exportBtn" disabled>Export Selection</button>
+            <button class="export-btn" id="continueBtn" style="margin-top:8px; background:rgba(7,121,190,0.3); border-color:#0779be;" onclick="navigateToPrep()">Continue to Preparation &#8594;</button>
           </div>
           <div class="drag-hint">Drag cards here or right-click items to save</div>
         </div>
@@ -2725,6 +2794,19 @@
       }
 
       updateSlotUI();
+    }
+
+    function buildSelectionParams() {
+      const params = new URLSearchParams();
+      if (selections.region) params.set('region', selections.region);
+      if (selections.func)   params.set('func', selections.func);
+      if (selections.gene)   params.set('gene', selections.gene);
+      return params.toString();
+    }
+
+    function navigateToPrep() {
+      const qs = buildSelectionParams();
+      window.location.href = 'Practicum1-Preparation.html' + (qs ? '?' + qs : '');
     }
 
     function exportSelection() {

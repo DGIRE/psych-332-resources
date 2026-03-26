@@ -41,6 +41,64 @@
     }
     .back-link:hover { color: #0779be; }
 
+    /* Step Navigation Bar */
+    .step-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      animation: fadeIn 0.4s ease-out;
+    }
+    .step-nav-back {
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+    .step-nav-back:hover { color: #0779be; }
+    .step-nav-steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+    .step-nav-item {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #5a7d9e;
+      text-decoration: none;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .step-nav-item:hover:not(.active) {
+      color: #0779be;
+      border-color: rgba(7,121,190,0.3);
+      background: rgba(7,121,190,0.08);
+    }
+    .step-nav-item.active {
+      color: #fff;
+      background: rgba(7,121,190,0.2);
+      border-color: #0779be;
+    }
+    .step-nav-arrow {
+      color: #3a5a7a;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 680px) {
+      .step-nav { flex-direction: column; align-items: flex-start; }
+      .step-nav-steps { margin-left: 0; }
+    }
+
     /* Header */
     header {
       text-align: center;
@@ -360,7 +418,16 @@
 <body>
   <div class="container">
 
-    <a class="back-link" href="module1-practicum.html">&#8592; Back to Module 1 Practicum</a>
+    <nav class="step-nav">
+      <a href="module1-practicum.html" class="step-nav-back">&#8592; Module 1</a>
+      <div class="step-nav-steps">
+        <a href="PSYCH-332-Brain-Explorer_v1-3.html" class="step-nav-item">&#128161; Step 1: Explore Ideas</a>
+        <span class="step-nav-arrow">&#8594;</span>
+        <span class="step-nav-item active">&#128196; Step 2: Prepare Report</span>
+        <span class="step-nav-arrow">&#8594;</span>
+        <a href="#" class="step-nav-item" id="navToAnalysis" onclick="navigateToAnalysis(); return false;">&#128202; Step 3: Analyze Data</a>
+      </div>
+    </nav>
 
     <header>
       <div class="module-label">Module 1 &middot; Step 2</div>
@@ -712,6 +779,9 @@
       document.getElementById('selectionCard').style.display = 'block';
       uploadArea.style.display = 'none';
 
+      // Store for cross-page navigation
+      currentSelections = { region, func, gene };
+
       // Generate personalized advice
       generateAdvice(region, func, gene);
     }
@@ -836,6 +906,49 @@
       const li = e.target.closest('li');
       if (li) li.classList.toggle('checked');
     });
+
+    // ========== CROSS-PAGE NAVIGATION ==========
+    // Store current selections for passing to other pages
+    let currentSelections = { region: '', func: '', gene: '' };
+
+    function navigateToAnalysis() {
+      const params = new URLSearchParams();
+      if (currentSelections.region) params.set('region', currentSelections.region);
+      if (currentSelections.func)   params.set('func', currentSelections.func);
+      if (currentSelections.gene)   params.set('gene', currentSelections.gene);
+      const qs = params.toString();
+      window.location.href = 'Practicum1-Analysis.html' + (qs ? '?' + qs : '');
+    }
+
+    // ========== AUTO-POPULATE FROM URL PARAMS ==========
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const region = params.get('region');
+      const func = params.get('func');
+      const gene = params.get('gene');
+
+      if (region || func || gene) {
+        currentSelections = { region: region || '', func: func || '', gene: gene || '' };
+
+        // Show selection card directly
+        document.getElementById('selRegion').textContent = region || '—';
+        document.getElementById('selFunc').textContent = func || '—';
+        document.getElementById('selGene').textContent = gene || '—';
+
+        // Build research links
+        const linksEl = document.getElementById('selLinks');
+        linksEl.innerHTML = '';
+        if (region) linksEl.innerHTML += `<a href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(region + ' neuroanatomy')}&filter=pubt.review" target="_blank">PubMed: ${region}</a>`;
+        if (func)   linksEl.innerHTML += `<a href="https://neurosynth.org/analyses/terms/${encodeURIComponent(func.toLowerCase())}/" target="_blank">NeuroSynth: ${func}</a>`;
+        if (gene)   linksEl.innerHTML += `<a href="https://human.brain-map.org/microarray/search/show?search_type=gene&search_term=${encodeURIComponent(gene)}" target="_blank">Allen Brain: ${gene}</a>`;
+
+        document.getElementById('selectionCard').style.display = 'block';
+        uploadArea.style.display = 'none';
+
+        // Generate personalized advice
+        generateAdvice(region || '', func || '', gene || '');
+      }
+    })();
   </script>
 </body>
 </html>
