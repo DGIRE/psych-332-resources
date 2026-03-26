@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practicum 1 Preparation – PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 24px;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: #0779be; }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+      padding: 20px;
+      animation: fadeIn 0.6s ease-out;
+    }
+    .module-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #0779be;
+      margin-bottom: 10px;
+    }
+    header h1 {
+      font-size: 2.3rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      font-size: 1.05rem;
+      color: #b0c4de;
+      font-weight: 400;
+    }
+
+    /* Upload section */
+    .upload-area {
+      background: rgba(255,255,255,0.06);
+      border: 2px dashed rgba(7,121,190,0.4);
+      border-radius: 12px;
+      padding: 36px 28px;
+      text-align: center;
+      margin-bottom: 32px;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.5s ease-out 0.1s both;
+      cursor: pointer;
+      position: relative;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: #0779be;
+      background: rgba(7,121,190,0.1);
+    }
+    .upload-area .upload-icon {
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+    }
+    .upload-area h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .upload-area p {
+      font-size: 0.9rem;
+      color: #8aacc8;
+    }
+    .upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Parsed selection card */
+    .selection-card {
+      display: none;
+      background: rgba(7,121,190,0.12);
+      border: 2px solid #0779be;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 32px;
+      animation: fadeIn 0.4s ease-out;
+    }
+    .selection-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .selection-items {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .sel-item {
+      background: rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .sel-item .sel-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #5a7d9e;
+      margin-bottom: 4px;
+    }
+    .sel-item .sel-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .sel-links {
+      margin-top: 14px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .sel-links a {
+      font-size: 0.82rem;
+      color: #0779be;
+      text-decoration: none;
+      border: 1px solid rgba(7,121,190,0.35);
+      border-radius: 6px;
+      padding: 4px 12px;
+      transition: all 0.2s;
+    }
+    .sel-links a:hover {
+      background: rgba(7,121,190,0.15);
+      border-color: #0779be;
+    }
+
+    /* Personalized advice panel */
+    #advicePanel {
+      display: none;
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    /* Section styling */
+    .guide-section {
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,255,255,0.10);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 20px;
+      animation: fadeInUp 0.5s ease-out both;
+    }
+    .guide-section h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .guide-section h2 .sec-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: rgba(7,121,190,0.2);
+      border: 2px solid #0779be;
+      border-radius: 50%;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .guide-section h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #d0dde8;
+      margin: 18px 0 8px 0;
+    }
+    .guide-section p, .guide-section li {
+      font-size: 0.92rem;
+      color: #b0c4de;
+      line-height: 1.7;
+    }
+    .guide-section ul, .guide-section ol {
+      padding-left: 22px;
+      margin: 8px 0 12px 0;
+    }
+    .guide-section li {
+      margin-bottom: 6px;
+    }
+    .guide-section .tip {
+      background: rgba(7,121,190,0.1);
+      border-left: 3px solid #0779be;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 0.88rem;
+      color: #c4d9ed;
+    }
+    .guide-section .tip strong {
+      color: #fff;
+    }
+    .guide-section .warning {
+      background: rgba(220,120,40,0.12);
+      border-left: 3px solid #d4822a;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 0.88rem;
+      color: #e0c8a8;
+    }
+    .guide-section .warning strong {
+      color: #f0d090;
+    }
+
+    /* Rubric table */
+    .rubric-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.88rem;
+    }
+    .rubric-table th, .rubric-table td {
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .rubric-table th {
+      background: rgba(7,121,190,0.15);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .rubric-table td {
+      color: #b0c4de;
+    }
+
+    /* Accordion for detailed sections */
+    .accordion-toggle {
+      background: none;
+      border: none;
+      color: #0779be;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-family: inherit;
+    }
+    .accordion-toggle:hover { color: #4aa3e0; }
+    .accordion-toggle .arrow { transition: transform 0.2s; display: inline-block; }
+    .accordion-toggle.open .arrow { transform: rotate(90deg); }
+    .accordion-content {
+      display: none;
+      padding-top: 10px;
+    }
+    .accordion-content.open { display: block; }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+      margin: 10px 0;
+    }
+    .checklist li {
+      padding: 6px 0 6px 28px;
+      position: relative;
+      font-size: 0.9rem;
+      color: #b0c4de;
+    }
+    .checklist li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(7,121,190,0.5);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .checklist li.checked::before {
+      background: #0779be;
+      border-color: #0779be;
+    }
+    .checklist li.checked::after {
+      content: '\2713';
+      position: absolute;
+      left: 3px;
+      top: 7px;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #5a7d9e;
+      font-size: 0.85rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 680px) {
+      header h1 { font-size: 1.7rem; }
+      .selection-items { grid-template-columns: 1fr; }
+      .guide-section { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <a class="back-link" href="module1-practicum.html">&#8592; Back to Module 1 Practicum</a>
+
+    <header>
+      <div class="module-label">Module 1 &middot; Step 2</div>
+      <h1>Practicum Preparation</h1>
+      <p>Upload your Brain Explorer export to get personalized guidance for your research report, then review best practices for writing each section.</p>
+    </header>
+
+    <!-- Upload area -->
+    <div class="upload-area" id="uploadArea">
+      <input type="file" id="fileInput" accept=".txt">
+      <div class="upload-icon">&#128194;</div>
+      <h2>Upload Your Brain Explorer Export</h2>
+      <p>Drag &amp; drop your <code>.txt</code> file here, or click to browse. This is the file you exported from the Brain Explorer (Step 1).</p>
+    </div>
+
+    <!-- Parsed selection -->
+    <div class="selection-card" id="selectionCard">
+      <h3>Your Selections</h3>
+      <div class="selection-items">
+        <div class="sel-item">
+          <div class="sel-label">Brain Area</div>
+          <div class="sel-value" id="selRegion">—</div>
+        </div>
+        <div class="sel-item">
+          <div class="sel-label">fMRI Function</div>
+          <div class="sel-value" id="selFunc">—</div>
+        </div>
+        <div class="sel-item">
+          <div class="sel-label">Gene / Receptor</div>
+          <div class="sel-value" id="selGene">—</div>
+        </div>
+      </div>
+      <div class="sel-links" id="selLinks"></div>
+    </div>
+
+    <!-- Personalized advice (shown after upload) -->
+    <div id="advicePanel"></div>
+
+    <!-- ========== STATIC GUIDE SECTIONS ========== -->
+
+    <!-- Overview -->
+    <div class="guide-section" style="animation-delay: 0.15s">
+      <h2><span class="sec-icon">&#128218;</span> What Is the Module 1 Practicum?</h2>
+      <p>The Module 1 Practicum is a research report in which you investigate three interconnected topics using real neuroscience datasets. You will write three main sections, each containing three figure-based subsections plus a statement of work:</p>
+      <ol>
+        <li><strong>Section 1 &mdash; Brain Area Report:</strong> Anatomy, receptor gene expression, and cognitive function of a chosen brain region.</li>
+        <li><strong>Section 2 &mdash; fMRI Function Report:</strong> A Neurosynth keyword function&rsquo;s brain-wide representation and its connection to transcriptomic and connectomic data.</li>
+        <li><strong>Section 3 &mdash; Receptor Report:</strong> A specific receptor&rsquo;s structure, brain-wide expression, and relationship to fMRI functions.</li>
+      </ol>
+      <p>Each subsection requires <strong>one figure with a detailed caption</strong> and a written analysis that incorporates both the course datasets (gene expression, DTI, fMRI) and outside scientific literature.</p>
+    </div>
+
+    <!-- Grading -->
+    <div class="guide-section" style="animation-delay: 0.2s">
+      <h2><span class="sec-icon">&#127942;</span> How You Are Graded</h2>
+      <p>The practicum is worth 40 points total. Each of the 9 figure subsections is scored on three criteria:</p>
+      <table class="rubric-table">
+        <thead>
+          <tr>
+            <th>Criterion</th>
+            <th>Points</th>
+            <th>What It Means</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Comprehension</td>
+            <td>1.5</td>
+            <td>You correctly understand and explain the science. Claims are accurate and supported by evidence.</td>
+          </tr>
+          <tr>
+            <td>Clearness</td>
+            <td>1.5</td>
+            <td>Your writing and figures are easy to follow. Figures have labeled panels, and captions walk the reader through each panel.</td>
+          </tr>
+          <tr>
+            <td>Creativeness</td>
+            <td>1.0</td>
+            <td>You go beyond the basics&mdash;interesting comparisons, unexpected connections, or novel visual presentations.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:8px">That gives <strong>4 points per subsection &times; 9 subsections = 36 points</strong>, plus <strong>4 points</strong> for submitting statements of work on time. The statements of work for all three sections are due before the final practicum.</p>
+      <div class="tip"><strong>Tip:</strong> The &ldquo;creativeness&rdquo; point rewards intellectual curiosity. Ask yourself: &ldquo;What would surprise the reader?&rdquo; or &ldquo;What connection hasn&rsquo;t been made yet?&rdquo;</div>
+    </div>
+
+    <!-- Statements of Work -->
+    <div class="guide-section" style="animation-delay: 0.25s">
+      <h2><span class="sec-icon">&#128221;</span> Writing Statements of Work (Subsection 0)</h2>
+      <p>Every section starts with a <strong>Statement of Work</strong> (Subsection 0). This is a 1&ndash;2 paragraph preview describing <em>exactly</em> what you will investigate in that section. Think of it as a contract with yourself.</p>
+      <h3>What a Good Statement Includes</h3>
+      <ul>
+        <li>The specific brain area, function, or receptor you chose and <em>why</em>.</li>
+        <li>The data sources you will use (Allen transcriptomic data, Neurosynth fMRI maps, DTI connectivity).</li>
+        <li>The specific questions or comparisons you plan to address in each subsection.</li>
+        <li>Any outside topics you plan to connect to (disorders, drugs, evolution).</li>
+      </ul>
+      <div class="tip"><strong>Example:</strong> &ldquo;I will investigate the CACNA1E expression in the amygdala. I will focus on its role in emotional processing and anxiety disorders. Additionally, I will focus on synaptic plasticity, comparing CACNA1E expression in the amygdala to its expression in the hippocampus.&rdquo;</div>
+      <div class="warning"><strong>Important:</strong> Once submitted, do <em>not</em> alter your statement of work. Include it as-is in your final practicum. It is graded on timeliness, not on whether your final work changed direction.</div>
+    </div>
+
+    <!-- Figures -->
+    <div class="guide-section" style="animation-delay: 0.3s">
+      <h2><span class="sec-icon">&#128202;</span> Creating Effective Figures</h2>
+      <p>Each subsection centers on <strong>one multi-panel figure</strong>. The best figures combine course data visualizations with outside images from the scientific literature.</p>
+      <h3>Figure Construction</h3>
+      <ul>
+        <li><strong>Use labeled panels (A, B, C, D&hellip;).</strong> Put a clear letter label in the corner of each sub-image so your caption can reference them.</li>
+        <li><strong>Mix data types.</strong> A strong figure might pair a brain map from the Colab notebook (panel A) with a bar chart of expression data (panel B) and a diagram from a published paper (panel C).</li>
+        <li><strong>Annotate directly on the figure.</strong> Add arrows, labels, and color highlights to draw the reader&rsquo;s eye to the key finding.</li>
+        <li><strong>Use colored borders or background tints</strong> to visually group related panels.</li>
+      </ul>
+      <h3>Writing Figure Captions</h3>
+      <ul>
+        <li>Start with a <strong>bold title</strong> that states the figure&rsquo;s main point (e.g., &ldquo;Figure 1: <em>Amygdala Anatomy</em>&rdquo;).</li>
+        <li><strong>Walk through each panel</strong> by letter: &ldquo;<strong>(A)</strong> shows&hellip; <strong>(B)</strong> illustrates&hellip;&rdquo;</li>
+        <li>Don&rsquo;t just describe what&rsquo;s visible&mdash;<strong>interpret the data</strong>. What does this panel <em>mean</em> for the question you&rsquo;re investigating?</li>
+        <li>Cite every outside image or dataset with an in-text citation (Author et al., Year).</li>
+      </ul>
+      <div class="tip"><strong>Tip:</strong> Look at the example practicum&rsquo;s figures. Notice how each panel serves a distinct purpose and the caption weaves them into a single narrative about the brain region, function, or receptor.</div>
+    </div>
+
+    <!-- Section-by-Section Guide -->
+    <div class="guide-section" style="animation-delay: 0.35s">
+      <h2><span class="sec-icon">&#128209;</span> Section-by-Section Guide</h2>
+
+      <!-- Section 1 -->
+      <h3>Section 1: Brain Area Report</h3>
+      <p>You pick one brain region and write three subsections about its anatomy, gene expression, and cognitive role.</p>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 1 &mdash; Anatomy &amp; DSI Connectivity</button>
+      <div class="accordion-content">
+        <p>Introduce your brain area and use the DSI connectivity data to explore its anatomical connections.</p>
+        <ul>
+          <li>What other brain regions is it structurally connected to? Use the DTI/DSI visualizations to show this.</li>
+          <li>How is the region defined anatomically? What cell types does it contain?</li>
+          <li>How can this area vary across individuals?</li>
+          <li>What are the implications of its connections for its function?</li>
+        </ul>
+        <div class="tip"><strong>Strong approach:</strong> Pair a brain map showing the region (from the Colab notebook) with a published DSI or DTI image showing its white matter tracts, then discuss how those connections support cognition.</div>
+      </div>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 2 &mdash; Receptor Gene Expression</button>
+      <div class="accordion-content">
+        <p>Use Allen Institute transcriptomic data to investigate which receptor genes are highly or lowly expressed in your region.</p>
+        <ul>
+          <li>Highlight 2&ndash;3 genes with notably high or low expression and explain their relevance.</li>
+          <li>Connect expression patterns to neurological disorders associated with the region.</li>
+          <li>Are there drugs (pharmaceutical or recreational) that target these receptors?</li>
+          <li>How does your region&rsquo;s expression compare to neighboring regions?</li>
+        </ul>
+        <div class="tip"><strong>Strong approach:</strong> Use the gene expression bar chart from the Colab, annotate the high/low genes with color-coded arrows, and pair with a published figure showing the receptor&rsquo;s mechanism of action.</div>
+      </div>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 3 &mdash; Cognitive Function &amp; fMRI</button>
+      <div class="accordion-content">
+        <p>Investigate how your brain area participates in cognition using Neurosynth fMRI keyword maps.</p>
+        <ul>
+          <li>Which cognitive functions activate your region? Show fMRI maps for 1&ndash;2 key functions.</li>
+          <li>What other regions does it work with to execute these functions?</li>
+          <li>What happens when the region is disrupted (lesion studies, disorders)?</li>
+        </ul>
+        <div class="tip"><strong>Strong approach:</strong> Show fMRI activation maps for two related functions side by side, with your region highlighted, then discuss how they converge on that area.</div>
+      </div>
+
+      <!-- Section 2 -->
+      <h3 style="margin-top:24px">Section 2: fMRI Function Report</h3>
+      <p>You pick one Neurosynth keyword function and explore how the brain represents it.</p>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 1 &mdash; Introduce the Function</button>
+      <div class="accordion-content">
+        <p>Describe the function, how it is used in daily life, and how it is measured with fMRI.</p>
+        <ul>
+          <li>Look up your keyword on neurosynth.org to find how many studies contribute to the map.</li>
+          <li>Explain how fMRI works at a conceptual level (BOLD signal, hemodynamic response).</li>
+          <li>What types of experimental tasks are used to study this function in the scanner?</li>
+          <li>What are limitations of the Neurosynth dataset for this function?</li>
+        </ul>
+      </div>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 2 &mdash; Brain Map of Activation</button>
+      <div class="accordion-content">
+        <p>Create an fMRI brain map of your function and analyze which regions drive it.</p>
+        <ul>
+          <li>Which regions show the highest activation? Use the bar plot and brain map from the Colab.</li>
+          <li>How do different brain areas coordinate to produce this function?</li>
+          <li>What neurological disorders affect this function, and how does that appear in fMRI data?</li>
+        </ul>
+      </div>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 3 &mdash; Connecting to Transcriptomics &amp; Connectomics</button>
+      <div class="accordion-content">
+        <p>This is the most challenging subsection. You attempt to bridge fMRI functional data with gene expression and white matter connectivity.</p>
+        <ul>
+          <li><strong>Transcriptomic analysis:</strong> Do the regions supporting your function share receptor expression profiles? If you designed a drug to modulate the function, what receptor would you target?</li>
+          <li><strong>Connectomic analysis:</strong> Are the regions supporting your function structurally connected to each other?</li>
+          <li>Be honest about limitations&mdash;combining data sources is inherently imperfect and acknowledging this is part of the grade.</li>
+        </ul>
+        <div class="warning"><strong>Note:</strong> This subsection rewards honest scientific reasoning more than clean answers. It is okay if the data don&rsquo;t align perfectly&mdash;explain <em>why</em> they might not.</div>
+      </div>
+
+      <!-- Section 3 -->
+      <h3 style="margin-top:24px">Section 3: Receptor Report</h3>
+      <p>You pick one receptor gene and investigate its biology, brain-wide expression, and relationship to fMRI functions.</p>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 1 &mdash; Describe the Receptor</button>
+      <div class="accordion-content">
+        <ul>
+          <li>What is the receptor&rsquo;s molecular structure and how was it determined?</li>
+          <li>What gene family does it belong to? How ancient and conserved is that family?</li>
+          <li>Which neurotransmitter activates it? Are there known drugs that interact with it?</li>
+          <li>What behavioral or perceptual effects come from modulating it?</li>
+        </ul>
+      </div>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 2 &mdash; Brain-Wide Expression</button>
+      <div class="accordion-content">
+        <ul>
+          <li>Use the Colab notebook to map where the receptor is expressed across the brain.</li>
+          <li>Which regions show high vs. low expression? Does the pattern correlate with evolutionary age of structures?</li>
+          <li>Does expression overlap with regions associated with known neurological disorders?</li>
+          <li>Are there other family members with similar patterns?</li>
+        </ul>
+      </div>
+
+      <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 3 &mdash; Connecting Receptor to Function</button>
+      <div class="accordion-content">
+        <ul>
+          <li>Compare the receptor&rsquo;s expression map to Neurosynth function maps. Do they overlap?</li>
+          <li>If you suppressed or upregulated this receptor with a drug, which functions might be impacted?</li>
+          <li>What does outside research say about drugs that target this receptor?</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Writing Best Practices -->
+    <div class="guide-section" style="animation-delay: 0.4s">
+      <h2><span class="sec-icon">&#9997;&#65039;</span> Writing Best Practices</h2>
+      <h3>Scientific Writing Style</h3>
+      <ul>
+        <li><strong>Be specific, not vague.</strong> Instead of &ldquo;this gene is important,&rdquo; say &ldquo;CACNA1E is highly expressed in the amygdala (expression score: 0.88), where it contributes to calcium channel function and efficient synaptic transmission.&rdquo;</li>
+        <li><strong>Use data as evidence.</strong> Every claim should reference either a course dataset visualization or a published source.</li>
+        <li><strong>Cite as you go.</strong> Use in-text citations in (Author, Year) format. Don&rsquo;t save all citations for the end.</li>
+        <li><strong>Stay in the third person</strong> for scientific claims: &ldquo;The amygdala is implicated in&hellip;&rdquo; rather than &ldquo;I think the amygdala does&hellip;&rdquo; (first person is fine in the Statement of Work).</li>
+      </ul>
+
+      <h3>Structuring Each Subsection</h3>
+      <ol>
+        <li><strong>Opening sentence:</strong> State the main point of the subsection.</li>
+        <li><strong>Body:</strong> Walk through the figure panels, integrating outside literature to explain what the data show.</li>
+        <li><strong>Closing sentence:</strong> Tie the subsection back to the broader theme of your section.</li>
+      </ol>
+
+      <h3>Common Pitfalls to Avoid</h3>
+      <ul>
+        <li>Don&rsquo;t just describe the figure&mdash;<strong>interpret</strong> it. &ldquo;The bar chart shows high expression&rdquo; is description; &ldquo;High SCN5A expression in the amygdala may underlie its role in fear and anxiety response via sodium channel modulation&rdquo; is interpretation.</li>
+        <li>Don&rsquo;t ignore limitations. Especially in the cross-data sections (Section 2 Sub 3, Section 3 Sub 3), acknowledge where datasets don&rsquo;t align and explain why.</li>
+        <li>Don&rsquo;t forget to label figure panels (A, B, C) and reference them in the caption.</li>
+        <li>Don&rsquo;t recycle the same outside source for every claim&mdash;use a variety of references.</li>
+      </ul>
+    </div>
+
+    <!-- Final Checklist -->
+    <div class="guide-section" style="animation-delay: 0.45s">
+      <h2><span class="sec-icon">&#9989;</span> Pre-Submission Checklist</h2>
+      <ul class="checklist" id="checklist">
+        <li>Statements of work (Subsection 0) are included for all three sections and were not modified after initial submission</li>
+        <li>Each of the 9 subsections has exactly one multi-panel figure with labeled panels (A, B, C&hellip;)</li>
+        <li>Every figure has a descriptive caption that references each panel by letter</li>
+        <li>Course data visualizations (gene expression, DTI, fMRI maps) are incorporated into figures</li>
+        <li>Outside scientific literature is cited in (Author, Year) format throughout</li>
+        <li>Section 1 uses DSI/DTI data for anatomy, Allen data for gene expression, and Neurosynth for function</li>
+        <li>Section 2 includes a Neurosynth function map and attempts to connect to transcriptomics and connectomics</li>
+        <li>Section 3 describes the receptor, maps its expression, and connects it to fMRI function data</li>
+        <li>Limitations of combining data sources are discussed where appropriate</li>
+      </ul>
+    </div>
+
+    <footer>
+      PSYCH 332 &middot; University of Washington
+    </footer>
+
+  </div>
+
+  <script>
+    // ========== FILE UPLOAD & PARSING ==========
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file.name.endsWith('.txt')) {
+        alert('Please upload a .txt file exported from the Brain Explorer.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => parseExport(e.target.result);
+      reader.readAsText(file);
+    }
+
+    function parseExport(text) {
+      const lines = text.split('\n');
+      let region = '', func = '', gene = '';
+      const links = {};
+
+      for (const line of lines) {
+        const l = line.trim();
+        if (l.startsWith('Brain Area:'))  region = l.replace('Brain Area:', '').trim();
+        if (l.startsWith('Function:'))    func   = l.replace('Function:', '').trim();
+        if (l.startsWith('Gene:'))        gene   = l.replace('Gene:', '').trim();
+        if (l.startsWith('Region (PubMed'))  links.region  = l.split(': ').slice(1).join(': ').trim();
+        if (l.startsWith('Function (Neuro')) links.func    = l.split(': ').slice(1).join(': ').trim();
+        if (l.startsWith('Gene (Allen'))     links.gene    = l.split(': ').slice(1).join(': ').trim();
+      }
+
+      if (!region && !func && !gene) {
+        alert('Could not parse the file. Please make sure it is a Brain Explorer export.');
+        return;
+      }
+
+      // Show selection card
+      document.getElementById('selRegion').textContent = region || '—';
+      document.getElementById('selFunc').textContent = func || '—';
+      document.getElementById('selGene').textContent = gene || '—';
+
+      const linksEl = document.getElementById('selLinks');
+      linksEl.innerHTML = '';
+      if (links.region) linksEl.innerHTML += `<a href="${links.region}" target="_blank">PubMed: ${region}</a>`;
+      if (links.func)   linksEl.innerHTML += `<a href="${links.func}" target="_blank">NeuroSynth: ${func}</a>`;
+      if (links.gene)   linksEl.innerHTML += `<a href="${links.gene}" target="_blank">Allen Brain: ${gene}</a>`;
+
+      document.getElementById('selectionCard').style.display = 'block';
+      uploadArea.style.display = 'none';
+
+      // Generate personalized advice
+      generateAdvice(region, func, gene);
+    }
+
+    // ========== PERSONALIZED ADVICE ==========
+    function generateAdvice(region, func, gene) {
+      const panel = document.getElementById('advicePanel');
+
+      // Build region-specific suggestions
+      const regionLower = region.toLowerCase();
+      const funcLower = func.toLowerCase();
+      const geneLower = gene.toLowerCase();
+
+      // Determine likely brain system for richer advice
+      let regionSystem = '';
+      let regionHints = [];
+      if (/amygdala/i.test(region)) {
+        regionSystem = 'limbic';
+        regionHints = ['fear conditioning and emotional learning', 'the HPA axis and fight-or-flight response', 'social processing and facial cue interpretation', 'anxiety disorders and PTSD'];
+      } else if (/hippocampus/i.test(region)) {
+        regionSystem = 'limbic';
+        regionHints = ['memory consolidation and spatial navigation', 'long-term potentiation (LTP)', 'Alzheimer\'s disease and neurodegeneration', 'neurogenesis in the dentate gyrus'];
+      } else if (/prefrontal|frontal/i.test(region)) {
+        regionSystem = 'frontal executive';
+        regionHints = ['executive function and decision-making', 'working memory and cognitive control', 'ADHD and prefrontal hypoactivation', 'developmental maturation during adolescence'];
+      } else if (/visual|occipital|lingual|fusiform/i.test(region)) {
+        regionSystem = 'visual';
+        regionHints = ['visual processing hierarchies (V1 through higher areas)', 'face and object recognition', 'visual agnosia and prosopagnosia', 'retinotopic mapping'];
+      } else if (/insula/i.test(region)) {
+        regionSystem = 'salience';
+        regionHints = ['interoception and bodily awareness', 'the salience network', 'pain processing and empathy', 'addiction and craving'];
+      } else if (/cingulate/i.test(region)) {
+        regionSystem = 'cingulate/salience';
+        regionHints = ['error monitoring and conflict detection', 'the default mode network (posterior) or salience network (anterior)', 'pain perception', 'depression and the subgenual cingulate'];
+      } else if (/temporal/i.test(region)) {
+        regionSystem = 'temporal';
+        regionHints = ['language processing (Wernicke\'s area)', 'auditory processing', 'semantic memory', 'temporal lobe epilepsy'];
+      } else if (/parietal/i.test(region)) {
+        regionSystem = 'parietal';
+        regionHints = ['spatial attention and the dorsal attention network', 'sensory integration', 'hemispatial neglect', 'number processing and calculation'];
+      } else if (/cerebellum|cerebellar/i.test(region)) {
+        regionSystem = 'cerebellar';
+        regionHints = ['motor coordination and timing', 'cerebellar contributions to cognition', 'ataxia and motor learning', 'error-based learning'];
+      } else if (/thalamus|thalamic/i.test(region)) {
+        regionSystem = 'thalamic relay';
+        regionHints = ['sensory relay and gating functions', 'thalamocortical loops', 'consciousness and arousal', 'sleep spindles and thalamic oscillations'];
+      } else if (/caudate|putamen|striatum|basal ganglia|nucleus accumbens|globus pallidus/i.test(region)) {
+        regionSystem = 'basal ganglia';
+        regionHints = ['reward processing and reinforcement learning', 'motor planning and habit formation', 'Parkinson\'s disease and dopamine', 'addiction circuits'];
+      } else {
+        regionHints = ['its anatomical connections via DTI white matter tracts', 'neurological disorders associated with the region', 'how it interacts with neighboring structures', 'its evolutionary history and comparative anatomy'];
+      }
+
+      // Gene family hints
+      let geneHints = [];
+      if (/^DRD/i.test(gene)) {
+        geneHints = ['dopamine signaling pathways', 'Parkinson\'s disease or schizophrenia', 'stimulant drugs (cocaine, amphetamine) and their receptor mechanisms', 'reward circuitry in the basal ganglia'];
+      } else if (/^HTR|^5HT/i.test(gene)) {
+        geneHints = ['serotonin signaling and mood regulation', 'SSRIs and antidepressant pharmacology', 'psychedelic drugs (psilocybin, LSD) and 5-HT2A', 'gut-brain serotonin axis'];
+      } else if (/^GABA|^GABR/i.test(gene)) {
+        geneHints = ['inhibitory neurotransmission', 'benzodiazepines and anesthetics', 'epilepsy and seizure disorders', 'excitatory/inhibitory balance in neural circuits'];
+      } else if (/^GRI|^GRIN|^GRM/i.test(gene)) {
+        geneHints = ['glutamate excitatory signaling', 'NMDA receptors and synaptic plasticity', 'excitotoxicity in stroke or neurodegeneration', 'ketamine and its antidepressant effects'];
+      } else if (/^CHRN|^CHRM/i.test(gene)) {
+        geneHints = ['cholinergic signaling', 'nicotine and nicotinic receptors', 'Alzheimer\'s disease and cholinesterase inhibitors', 'autonomic nervous system regulation'];
+      } else if (/^SCN/i.test(gene)) {
+        geneHints = ['sodium channel function and neuronal excitability', 'epilepsy and channelopathies', 'pain signaling pathways', 'local anesthetic mechanisms'];
+      } else if (/^CACNA/i.test(gene)) {
+        geneHints = ['calcium channel function and synaptic transmission', 'seizure predisposition', 'migraine and calcium channelopathies', 'synaptic plasticity and LTP'];
+      } else if (/^KCNH|^KCN/i.test(gene)) {
+        geneHints = ['potassium channel function and repolarization', 'cardiac-neural channel overlap', 'schizophrenia risk genes', 'neuronal firing rate regulation'];
+      } else if (/^OPRM|^OPRK|^OPRD/i.test(gene)) {
+        geneHints = ['opioid signaling and pain modulation', 'opioid addiction and tolerance', 'endorphin and enkephalin pathways', 'mu, kappa, and delta receptor subtypes'];
+      } else {
+        geneHints = ['what gene family it belongs to and its known functions', 'whether it is a drug target for any condition', 'how its expression compares across brain regions', 'its role in synaptic signaling or neuronal excitability'];
+      }
+
+      let html = `
+        <div class="guide-section" style="border-color: #0779be;">
+          <h2><span class="sec-icon">&#127919;</span> Personalized Advice for Your Selections</h2>
+
+          <h3>Section 1: Brain Area Report &mdash; ${region}</h3>
+          <p>Your brain area is part of the <strong>${regionSystem || 'brain'}</strong> system. Here are angles that could strengthen each subsection:</p>
+          <ul>
+            ${regionHints.map(h => `<li>${h}</li>`).join('')}
+          </ul>
+          <div class="tip"><strong>For Subsection 1 (Anatomy):</strong> Use the DTI connectivity map from the Colab to identify which regions ${region} connects to. Look for published DSI or tractography images of these pathways. Consider discussing how these structural connections support ${region}'s cognitive role.</div>
+          <div class="tip"><strong>For Subsection 2 (Gene Expression):</strong> In the Colab, look at the gene expression bar chart for ${region}. Identify the 2&ndash;3 highest and lowest expressed genes and research their roles. You selected <strong>${gene}</strong>&mdash;check whether it is notably expressed in ${region} and discuss why.</div>
+          <div class="tip"><strong>For Subsection 3 (Cognition):</strong> Use Neurosynth fMRI keyword maps related to ${region}'s known functions. You selected <strong>${func}</strong>&mdash;consider whether ${region} appears in that function's brain map and what that implies.</div>
+
+          <h3>Section 2: fMRI Function Report &mdash; ${func}</h3>
+          <p>For your fMRI function, you will need to explore how &ldquo;${func}&rdquo; is represented brain-wide. A few suggestions:</p>
+          <ul>
+            <li>Visit <a href="https://neurosynth.org/analyses/terms/${encodeURIComponent(func.toLowerCase())}/" target="_blank" style="color:#0779be">neurosynth.org</a> and note how many studies contribute to this term&rsquo;s meta-analysis.</li>
+            <li>Look at which brain areas light up most strongly for &ldquo;${func}&rdquo; in the fMRI bar plot from the Colab.</li>
+            <li>For the transcriptomic cross-analysis (Subsection 3), check whether the high-activation regions for &ldquo;${func}&rdquo; share similar receptor expression profiles. This is where <strong>${gene}</strong> could be a connecting thread.</li>
+          </ul>
+
+          <h3>Section 3: Receptor Report &mdash; ${gene}</h3>
+          <p>For your receptor, consider these research angles:</p>
+          <ul>
+            ${geneHints.map(h => `<li>${h}</li>`).join('')}
+          </ul>
+          <div class="tip"><strong>Connecting it all:</strong> The strongest practicums weave a narrative thread across all three sections. Your choices of <strong>${region}</strong>, <strong>${func}</strong>, and <strong>${gene}</strong> should ideally have points of overlap. Ask yourself: Is ${gene} expressed in ${region}? Does ${region} support the &ldquo;${func}&rdquo; function? If so, you have a natural story to tell.</div>
+        </div>
+      `;
+
+      panel.innerHTML = html;
+      panel.style.display = 'block';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ========== ACCORDION ==========
+    function toggleAccordion(btn) {
+      btn.classList.toggle('open');
+      const content = btn.nextElementSibling;
+      content.classList.toggle('open');
+    }
+
+    // ========== CHECKLIST ==========
+    document.getElementById('checklist').addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (li) li.classList.toggle('checked');
+    });
+  </script>
+</body>
+</html>
