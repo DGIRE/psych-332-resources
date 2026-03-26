@@ -944,105 +944,408 @@
     }
 
     // ========== PERSONALIZED ADVICE ==========
+
+    // --- Random sampling utility ---
+    function pickRandom(arr, count) {
+      const shuffled = arr.slice();
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled.slice(0, Math.min(count, shuffled.length));
+    }
+
+    // =====================================================================
+    //  EXAMPLE POOLS — large banks of strong examples drawn randomly
+    //  Each pool is keyed by category.  generateAdvice() picks a random
+    //  subset each time so students see fresh examples on every visit.
+    // =====================================================================
+
+    const EXAMPLE_POOLS = {
+
+      // ----- Statement of Work examples (Section 0) -----
+      statementsOfWork: [
+        "I will investigate the role of the anterior cingulate cortex in error monitoring. Using DTI data I will trace its connections to lateral prefrontal cortex and examine whether GRIN2B expression in this region could underlie its involvement in conflict detection tasks shown in Neurosynth fMRI maps.",
+        "My report focuses on the hippocampus and its contribution to spatial navigation. I plan to compare DTI connectivity between the hippocampus and entorhinal cortex with Allen Institute expression data for CHRM1, exploring how cholinergic tone may modulate place-cell activity.",
+        "I will examine the nucleus accumbens and its role in reward processing. I will use DTI to map its ventral striatal connections, analyze DRD2 expression relative to neighboring caudate regions, and compare Neurosynth activation maps for 'reward' and 'motivation' keywords.",
+        "This section investigates the fusiform gyrus and face recognition. I will map its structural connections using DTI, identify highly expressed receptor genes using the Allen dataset, and examine Neurosynth maps for face-related terms to understand which other areas participate.",
+        "I plan to investigate the insular cortex and interoception. Using DTI I will trace its connections to the amygdala and prefrontal cortex. I will then analyze HTR2A expression to explore whether serotonergic mechanisms contribute to the insula's role in bodily awareness and pain perception.",
+        "My focus is the lateral prefrontal cortex and working memory. I will analyze DTI tracts connecting it to parietal cortex, examine GABAergic receptor expression (GABRA1) that may support the excitatory-inhibitory balance necessary for sustained neural firing, and use Neurosynth to map working memory activation.",
+        "I will study the cerebellum and its emerging role in cognitive processing beyond motor control. DTI data will reveal cerebellar-cortical loops, while CACNA1A expression patterns may explain why calcium channelopathies disproportionately affect cerebellar function.",
+        "This section examines the thalamus as a sensory relay hub. I will use DTI to quantify thalamocortical projections, compare SCN1A expression across thalamic nuclei, and use Neurosynth to determine which cognitive functions depend on intact thalamic relay.",
+        "I will investigate the amygdala and fear conditioning. DTI data will reveal its connections to prefrontal cortex and brainstem, OPRM1 expression will be analyzed for potential opioidergic modulation of fear responses, and Neurosynth maps for 'fear' will contextualize its network role.",
+        "My report centers on the superior temporal gyrus and language comprehension. I will trace DTI connections to Broca's area, examine GRM5 expression patterns that may support glutamatergic signaling important for auditory processing, and compare Neurosynth maps for 'language' and 'speech'."
+      ],
+
+      // ----- Figure caption examples -----
+      figureCaptions: [
+        "Figure X: Structural connectivity of REGION. (A) Brain map highlighting REGION in sagittal view (Allen Brain Atlas). (B) DTI tractography showing major white matter pathways connecting REGION to adjacent cortical areas (generated from Colab notebook). (C) Published diffusion spectrum imaging of the arcuate fasciculus (adapted from Author et al., Year). Collectively, these panels reveal that REGION serves as a hub linking sensory and association areas.",
+        "Figure X: Receptor expression profile of REGION. (A) Horizontal bar chart of receptor gene expression z-scores in REGION, with GENE highlighted in red (Colab data). (B) Brain-wide heatmap of GENE expression across all Allen Atlas regions, with REGION indicated by an arrow. (C) Molecular diagram of the GENE receptor showing ligand-binding domain (adapted from Author et al., Year). High GENE expression in REGION suggests a prominent role for this signaling pathway in the region's function.",
+        "Figure X: Functional activation for FUNCTION. (A) Neurosynth meta-analytic activation map for 'FUNCTION' overlaid on a standard MNI template (neurosynth.org). (B) Bar plot of FUNCTION activation scores by region from the Colab fMRI dataset, with the top five regions labeled. (C) Schematic of a typical fMRI experimental paradigm used to study FUNCTION (adapted from Author et al., Year). The convergence of activation in REGION across panels A and B supports its central role in FUNCTION.",
+        "Figure X: Comparative expression of GENE family members. (A) Clustergram of receptor gene expression across brain regions with GENE's column highlighted (Colab data). (B) Allen Brain Atlas in-situ hybridization image for GENE in coronal section. (C) Phylogenetic tree of the GENE family showing evolutionary conservation (adapted from Author et al., Year). The distinct expression pattern of GENE relative to its family members suggests functional specialization.",
+        "Figure X: Cross-modal analysis of REGION. (A) DTI connectivity matrix row for REGION showing strongest structural connections (Colab data). (B) Neurosynth activation map for FUNCTION with REGION circled. (C) Scatter plot comparing DTI connectivity strength vs. fMRI co-activation for REGION's top connected areas (generated from combined datasets). This multi-modal approach reveals that structural and functional connectivity are correlated for REGION's primary network.",
+        "Figure X: Pharmacological relevance of GENE in REGION. (A) Brain map showing GENE expression intensity across regions with REGION labeled (Colab data). (B) Dose-response curve for a GENE agonist in a behavioral assay (adapted from Author et al., Year). (C) PET scan showing GENE receptor occupancy following drug administration (adapted from Author et al., Year). These panels illustrate the translational relevance of GENE expression patterns to pharmacotherapy.",
+        "Figure X: Network analysis of FUNCTION. (A) Neurosynth co-activation map for FUNCTION showing the distributed network of involved regions. (B) t-SNE embedding of brain regions colored by FUNCTION activation score (Colab data), revealing clusters of co-activated areas. (C) Published resting-state connectivity diagram for the FUNCTION network (adapted from Author et al., Year). The spatial overlap between task-based activation and resting-state networks supports the existence of a dedicated FUNCTION circuit.",
+        "Figure X: Developmental trajectory of REGION. (A) Allen Brain Atlas expression of GENE across developmental stages (BrainSpan data). (B) Structural MRI volumetric data showing REGION maturation from childhood to adulthood (adapted from Author et al., Year). (C) Brain map of REGION from the Colab notebook with age-related annotation. GENE expression peaks during adolescence, paralleling the structural maturation window of REGION.",
+        "Figure X: Pathological implications for REGION. (A) Comparison of GENE expression in REGION between healthy controls and patients with DISORDER (adapted from Author et al., Year). (B) Brain map of REGION from the Colab with lesion overlay. (C) Bar chart of symptom severity correlated with REGION volume (adapted from Author et al., Year). Reduced GENE expression in REGION may contribute to the DISORDER phenotype.",
+        "Figure X: Evolutionary perspective on GENE expression. (A) Cross-species comparison of GENE expression in homologous brain regions (adapted from Author et al., Year). (B) Brain-wide GENE expression heatmap from the Colab data. (C) Cladogram showing GENE conservation across vertebrates (adapted from Author et al., Year). The high conservation of GENE in REGION across species suggests an ancient and essential functional role."
+      ],
+
+      // ----- Strong opening sentences for subsections -----
+      openingSentences: [
+        "The REGION occupies a critical position within the SYSTEM network, serving as an integrative hub where sensory input converges with higher-order cognitive processing.",
+        "Among the brain's receptor systems, GENE plays a uniquely important role in modulating neural excitability and synaptic plasticity throughout the SYSTEM.",
+        "Functional neuroimaging studies have consistently implicated a distributed network of brain regions in FUNCTION, with REGION emerging as one of the most reliably activated structures.",
+        "The structural connectivity of REGION, as revealed by diffusion tensor imaging, suggests it functions less as an isolated processor and more as a relay between distant cortical territories.",
+        "Understanding how GENE expression varies across brain regions is essential for explaining why certain areas are preferentially vulnerable to neurological disease.",
+        "FUNCTION depends on the coordinated activity of multiple brain regions, each contributing a distinct computational element to the overall process.",
+        "The white matter tracts connecting REGION to the rest of the brain form the structural backbone upon which its cognitive contributions depend.",
+        "Recent advances in transcriptomics have revealed that REGION possesses a distinctive molecular signature, with GENE among the most differentially expressed receptors.",
+        "The Neurosynth meta-analytic database synthesizes activation patterns across thousands of fMRI studies, providing a uniquely comprehensive view of the neural substrates of FUNCTION.",
+        "At the molecular level, GENE encodes a receptor that sits at the intersection of neurotransmitter signaling and long-term synaptic modification.",
+        "Lesion studies in both humans and animal models have established that damage to REGION produces selective deficits in FUNCTION, implicating it as a necessary node in the underlying circuit.",
+        "The expression of GENE across the brain follows a gradient that mirrors the functional organization of the SYSTEM, suggesting that receptor distribution constrains neural computation.",
+        "Few brain regions exhibit the degree of multimodal connectivity displayed by REGION, which receives inputs from sensory, limbic, and prefrontal areas simultaneously.",
+        "The pharmacology of GENE has attracted considerable clinical attention, as drugs targeting this receptor have shown efficacy in treating disorders ranging from anxiety to chronic pain.",
+        "FUNCTION, as measured by fMRI, engages a canonical set of brain regions whose activation intensity varies predictably with task demands and individual differences."
+      ],
+
+      // ----- Interpretation examples (moving beyond description) -----
+      interpretationExamples: [
+        "The high expression of GENE in REGION (z-score = X.XX) is consistent with REGION's known dependence on NEUROTRANSMITTER signaling for its primary cognitive functions. This molecular profile may explain why pharmacological agents targeting GENE produce pronounced behavioral effects when administered systemically.",
+        "The DTI connectivity matrix reveals that REGION's strongest structural connection is to CONNECTED_REGION, which is notable because both areas participate in the FUNCTION network. This structural-functional correspondence suggests that white matter integrity between these regions may be a rate-limiting factor for FUNCTION performance.",
+        "The Neurosynth meta-analysis for 'FUNCTION' reveals activation in REGION across N studies, placing it in the top 5% of activated structures. This consistency across diverse experimental paradigms suggests that REGION's contribution to FUNCTION is robust and not dependent on specific task parameters.",
+        "Comparing GENE expression in REGION to its expression in neighboring structures reveals a sharp gradient, with expression dropping by approximately X% at the boundary. Such steep molecular boundaries often correspond to cytoarchitectonic transitions and may reflect distinct computational roles.",
+        "The convergence of high GENE expression and strong FUNCTION activation in REGION raises the possibility that NEUROTRANSMITTER tone directly modulates FUNCTION-related neural activity. This hypothesis is supported by pharmacological studies showing that GENE antagonists impair FUNCTION in both animal models and human subjects.",
+        "While the fMRI data show robust REGION activation during FUNCTION, the DTI data reveal relatively sparse direct connections to other FUNCTION-network regions. This dissociation suggests that REGION may exert its influence through indirect, polysynaptic pathways rather than direct white matter projections.",
+        "The PCA analysis groups REGION with other SYSTEM structures, reflecting their shared receptor expression profiles. This molecular similarity may underlie the clinical observation that diseases affecting one SYSTEM region often produce cascading dysfunction across the entire network.",
+        "The clustergram reveals that GENE clusters with other FAMILY receptors in terms of brain-wide expression, but uniquely diverges in REGION. This regional specialization could represent an adaptive mechanism where REGION has evolved a distinct molecular toolkit to support its specialized functions.",
+        "The relatively low expression of GENE in REGION is itself informative: it suggests that REGION's computational mechanisms rely less on NEUROTRANSMITTER modulation and more on alternative signaling pathways, potentially explaining its resistance to drugs that target GENE.",
+        "Cross-referencing the fMRI activation map with the DTI connectivity matrix reveals that the regions most strongly co-activated with REGION during FUNCTION are also its most structurally connected partners. This structure-function coupling score of r = X.XX supports the principle that anatomical connectivity constrains functional interactions."
+      ],
+
+      // ----- Cross-data connection examples (bridging modalities) -----
+      crossDataConnections: [
+        "Regions with high FUNCTION activation tend to express GENE at above-average levels (r = X.XX across regions), suggesting that NEUROTRANSMITTER receptor density may predispose certain areas to participate in this cognitive process.",
+        "The DTI data show that REGION's structural connections align with its fMRI co-activation pattern for FUNCTION: 7 of its 10 strongest DTI connections are to regions that also show significant FUNCTION activation in Neurosynth.",
+        "An intriguing discrepancy emerges when comparing expression and activation data: REGION expresses GENE at high levels but shows relatively weak FUNCTION activation. This could indicate that GENE in REGION serves a modulatory rather than driving role for FUNCTION.",
+        "Using the clustergram to identify regions with similar expression profiles to REGION reveals a set of structures that also share functional activation for FUNCTION. This 'molecular similarity predicts functional similarity' pattern suggests that receptor composition constrains cognitive specialization.",
+        "The t-SNE embedding positions REGION near other SYSTEM structures in gene expression space, and independently, these same regions cluster together in fMRI co-activation analyses. This convergent evidence from molecular and functional data strengthens the case for a coherent SYSTEM network.",
+        "When the expression profile of GENE is projected onto the DTI connectivity matrix, a clear pattern emerges: structurally connected region pairs tend to have correlated GENE expression levels (r = X.XX), consistent with the hypothesis that connected regions share molecular features.",
+        "Overlaying the Neurosynth FUNCTION map onto the Allen Brain Atlas GENE expression map reveals spatial correspondence in cortical areas but divergence in subcortical structures. This cortical-subcortical dissociation may reflect different GENE functions at different levels of the neural hierarchy.",
+        "A limitation of this cross-modal analysis is that the Allen transcriptomic data derive from post-mortem tissue while fMRI captures in-vivo dynamics. Expression levels at rest may not reflect receptor availability during active task engagement, a caveat that must be acknowledged when interpreting spatial correlations.",
+        "PCA of the expression data places REGION in the same principal component space as regions active during FUNCTION, but with a distinctive loading on the second component. This suggests REGION shares a general molecular profile with the FUNCTION network while maintaining unique receptor features.",
+        "The DTI data complement the fMRI findings by revealing that the FUNCTION network is structurally integrated: regions co-activated during FUNCTION have significantly higher mutual DTI connectivity than randomly selected region pairs (p < 0.01), supporting the notion of a dedicated anatomical substrate."
+      ],
+
+      // ----- Anatomy subsection tips -----
+      anatomyTips: [
+        "Consider discussing how REGION's laminar organization (if cortical) or nuclear structure (if subcortical) relates to its input-output connectivity. Different cell types at different layers often receive from and project to distinct targets.",
+        "Look for published tractography or DSI images that specifically show REGION's white matter connections. The Human Connectome Project is an excellent source for high-resolution diffusion imaging data.",
+        "Compare REGION's size and connectivity in humans versus other primates. Evolutionary expansion or reduction of a region often signals changes in its functional importance.",
+        "Map REGION's blood supply — knowing which arteries feed a region can help explain why certain strokes produce specific deficits and connects anatomy to clinical neurology.",
+        "Identify REGION's cytoarchitectonic classification (e.g., Brodmann area) and discuss how its cellular architecture differs from neighboring regions. This microstructural variation underpins functional specialization.",
+        "Use the DTI connectivity data to build a 'connectivity fingerprint' for REGION — a ranked list of its strongest and weakest connections — which can serve as a concise summary of its network position.",
+        "Explore whether REGION shows hemispheric lateralization in its connectivity patterns. Many regions have asymmetric connections that relate to lateralized functions like language or spatial attention.",
+        "Discuss the developmental trajectory of REGION's white matter connections. Many tracts mature at different rates during childhood and adolescence, with implications for cognitive development."
+      ],
+
+      // ----- Gene expression subsection tips -----
+      geneExpressionTips: [
+        "Rank all receptor genes by expression in REGION and focus your discussion on the top 3 and bottom 3. Explaining both high and low expression is informative — low expression of an inhibitory receptor, for instance, might mean the region is tonically more excitable.",
+        "Check whether GENE belongs to a gene family with multiple members in the dataset. Comparing expression of family members (e.g., all DRD receptors) across brain regions can reveal functional subspecialization.",
+        "Look up whether GENE has known splice variants or post-translational modifications that affect its function. Sometimes the same gene produces different protein isoforms in different brain regions.",
+        "Search PubMed for 'GENE + REGION' to find studies that have specifically investigated this receptor in your brain area. Existing literature can validate your expression findings and provide mechanistic context.",
+        "Consider the clinical relevance: is GENE a target for any FDA-approved drug? If so, the therapeutic effects (and side effects) of that drug provide insight into what GENE does in the brain.",
+        "Compare GENE expression in REGION to a functionally related region. For instance, if REGION is the amygdala, compare to the bed nucleus of the stria terminalis, which mediates related but distinct aspects of anxiety.",
+        "Visualize expression data as a brain heatmap rather than just a bar chart. The spatial pattern of expression across the brain can reveal gradients, clusters, or boundaries that are not apparent in a sorted list.",
+        "Investigate whether GENE expression changes across the lifespan using BrainSpan data. Developmental expression patterns can reveal critical periods when the receptor is particularly important for brain maturation."
+      ],
+
+      // ----- fMRI function subsection tips -----
+      fmriFunctionTips: [
+        "When discussing FUNCTION, distinguish between 'forward inference' (which regions activate during FUNCTION tasks?) and 'reverse inference' (if REGION is active, does that mean FUNCTION is occurring?). Neurosynth supports both analyses.",
+        "Identify the top 5 brain regions activated for FUNCTION and research whether they form a recognized large-scale network (e.g., default mode, salience, frontoparietal). Network membership provides context for understanding how FUNCTION is implemented.",
+        "Look for experimental paradigms that dissociate FUNCTION from related processes. For example, 'working memory' can be separated from 'attention' using specific task contrasts. This helps define what FUNCTION specifically refers to.",
+        "Consider individual differences: are there published studies showing that FUNCTION activation varies with age, expertise, clinical status, or genetic polymorphisms? Such variation provides the 'creativeness' angle.",
+        "The Neurosynth database uses automated term extraction, so the FUNCTION map may include studies that used the term in different contexts. Acknowledge this limitation and discuss how it might affect the meta-analytic map.",
+        "Compare the FUNCTION map to a related but distinct function (e.g., 'fear' vs. 'anxiety', or 'memory' vs. 'learning'). Where the maps overlap suggests shared mechanisms; where they diverge reveals functional distinctions.",
+        "Consider the temporal dynamics of FUNCTION: does it unfold over milliseconds (like sensory processing) or seconds to minutes (like decision-making)? fMRI's temporal resolution (~2 seconds) means it captures some processes better than others.",
+        "Discuss how FUNCTION might be studied with methods beyond fMRI — EEG for temporal resolution, lesion studies for necessity, or TMS for causal manipulation. This multimethod perspective demonstrates sophisticated understanding."
+      ],
+
+      // ----- Receptor report tips -----
+      receptorReportTips: [
+        "Describe GENE's receptor structure: is it a ligand-gated ion channel, a G-protein coupled receptor, or a transporter? The receptor type determines the timescale and nature of its effects on neural activity.",
+        "Map the complete signaling cascade downstream of GENE activation. For GPCRs this includes G-protein subtype, second messengers, and effector proteins. This molecular detail shows comprehension depth.",
+        "Research the evolutionary conservation of GENE across species. Highly conserved receptors typically serve fundamental functions, while recently evolved receptors may mediate more specialized processes.",
+        "Identify natural and synthetic ligands for GENE. Discuss how agonists, antagonists, and allosteric modulators produce different behavioral and clinical effects.",
+        "Look into whether GENE has been implicated in genome-wide association studies (GWAS) for any neurological or psychiatric conditions. Genetic association provides an independent line of evidence for functional importance.",
+        "Discuss receptor desensitization and tolerance mechanisms for GENE. Chronic exposure to agonists often downregulates receptors, which has implications for drug dependence and treatment resistance.",
+        "Compare GENE to its closest phylogenetic relative in the receptor family. Where do they differ in expression, pharmacology, and function? Such comparisons reveal the specific niche that GENE fills.",
+        "Investigate whether GENE knockout or knockdown animal models exist and what behavioral phenotypes they show. These loss-of-function experiments provide the strongest evidence for GENE's functional role."
+      ],
+
+      // ----- Creative angle suggestions -----
+      creativeAngles: [
+        "Compare your findings to a non-human species. Does REGION exist in rodents? Is GENE conserved in zebrafish? Evolutionary comparisons are inherently creative and demonstrate breadth of thinking.",
+        "Connect your topic to a real-world application: drug development, brain-computer interfaces, neurological rehabilitation, or forensic neuroscience. Applied connections make your report memorable.",
+        "Pose a testable hypothesis that emerges from your data analysis. For example: 'If GENE expression in REGION predicts FUNCTION activation, then patients with GENE polymorphisms should show altered FUNCTION performance.' This forward-thinking approach earns creativity points.",
+        "Create an original diagram or schematic that synthesizes information across your three sections. For instance, a circuit diagram showing how REGION, FUNCTION, and GENE interact at the molecular, cellular, and systems levels.",
+        "Discuss a historical discovery related to your topic — who first described REGION, when was GENE cloned, or how was FUNCTION first studied with neuroimaging? Historical context enriches scientific narrative.",
+        "Use the t-SNE or PCA visualizations from the analysis page to identify unexpected groupings. If REGION clusters with a surprising partner in expression space, investigate why — this kind of data-driven discovery is exactly what earns creativity points.",
+        "Consider sex differences in your topic. Many brain regions, receptor systems, and cognitive functions show sex-specific patterns that are often overlooked in standard analyses.",
+        "Explore the computational theory behind FUNCTION. What algorithm might the brain implement? How does this connect to artificial intelligence or machine learning approaches to the same problem?",
+        "Investigate the gut-brain axis connection to your receptor. Many neurotransmitter receptors (especially serotonin and GABA) are expressed in the enteric nervous system, offering an unexpected physiological connection.",
+        "Look at environmental factors: does stress, exercise, diet, or sleep deprivation alter GENE expression or FUNCTION performance? Environmental modulation adds ecological validity to your report."
+      ],
+
+      // ----- Common mistakes to avoid -----
+      commonMistakes: [
+        "Stating that a brain region 'controls' a function rather than 'contributes to' or 'is involved in' it. Almost no cognitive function is localized to a single region — use network-level language.",
+        "Confusing correlation with causation when interpreting expression-activation overlaps. Just because GENE is highly expressed where FUNCTION activates does not prove that GENE causes FUNCTION.",
+        "Presenting raw data without normalization context. An expression value of 0.85 is meaningless without knowing the scale, what a typical value is, and how your region compares to the average.",
+        "Using only course data with no outside literature. The grading rubric rewards integration of published research — aim for at least 2-3 outside citations per subsection.",
+        "Ignoring negative results. If GENE is NOT expressed in REGION, or if REGION does NOT activate during FUNCTION, that is still interesting and worth discussing.",
+        "Making the figure caption a bare description ('This shows a brain map') instead of an interpretation ('The brain map reveals that activation is concentrated in frontal and parietal regions, consistent with the frontoparietal attention network').",
+        "Forgetting to label figure panels. Every sub-image needs a letter (A, B, C) and every letter needs to be referenced in the caption.",
+        "Writing the Statement of Work after finishing the section and reverse-engineering it. The Statement should be genuine — write it first, then follow through.",
+        "Over-relying on a single source (e.g., one textbook or one review paper) for all your claims. Diversify your references to show breadth of research.",
+        "Neglecting to discuss limitations. Especially in the cross-data sections, you must acknowledge that combining post-mortem expression data with in-vivo fMRI has inherent constraints."
+      ]
+    };
+
+    // =====================================================================
+    //  Region system and gene family lookup (kept from original)
+    // =====================================================================
+
+    function getRegionInfo(region) {
+      let system = '', hints = [];
+      if (/amygdala/i.test(region)) {
+        system = 'limbic';
+        hints = ['fear conditioning and emotional learning', 'the HPA axis and fight-or-flight response', 'social processing and facial cue interpretation', 'anxiety disorders and PTSD', 'amygdala-prefrontal regulatory circuits', 'stress hormone modulation of amygdala excitability'];
+      } else if (/hippocampus/i.test(region)) {
+        system = 'limbic';
+        hints = ['memory consolidation and spatial navigation', 'long-term potentiation (LTP)', 'Alzheimer\'s disease and neurodegeneration', 'neurogenesis in the dentate gyrus', 'place cells and grid cells', 'hippocampal sharp-wave ripples during sleep'];
+      } else if (/prefrontal|frontal/i.test(region)) {
+        system = 'frontal executive';
+        hints = ['executive function and decision-making', 'working memory and cognitive control', 'ADHD and prefrontal hypoactivation', 'developmental maturation during adolescence', 'prefrontal-striatal reward valuation circuits', 'inhibitory control and impulsivity'];
+      } else if (/visual|occipital|lingual|fusiform/i.test(region)) {
+        system = 'visual';
+        hints = ['visual processing hierarchies (V1 through higher areas)', 'face and object recognition', 'visual agnosia and prosopagnosia', 'retinotopic mapping', 'ventral vs. dorsal visual streams', 'visual cortex plasticity in blindness'];
+      } else if (/insula/i.test(region)) {
+        system = 'salience';
+        hints = ['interoception and bodily awareness', 'the salience network', 'pain processing and empathy', 'addiction and craving', 'disgust perception and taste', 'anterior vs. posterior insula functional specialization'];
+      } else if (/cingulate/i.test(region)) {
+        system = 'cingulate/salience';
+        hints = ['error monitoring and conflict detection', 'the default mode network (posterior) or salience network (anterior)', 'pain perception', 'depression and the subgenual cingulate', 'reward-based decision-making', 'cingulate contributions to motor planning'];
+      } else if (/temporal/i.test(region)) {
+        system = 'temporal';
+        hints = ['language processing (Wernicke\'s area)', 'auditory processing', 'semantic memory', 'temporal lobe epilepsy', 'voice and music perception', 'multisensory integration in superior temporal sulcus'];
+      } else if (/parietal/i.test(region)) {
+        system = 'parietal';
+        hints = ['spatial attention and the dorsal attention network', 'sensory integration', 'hemispatial neglect', 'number processing and calculation', 'tool use and praxis', 'posterior parietal cortex in reaching and grasping'];
+      } else if (/cerebellum|cerebellar/i.test(region)) {
+        system = 'cerebellar';
+        hints = ['motor coordination and timing', 'cerebellar contributions to cognition', 'ataxia and motor learning', 'error-based learning', 'cerebellar-prefrontal loops', 'autism spectrum disorder and cerebellar pathology'];
+      } else if (/thalamus|thalamic/i.test(region)) {
+        system = 'thalamic relay';
+        hints = ['sensory relay and gating functions', 'thalamocortical loops', 'consciousness and arousal', 'sleep spindles and thalamic oscillations', 'pulvinar contributions to attention', 'thalamic reticular nucleus and sensory filtering'];
+      } else if (/caudate|putamen|striatum|basal ganglia|nucleus accumbens|globus pallidus/i.test(region)) {
+        system = 'basal ganglia';
+        hints = ['reward processing and reinforcement learning', 'motor planning and habit formation', 'Parkinson\'s disease and dopamine', 'addiction circuits', 'direct vs. indirect basal ganglia pathways', 'striatal cholinergic interneurons'];
+      } else {
+        hints = ['its anatomical connections via DTI white matter tracts', 'neurological disorders associated with the region', 'how it interacts with neighboring structures', 'its evolutionary history and comparative anatomy', 'its role within large-scale brain networks', 'clinical case studies involving lesions to this area'];
+      }
+      return { system, hints };
+    }
+
+    function getGeneHints(gene) {
+      if (/^DRD/i.test(gene))            return ['dopamine signaling pathways', 'Parkinson\'s disease or schizophrenia', 'stimulant drugs (cocaine, amphetamine) and their receptor mechanisms', 'reward circuitry in the basal ganglia', 'dopamine hypothesis of psychosis', 'DRD polymorphisms and individual differences in impulsivity'];
+      if (/^HTR|^5HT/i.test(gene))       return ['serotonin signaling and mood regulation', 'SSRIs and antidepressant pharmacology', 'psychedelic drugs (psilocybin, LSD) and 5-HT2A', 'gut-brain serotonin axis', 'serotonin in sleep-wake regulation', 'serotonergic modulation of aggression'];
+      if (/^GABA|^GABR/i.test(gene))     return ['inhibitory neurotransmission', 'benzodiazepines and anesthetics', 'epilepsy and seizure disorders', 'excitatory/inhibitory balance in neural circuits', 'GABAergic interneuron subtypes', 'GABA in cortical development and critical periods'];
+      if (/^GRI|^GRIN|^GRM/i.test(gene)) return ['glutamate excitatory signaling', 'NMDA receptors and synaptic plasticity', 'excitotoxicity in stroke or neurodegeneration', 'ketamine and its antidepressant effects', 'metabotropic vs. ionotropic glutamate receptor functions', 'glutamate in learning and memory consolidation'];
+      if (/^CHRN|^CHRM/i.test(gene))     return ['cholinergic signaling', 'nicotine and nicotinic receptors', 'Alzheimer\'s disease and cholinesterase inhibitors', 'autonomic nervous system regulation', 'cholinergic modulation of attention', 'basal forebrain cholinergic projections'];
+      if (/^SCN/i.test(gene))            return ['sodium channel function and neuronal excitability', 'epilepsy and channelopathies', 'pain signaling pathways', 'local anesthetic mechanisms', 'action potential propagation speed', 'SCN mutations in cardiac and neural disease'];
+      if (/^CACNA/i.test(gene))          return ['calcium channel function and synaptic transmission', 'seizure predisposition', 'migraine and calcium channelopathies', 'synaptic plasticity and LTP', 'presynaptic calcium entry and vesicle release', 'calcium channel subtypes (L, N, P/Q, T type)'];
+      if (/^KCNH|^KCN/i.test(gene))      return ['potassium channel function and repolarization', 'cardiac-neural channel overlap', 'schizophrenia risk genes', 'neuronal firing rate regulation', 'afterhyperpolarization and spike frequency adaptation', 'potassium channelopathies in epilepsy'];
+      if (/^OPRM|^OPRK|^OPRD/i.test(gene)) return ['opioid signaling and pain modulation', 'opioid addiction and tolerance', 'endorphin and enkephalin pathways', 'mu, kappa, and delta receptor subtypes', 'opioid receptor desensitization and withdrawal', 'social bonding and the opioid system'];
+      return ['what gene family it belongs to and its known functions', 'whether it is a drug target for any condition', 'how its expression compares across brain regions', 'its role in synaptic signaling or neuronal excitability', 'published knockout or knockdown studies for this gene', 'evolutionary conservation of this receptor across species'];
+    }
+
+    // =====================================================================
+    //  Template substitution — replaces placeholders with student's choices
+    // =====================================================================
+    function fillTemplate(text, region, func, gene, system) {
+      return text
+        .replace(/\bREGION\b/g, region || '[your region]')
+        .replace(/\bFUNCTION\b/g, func || '[your function]')
+        .replace(/\bGENE\b/g, gene || '[your gene]')
+        .replace(/\bSYSTEM\b/g, system || 'brain')
+        .replace(/\bNEUROTRANSMITTER\b/g, guessNeurotransmitter(gene))
+        .replace(/\bFAMILY\b/g, guessFamily(gene))
+        .replace(/\bCONNECTED_REGION\b/g, '[connected region from DTI data]')
+        .replace(/\bDISORDER\b/g, '[associated disorder]')
+        .replace(/X\.XX/g, '[value]')
+        .replace(/\bN\b(?= studies)/g, '[number of]')
+        .replace(/Author et al\., Year/g, 'Author et al., Year');
+    }
+
+    function guessNeurotransmitter(gene) {
+      if (!gene) return 'neurotransmitter';
+      if (/^DRD/i.test(gene)) return 'dopamine';
+      if (/^HTR|^5HT/i.test(gene)) return 'serotonin';
+      if (/^GABA|^GABR/i.test(gene)) return 'GABA';
+      if (/^GRI|^GRIN|^GRM/i.test(gene)) return 'glutamate';
+      if (/^CHRN|^CHRM/i.test(gene)) return 'acetylcholine';
+      if (/^OPRM|^OPRK|^OPRD/i.test(gene)) return 'endogenous opioid';
+      return 'neurotransmitter';
+    }
+
+    function guessFamily(gene) {
+      if (!gene) return 'receptor';
+      if (/^DRD/i.test(gene)) return 'dopamine receptor';
+      if (/^HTR/i.test(gene)) return 'serotonin receptor';
+      if (/^GABR/i.test(gene)) return 'GABA receptor';
+      if (/^GRIN/i.test(gene)) return 'NMDA receptor';
+      if (/^GRM/i.test(gene)) return 'metabotropic glutamate receptor';
+      if (/^CHRN/i.test(gene)) return 'nicotinic receptor';
+      if (/^CHRM/i.test(gene)) return 'muscarinic receptor';
+      if (/^SCN/i.test(gene)) return 'sodium channel';
+      if (/^CACNA/i.test(gene)) return 'calcium channel';
+      if (/^KCN/i.test(gene)) return 'potassium channel';
+      if (/^OPRM/i.test(gene)) return 'mu-opioid receptor';
+      return 'receptor';
+    }
+
+    // =====================================================================
+    //  Main advice generator
+    // =====================================================================
     function generateAdvice(region, func, gene) {
       const panel = document.getElementById('advicePanel');
+      const { system: regionSystem, hints: allRegionHints } = getRegionInfo(region);
+      const allGeneHints = getGeneHints(gene);
+      const fill = (t) => fillTemplate(t, region, func, gene, regionSystem);
 
-      // Build region-specific suggestions
-      const regionLower = region.toLowerCase();
-      const funcLower = func.toLowerCase();
-      const geneLower = gene.toLowerCase();
-
-      // Determine likely brain system for richer advice
-      let regionSystem = '';
-      let regionHints = [];
-      if (/amygdala/i.test(region)) {
-        regionSystem = 'limbic';
-        regionHints = ['fear conditioning and emotional learning', 'the HPA axis and fight-or-flight response', 'social processing and facial cue interpretation', 'anxiety disorders and PTSD'];
-      } else if (/hippocampus/i.test(region)) {
-        regionSystem = 'limbic';
-        regionHints = ['memory consolidation and spatial navigation', 'long-term potentiation (LTP)', 'Alzheimer\'s disease and neurodegeneration', 'neurogenesis in the dentate gyrus'];
-      } else if (/prefrontal|frontal/i.test(region)) {
-        regionSystem = 'frontal executive';
-        regionHints = ['executive function and decision-making', 'working memory and cognitive control', 'ADHD and prefrontal hypoactivation', 'developmental maturation during adolescence'];
-      } else if (/visual|occipital|lingual|fusiform/i.test(region)) {
-        regionSystem = 'visual';
-        regionHints = ['visual processing hierarchies (V1 through higher areas)', 'face and object recognition', 'visual agnosia and prosopagnosia', 'retinotopic mapping'];
-      } else if (/insula/i.test(region)) {
-        regionSystem = 'salience';
-        regionHints = ['interoception and bodily awareness', 'the salience network', 'pain processing and empathy', 'addiction and craving'];
-      } else if (/cingulate/i.test(region)) {
-        regionSystem = 'cingulate/salience';
-        regionHints = ['error monitoring and conflict detection', 'the default mode network (posterior) or salience network (anterior)', 'pain perception', 'depression and the subgenual cingulate'];
-      } else if (/temporal/i.test(region)) {
-        regionSystem = 'temporal';
-        regionHints = ['language processing (Wernicke\'s area)', 'auditory processing', 'semantic memory', 'temporal lobe epilepsy'];
-      } else if (/parietal/i.test(region)) {
-        regionSystem = 'parietal';
-        regionHints = ['spatial attention and the dorsal attention network', 'sensory integration', 'hemispatial neglect', 'number processing and calculation'];
-      } else if (/cerebellum|cerebellar/i.test(region)) {
-        regionSystem = 'cerebellar';
-        regionHints = ['motor coordination and timing', 'cerebellar contributions to cognition', 'ataxia and motor learning', 'error-based learning'];
-      } else if (/thalamus|thalamic/i.test(region)) {
-        regionSystem = 'thalamic relay';
-        regionHints = ['sensory relay and gating functions', 'thalamocortical loops', 'consciousness and arousal', 'sleep spindles and thalamic oscillations'];
-      } else if (/caudate|putamen|striatum|basal ganglia|nucleus accumbens|globus pallidus/i.test(region)) {
-        regionSystem = 'basal ganglia';
-        regionHints = ['reward processing and reinforcement learning', 'motor planning and habit formation', 'Parkinson\'s disease and dopamine', 'addiction circuits'];
-      } else {
-        regionHints = ['its anatomical connections via DTI white matter tracts', 'neurological disorders associated with the region', 'how it interacts with neighboring structures', 'its evolutionary history and comparative anatomy'];
-      }
-
-      // Gene family hints
-      let geneHints = [];
-      if (/^DRD/i.test(gene)) {
-        geneHints = ['dopamine signaling pathways', 'Parkinson\'s disease or schizophrenia', 'stimulant drugs (cocaine, amphetamine) and their receptor mechanisms', 'reward circuitry in the basal ganglia'];
-      } else if (/^HTR|^5HT/i.test(gene)) {
-        geneHints = ['serotonin signaling and mood regulation', 'SSRIs and antidepressant pharmacology', 'psychedelic drugs (psilocybin, LSD) and 5-HT2A', 'gut-brain serotonin axis'];
-      } else if (/^GABA|^GABR/i.test(gene)) {
-        geneHints = ['inhibitory neurotransmission', 'benzodiazepines and anesthetics', 'epilepsy and seizure disorders', 'excitatory/inhibitory balance in neural circuits'];
-      } else if (/^GRI|^GRIN|^GRM/i.test(gene)) {
-        geneHints = ['glutamate excitatory signaling', 'NMDA receptors and synaptic plasticity', 'excitotoxicity in stroke or neurodegeneration', 'ketamine and its antidepressant effects'];
-      } else if (/^CHRN|^CHRM/i.test(gene)) {
-        geneHints = ['cholinergic signaling', 'nicotine and nicotinic receptors', 'Alzheimer\'s disease and cholinesterase inhibitors', 'autonomic nervous system regulation'];
-      } else if (/^SCN/i.test(gene)) {
-        geneHints = ['sodium channel function and neuronal excitability', 'epilepsy and channelopathies', 'pain signaling pathways', 'local anesthetic mechanisms'];
-      } else if (/^CACNA/i.test(gene)) {
-        geneHints = ['calcium channel function and synaptic transmission', 'seizure predisposition', 'migraine and calcium channelopathies', 'synaptic plasticity and LTP'];
-      } else if (/^KCNH|^KCN/i.test(gene)) {
-        geneHints = ['potassium channel function and repolarization', 'cardiac-neural channel overlap', 'schizophrenia risk genes', 'neuronal firing rate regulation'];
-      } else if (/^OPRM|^OPRK|^OPRD/i.test(gene)) {
-        geneHints = ['opioid signaling and pain modulation', 'opioid addiction and tolerance', 'endorphin and enkephalin pathways', 'mu, kappa, and delta receptor subtypes'];
-      } else {
-        geneHints = ['what gene family it belongs to and its known functions', 'whether it is a drug target for any condition', 'how its expression compares across brain regions', 'its role in synaptic signaling or neuronal excitability'];
-      }
+      // Pick random subsets from each pool
+      const regionHints     = pickRandom(allRegionHints, 4);
+      const geneHints       = pickRandom(allGeneHints, 4);
+      const sowExamples     = pickRandom(EXAMPLE_POOLS.statementsOfWork, 2).map(fill);
+      const captionExamples = pickRandom(EXAMPLE_POOLS.figureCaptions, 3).map(fill);
+      const openingExamples = pickRandom(EXAMPLE_POOLS.openingSentences, 3).map(fill);
+      const interpExamples  = pickRandom(EXAMPLE_POOLS.interpretationExamples, 3).map(fill);
+      const crossExamples   = pickRandom(EXAMPLE_POOLS.crossDataConnections, 3).map(fill);
+      const anatomyTips     = pickRandom(EXAMPLE_POOLS.anatomyTips, 2).map(fill);
+      const geneExpTips     = pickRandom(EXAMPLE_POOLS.geneExpressionTips, 2).map(fill);
+      const fmriTips        = pickRandom(EXAMPLE_POOLS.fmriFunctionTips, 2).map(fill);
+      const receptorTips    = pickRandom(EXAMPLE_POOLS.receptorReportTips, 2).map(fill);
+      const creativeAngles  = pickRandom(EXAMPLE_POOLS.creativeAngles, 3).map(fill);
+      const mistakes        = pickRandom(EXAMPLE_POOLS.commonMistakes, 3);
 
       let html = `
         <div class="guide-section" style="border-color: #0779be;">
           <h2><span class="sec-icon">&#127919;</span> Personalized Advice for Your Selections</h2>
+          <p style="font-size: 0.85rem; color: #7a9ab8; margin-bottom: 16px;"><em>Examples below are drawn randomly from a large pool. Reload or re-upload to see different examples each time.</em></p>
 
-          <h3>Section 1: Brain Area Report &mdash; ${region}</h3>
+          <h3>Section 1: Brain Area Report &mdash; ${region || '[no region selected]'}</h3>
           <p>Your brain area is part of the <strong>${regionSystem || 'brain'}</strong> system. Here are angles that could strengthen each subsection:</p>
-          <ul>
-            ${regionHints.map(h => `<li>${h}</li>`).join('')}
-          </ul>
-          <div class="tip"><strong>For Subsection 1 (Anatomy):</strong> Use the DTI connectivity map from the Colab to identify which regions ${region} connects to. Look for published DSI or tractography images of these pathways. Consider discussing how these structural connections support ${region}'s cognitive role.</div>
-          <div class="tip"><strong>For Subsection 2 (Gene Expression):</strong> In the Colab, look at the gene expression bar chart for ${region}. Identify the 2&ndash;3 highest and lowest expressed genes and research their roles. You selected <strong>${gene}</strong>&mdash;check whether it is notably expressed in ${region} and discuss why.</div>
-          <div class="tip"><strong>For Subsection 3 (Cognition):</strong> Use Neurosynth fMRI keyword maps related to ${region}'s known functions. You selected <strong>${func}</strong>&mdash;consider whether ${region} appears in that function's brain map and what that implies.</div>
+          <ul>${regionHints.map(h => `<li>${h}</li>`).join('')}</ul>
 
-          <h3>Section 2: fMRI Function Report &mdash; ${func}</h3>
-          <p>For your fMRI function, you will need to explore how &ldquo;${func}&rdquo; is represented brain-wide. A few suggestions:</p>
+          <div class="tip"><strong>For Subsection 1 (Anatomy):</strong> Use the DTI connectivity map from the Colab to identify which regions ${region || 'your region'} connects to. Look for published DSI or tractography images of these pathways.</div>
+          ${anatomyTips.map(t => `<div class="tip"><strong>Anatomy tip:</strong> ${t}</div>`).join('')}
+
+          <div class="tip"><strong>For Subsection 2 (Gene Expression):</strong> In the Colab, look at the gene expression bar chart for ${region || 'your region'}. Identify the 2&ndash;3 highest and lowest expressed genes and research their roles. You selected <strong>${gene || '[no gene]'}</strong>&mdash;check whether it is notably expressed in ${region || 'your region'} and discuss why.</div>
+          ${geneExpTips.map(t => `<div class="tip"><strong>Gene expression tip:</strong> ${t}</div>`).join('')}
+
+          <div class="tip"><strong>For Subsection 3 (Cognition):</strong> Use Neurosynth fMRI keyword maps related to ${region || 'your region'}'s known functions. You selected <strong>${func || '[no function]'}</strong>&mdash;consider whether ${region || 'your region'} appears in that function's brain map.</div>
+          ${fmriTips.map(t => `<div class="tip"><strong>fMRI tip:</strong> ${t}</div>`).join('')}
+
+          <h3>Section 2: fMRI Function Report &mdash; ${func || '[no function selected]'}</h3>
+          <p>For your fMRI function, explore how &ldquo;${func || '[function]'}&rdquo; is represented brain-wide:</p>
           <ul>
-            <li>Visit <a href="https://neurosynth.org/analyses/terms/${encodeURIComponent(func.toLowerCase())}/" target="_blank" style="color:#0779be">neurosynth.org</a> and note how many studies contribute to this term&rsquo;s meta-analysis.</li>
-            <li>Look at which brain areas light up most strongly for &ldquo;${func}&rdquo; in the fMRI bar plot from the Colab.</li>
-            <li>For the transcriptomic cross-analysis (Subsection 3), check whether the high-activation regions for &ldquo;${func}&rdquo; share similar receptor expression profiles. This is where <strong>${gene}</strong> could be a connecting thread.</li>
+            <li>Visit <a href="https://neurosynth.org/analyses/terms/${encodeURIComponent((func || '').toLowerCase())}/" target="_blank" style="color:#0779be">neurosynth.org</a> and note how many studies contribute to this term&rsquo;s meta-analysis.</li>
+            <li>Look at which brain areas activate most strongly for &ldquo;${func || '[function]'}&rdquo; in the fMRI bar plot from the Colab.</li>
+            <li>For the transcriptomic cross-analysis (Subsection 3), check whether high-activation regions share similar receptor expression profiles. This is where <strong>${gene || '[gene]'}</strong> could be a connecting thread.</li>
           </ul>
 
-          <h3>Section 3: Receptor Report &mdash; ${gene}</h3>
+          <h3>Section 3: Receptor Report &mdash; ${gene || '[no gene selected]'}</h3>
           <p>For your receptor, consider these research angles:</p>
-          <ul>
-            ${geneHints.map(h => `<li>${h}</li>`).join('')}
-          </ul>
-          <div class="tip"><strong>Connecting it all:</strong> The strongest practicums weave a narrative thread across all three sections. Your choices of <strong>${region}</strong>, <strong>${func}</strong>, and <strong>${gene}</strong> should ideally have points of overlap. Ask yourself: Is ${gene} expressed in ${region}? Does ${region} support the &ldquo;${func}&rdquo; function? If so, you have a natural story to tell.</div>
+          <ul>${geneHints.map(h => `<li>${h}</li>`).join('')}</ul>
+          ${receptorTips.map(t => `<div class="tip"><strong>Receptor tip:</strong> ${t}</div>`).join('')}
+
+          <div class="tip"><strong>Connecting it all:</strong> The strongest practicums weave a narrative thread across all three sections. Ask yourself: Is ${gene || '[gene]'} expressed in ${region || '[region]'}? Does ${region || '[region]'} support the &ldquo;${func || '[function]'}&rdquo; function? If so, you have a natural story to tell.</div>
+        </div>
+
+        <!-- ======= EXAMPLE BANK PANELS ======= -->
+
+        <div class="guide-section" style="border-color: rgba(7,121,190,0.5); animation-delay: 0.1s;">
+          <h2><span class="sec-icon">&#128221;</span> Example Statements of Work</h2>
+          <p style="font-size: 0.85rem; color: #7a9ab8; margin-bottom: 12px;">Here are examples of strong Statements of Work adapted to your selections. Use them as models for structure and specificity, not to copy.</p>
+          ${sowExamples.map((ex, i) => `
+            <div class="tip" style="margin-bottom: 10px;">
+              <strong>Example ${i + 1}:</strong> &ldquo;${ex}&rdquo;
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="guide-section" style="border-color: rgba(7,121,190,0.5); animation-delay: 0.15s;">
+          <h2><span class="sec-icon">&#128202;</span> Example Figure Captions</h2>
+          <p style="font-size: 0.85rem; color: #7a9ab8; margin-bottom: 12px;">Strong captions walk the reader through each panel, interpret the data, and tie panels together into a narrative. Here are models:</p>
+          ${captionExamples.map((ex, i) => `
+            <div class="tip" style="margin-bottom: 10px;">
+              <strong>Example ${i + 1}:</strong> &ldquo;${ex}&rdquo;
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="guide-section" style="border-color: rgba(7,121,190,0.5); animation-delay: 0.2s;">
+          <h2><span class="sec-icon">&#128172;</span> Example Opening Sentences</h2>
+          <p style="font-size: 0.85rem; color: #7a9ab8; margin-bottom: 12px;">A strong opening sentence states the main point with authority. Here are models adapted to your selections:</p>
+          ${openingExamples.map((ex, i) => `
+            <div class="tip" style="margin-bottom: 10px;">
+              <strong>Example ${i + 1}:</strong> &ldquo;${ex}&rdquo;
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="guide-section" style="border-color: rgba(7,121,190,0.5); animation-delay: 0.25s;">
+          <h2><span class="sec-icon">&#128270;</span> Example Data Interpretations</h2>
+          <p style="font-size: 0.85rem; color: #7a9ab8; margin-bottom: 12px;">The difference between description and interpretation is what separates an average report from a strong one. Here are examples of interpretive writing:</p>
+          ${interpExamples.map((ex, i) => `
+            <div class="tip" style="margin-bottom: 10px;">
+              <strong>Example ${i + 1}:</strong> &ldquo;${ex}&rdquo;
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="guide-section" style="border-color: rgba(7,121,190,0.5); animation-delay: 0.3s;">
+          <h2><span class="sec-icon">&#128279;</span> Example Cross-Data Connections</h2>
+          <p style="font-size: 0.85rem; color: #7a9ab8; margin-bottom: 12px;">The most challenging (and rewarding) parts of the practicum involve connecting different data modalities. Here are examples of how to bridge expression, connectivity, and function:</p>
+          ${crossExamples.map((ex, i) => `
+            <div class="tip" style="margin-bottom: 10px;">
+              <strong>Example ${i + 1}:</strong> &ldquo;${ex}&rdquo;
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="guide-section" style="border-color: rgba(7,121,190,0.5); animation-delay: 0.35s;">
+          <h2><span class="sec-icon">&#128161;</span> Creative Angles to Explore</h2>
+          <p style="font-size: 0.85rem; color: #7a9ab8; margin-bottom: 12px;">The &ldquo;creativeness&rdquo; criterion rewards going beyond the basics. Here are directions that could add depth to your report:</p>
+          ${creativeAngles.map((ex, i) => `
+            <div class="tip" style="margin-bottom: 10px;">
+              <strong>Idea ${i + 1}:</strong> ${ex}
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="guide-section" style="border-color: rgba(220,120,40,0.5); animation-delay: 0.4s;">
+          <h2><span class="sec-icon">&#9888;&#65039;</span> Common Mistakes to Avoid</h2>
+          <p style="font-size: 0.85rem; color: #7a9ab8; margin-bottom: 12px;">These are pitfalls that frequently cost students points. Watch out for these:</p>
+          ${mistakes.map((ex, i) => `
+            <div class="warning" style="margin-bottom: 10px;">
+              <strong>Pitfall ${i + 1}:</strong> ${ex}
+            </div>
+          `).join('')}
         </div>
       `;
 
