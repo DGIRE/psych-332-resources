@@ -1279,53 +1279,33 @@
         }
 
         /**
-         * BFS gap-fill: creates a per-pixel value array where unmapped brain tissue
-         * inherits values from the nearest mapped region. This fills in the ~32% of
-         * brain pixels (ID 0 + unnamed IDs) that have no direct region assignment.
+         * Creates a per-pixel value array using direct pixel-to-region mapping only.
+         * Only pixels with a known region assignment in the brain map are colored.
          */
         function buildFilledValueArray(valueMap, width, height) {
             const total = width * height;
             const values = new Float32Array(total);
-            const status = new Uint8Array(total); // 0=bg, 1=mapped, 2=needs-fill
-            const queue = [];
+            const status = new Uint8Array(total); // 0=bg, 1=mapped
 
-            // Pass 1: classify every pixel
+            // Direct pixel mapping only — no BFS gap-fill
             for (let y = 0; y < height; y++) {
                 const row = decodedBrainMap[y];
                 if (!row) continue;
                 for (let x = 0; x < Math.min(row.length, width); x++) {
                     const rid = row[x];
                     const idx = y * width + x;
-                    if (rid === -100 || rid === undefined) {
-                        status[idx] = 0;
-                    } else if (valueMap[rid] !== undefined) {
+                    if (rid !== -100 && rid !== undefined && valueMap[rid] !== undefined) {
                         status[idx] = 1;
                         values[idx] = valueMap[rid];
-                        queue.push(idx); // seed for BFS
-                    } else {
-                        status[idx] = 2; // brain tissue, no value
                     }
                 }
-            }
-
-            // Pass 2: BFS from mapped pixels to fill adjacent unmapped brain tissue
-            let qi = 0;
-            while (qi < queue.length) {
-                const idx = queue[qi++];
-                const y = (idx / width) | 0;
-                const x = idx % width;
-                const val = values[idx];
-                if (y > 0)          { const ni = idx - width; if (status[ni] === 2) { status[ni] = 1; values[ni] = val; queue.push(ni); } }
-                if (y < height - 1) { const ni = idx + width; if (status[ni] === 2) { status[ni] = 1; values[ni] = val; queue.push(ni); } }
-                if (x > 0)          { const ni = idx - 1;     if (status[ni] === 2) { status[ni] = 1; values[ni] = val; queue.push(ni); } }
-                if (x < width - 1)  { const ni = idx + 1;     if (status[ni] === 2) { status[ni] = 1; values[ni] = val; queue.push(ni); } }
             }
 
             return { values, status };
         }
 
         /**
-         * Generic brain heatmap renderer with title, colorbar, and BFS gap-fill.
+         * Generic brain heatmap renderer with title, colorbar, and direct pixel mapping.
          */
         function drawBrainHeatmap(canvasId, opts) {
             const { valueMap, title, colorFn, colorbarLabel, centerAtZero, minOverride, maxOverride } = opts;
@@ -1345,7 +1325,7 @@
                 decodedBrainMap = decodeRLE(labeledBrainMap.rle_rows, bmW, bmH);
             }
 
-            // BFS gap-fill
+            // Direct pixel mapping (no BFS gap-fill)
             const filled = buildFilledValueArray(valueMap, bmW, bmH);
 
             // Compute data range
@@ -1455,35 +1435,17 @@
                 if (name === regionName) targetIds.add(parseInt(pixelId));
             }
 
-            // Also use BFS to fill unmapped brain pixels adjacent to target region
-            const isTarget = new Uint8Array(bmW * bmH); // 0=no, 1=yes, 2=brain-needs-check
+            // Direct pixel mapping only — no BFS gap-fill
+            const isTarget = new Uint8Array(bmW * bmH);
             for (let y = 0; y < bmH; y++) {
                 const row = decodedBrainMap[y];
                 if (!row) continue;
                 for (let x = 0; x < Math.min(row.length, bmW); x++) {
                     const rid = row[x];
-                    const idx = y * bmW + x;
-                    if (rid === -100 || rid === undefined) continue;
                     if (targetIds.has(rid)) {
-                        isTarget[idx] = 1;
-                    } else if (!(rid in PIXEL_TO_REGION) && rid !== -100) {
-                        isTarget[idx] = 2; // unmapped brain tissue
+                        isTarget[y * bmW + x] = 1;
                     }
                 }
-            }
-            // BFS from target pixels into adjacent unmapped tissue
-            const queue = [];
-            for (let i = 0; i < isTarget.length; i++) {
-                if (isTarget[i] === 1) queue.push(i);
-            }
-            let qi = 0;
-            while (qi < queue.length) {
-                const idx = queue[qi++];
-                const y = (idx / bmW) | 0, x = idx % bmW;
-                if (y > 0)       { const ni = idx - bmW; if (isTarget[ni] === 2) { isTarget[ni] = 1; queue.push(ni); } }
-                if (y < bmH - 1) { const ni = idx + bmW; if (isTarget[ni] === 2) { isTarget[ni] = 1; queue.push(ni); } }
-                if (x > 0)       { const ni = idx - 1;   if (isTarget[ni] === 2) { isTarget[ni] = 1; queue.push(ni); } }
-                if (x < bmW - 1) { const ni = idx + 1;   if (isTarget[ni] === 2) { isTarget[ni] = 1; queue.push(ni); } }
             }
 
             const imageData = ctx.getImageData(0, 0, bmW, bmH);
