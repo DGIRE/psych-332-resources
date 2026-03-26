@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>General Information – PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: #0779be; }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 16px;
+      padding: 20px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .course-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #0779be;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-size: 1.05rem;
+      color: #b0c4de;
+      font-weight: 400;
+    }
+
+    /* Section */
+    .section-label {
+      text-align: center;
+      margin-bottom: 28px;
+      animation: fadeIn 0.6s ease-out 0.15s both;
+    }
+    .section-label span {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #5a7d9e;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(90, 125, 158, 0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+    }
+
+    /* Card Grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 36px 28px;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .card:hover {
+      border-color: #0779be;
+      background: rgba(7, 121, 190, 0.12);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(7, 121, 190, 0.2);
+      border: 2px solid #0779be;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover .card-icon {
+      background: #0779be;
+      transform: scale(1.08);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #8aacc8;
+      line-height: 1.5;
+    }
+
+    .card .link-hint {
+      margin-top: auto;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #0779be;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover .link-hint { opacity: 1; }
+
+    .card.coming-soon {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .card.coming-soon .link-hint { display: none; }
+    .card.coming-soon::after {
+      content: 'Coming soon';
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #5a7d9e;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: #5a7d9e;
+      font-size: 0.85rem;
+      animation: fadeIn 0.6s ease-out 0.4s both;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 380px) {
+      body { padding: 12px; }
+      header { padding: 12px 0; margin-bottom: 12px; }
+      header h1 { font-size: 1.5rem; }
+      header p { font-size: 0.95rem; }
+      .card-grid { grid-template-columns: 1fr; gap: 16px; }
+      .card { padding: 20px 16px; gap: 12px; }
+      .card-icon { width: 52px; height: 52px; font-size: 1.4rem; }
+      .card h2 { font-size: 1.1rem; }
+      .card p { font-size: 0.88rem; }
+      footer { margin-top: 30px; padding: 16px; font-size: 0.8rem; }
+    }
+    @media (max-width: 480px) and (min-width: 381px) {
+      body { padding: 14px; }
+      header { padding: 14px 0; margin-bottom: 14px; }
+      header h1 { font-size: 1.6rem; }
+      header p { font-size: 0.98rem; }
+      .card-grid { grid-template-columns: 1fr; gap: 18px; }
+      .card { padding: 24px 18px; gap: 12px; }
+      .card-icon { width: 56px; height: 56px; font-size: 1.5rem; }
+      .card h2 { font-size: 1.15rem; }
+      .card p { font-size: 0.9rem; }
+      footer { margin-top: 35px; padding: 16px; }
+    }
+    @media (max-width: 768px) and (min-width: 481px) {
+      body { padding: 16px; }
+      header { padding: 16px 0; margin-bottom: 16px; }
+      header h1 { font-size: 1.8rem; }
+      header p { font-size: 1.0rem; }
+      .card-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+      .card { padding: 28px 20px; gap: 13px; }
+      .card-icon { width: 60px; height: 60px; font-size: 1.55rem; }
+      .card h2 { font-size: 1.2rem; }
+      .card p { font-size: 0.92rem; }
+      footer { margin-top: 40px; padding: 18px; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      body { padding: 18px; }
+      header { padding: 18px 0; margin-bottom: 18px; }
+      header h1 { font-size: 2.2rem; }
+      header p { font-size: 1.05rem; }
+      .card-grid { grid-template-columns: repeat(2, 1fr); gap: 22px; }
+      .card { padding: 32px 24px; gap: 14px; }
+      .card-icon { width: 62px; height: 62px; font-size: 1.58rem; }
+      .card h2 { font-size: 1.23rem; }
+      footer { margin-top: 45px; padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <a class="back-link" href="index.html">&#8592; Back to Home</a>
+
+    <header>
+      <div class="course-label">PSYCH 332</div>
+      <h1>General Information</h1>
+      <p>Course overview, tutorials, references, and supplementary materials.</p>
+    </header>
+
+    <div class="section-label">
+      <span>Select a resource</span>
+    </div>
+
+    <div class="card-grid">
+
+      <a class="card" href="module1-tutorials.html">
+        <div class="card-icon">&#128218;</div>
+        <h2>Module 1 Tutorials</h2>
+        <p>Supporting guides for computational methods including UMAP, PCA, hierarchical clustering, and z-score normalization.</p>
+        <span class="link-hint">Open &rarr;</span>
+      </a>
+
+      <a class="card coming-soon" href="#">
+        <div class="card-icon">&#128196;</div>
+        <h2>Syllabus</h2>
+        <p>Course schedule, grading policies, and expectations for the quarter.</p>
+      </a>
+
+      <a class="card coming-soon" href="#">
+        <div class="card-icon">&#128279;</div>
+        <h2>References &amp; Reading</h2>
+        <p>Recommended papers, textbook chapters, and online resources for each module.</p>
+      </a>
+
+      <a class="card coming-soon" href="#">
+        <div class="card-icon">&#128187;</div>
+        <h2>Software &amp; Tools</h2>
+        <p>Setup guides and links for the software and web tools used throughout the course.</p>
+      </a>
+
+    </div>
+
+    <footer>
+      PSYCH 332 &mdash; University of Washington
+    </footer>
+
+  </div>
+</body>
+</html>
