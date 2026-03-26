@@ -2289,14 +2289,12 @@
             const nEpochs = parseInt(document.getElementById('umapEpochs').value) || 500;
             const spread = parseFloat(document.getElementById('umapSpread').value) || 1.0;
 
-            // Seed handling: use locked seed, typed seed, or generate a new random one
+            // Seed handling: locked → keep current seed; unlocked → always generate a new random seed
             const seedInput = document.getElementById('umapSeed');
             const lockSeed = document.getElementById('umapLockSeed').checked;
             let seed;
             if (lockSeed && currentUmapSeed != null) {
                 seed = currentUmapSeed;
-            } else if (seedInput.value !== '') {
-                seed = parseInt(seedInput.value) || 0;
             } else {
                 seed = Math.floor(Math.random() * 1000000);
             }
