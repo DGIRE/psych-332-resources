@@ -1044,7 +1044,6 @@
 
             // Brain map
             html += `<canvas id="structureBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
-            html += `<br><button onclick="saveCanvasAsPNG('structureBrainMap', 'brain_${region.Name.replace(/\s+/g, '_')}')" class="save-btn">&#128190; Save Brain Map</button>`;
 
             // Gene expression bar plot
             html += `<div id="structureGeneBar" class="chart-container"></div>`;
@@ -1132,7 +1131,6 @@
             html += `<div id="geneBarPlot" class="chart-container"></div>`;
             html += `<button onclick="savePlotlyAsPNG('geneBarPlot', 'gene_barplot_${safeName}')" class="save-btn">&#128190; Save Bar Plot</button>`;
             html += `<canvas id="geneBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
-            html += `<br><button onclick="saveCanvasAsPNG('geneBrainMap', 'gene_brain_${safeName}')" class="save-btn">&#128190; Save Brain Map</button>`;
 
             document.getElementById('geneContent').innerHTML = html;
 
@@ -1195,7 +1193,6 @@
             html += `<div id="dtiBarPlot" class="chart-container"></div>`;
             html += `<button onclick="savePlotlyAsPNG('dtiBarPlot', 'dti_barplot_${safeName}')" class="save-btn">&#128190; Save Bar Plot</button>`;
             html += `<canvas id="dtiBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
-            html += `<br><button onclick="saveCanvasAsPNG('dtiBrainMap', 'dti_brain_${safeName}')" class="save-btn">&#128190; Save Brain Map</button>`;
 
             document.getElementById('dtiContent').innerHTML = html;
 
@@ -1259,7 +1256,6 @@
             html += `<div id="fmriBarPlot" class="chart-container"></div>`;
             html += `<button onclick="savePlotlyAsPNG('fmriBarPlot', 'fmri_barplot_${safeName}')" class="save-btn">&#128190; Save Bar Plot</button>`;
             html += `<canvas id="fmriBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
-            html += `<br><button onclick="saveCanvasAsPNG('fmriBrainMap', 'fmri_brain_${safeName}')" class="save-btn">&#128190; Save Brain Map</button>`;
 
             document.getElementById('fmriContent').innerHTML = html;
 
@@ -1430,11 +1426,11 @@
 
             // Semi-transparent "See Colab Code" overlay
             ctx.save();
-            ctx.globalAlpha = 0.25;
-            ctx.font = 'bold 72px Inter, sans-serif';
+            ctx.globalAlpha = 0.35;
+            ctx.font = 'bold 100px Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#555555';
+            ctx.fillStyle = '#333333';
             ctx.fillText('See Colab Code', bmW / 2, titleH + bmH / 2);
             ctx.restore();
         }
