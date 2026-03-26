@@ -957,7 +957,7 @@
                     <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 12px;">
                         <div>
                             <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Perplexity</label>
-                            <input id="tsnePerplexity" type="number" value="15" min="2" max="100" step="1" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                            <input id="tsnePerplexity" type="number" value="30" min="2" max="100" step="1" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
                         </div>
                         <div>
                             <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Learning Rate</label>
@@ -965,7 +965,7 @@
                         </div>
                         <div>
                             <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Iterations</label>
-                            <input id="tsneIter" type="number" value="500" min="100" max="2000" step="50" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
+                            <input id="tsneIter" type="number" value="1000" min="100" max="2000" step="50" style="width: 80px; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #e8eef5; font-size: 13px; font-family: inherit;">
                         </div>
                         <div>
                             <label style="display: block; font-size: 12px; color: #8aacc8; margin-bottom: 4px;">Early Exaggeration</label>
@@ -1830,9 +1830,9 @@
         // Full t-SNE implementation: Barnes-Hut approximation is not needed for
         // the small datasets here (~200 regions), so we use exact gradient descent.
         function tsneEmbed(data, opts = {}) {
-            const perplexity = opts.perplexity || 15;
+            const perplexity = opts.perplexity || 30;
             const lr = opts.lr || 200;
-            const maxIter = opts.maxIter || 500;
+            const maxIter = opts.maxIter || 1000;
             const earlyExagg = opts.earlyExagg || 4;
             const n = data.length;
             const dim = 2;
@@ -1987,9 +1987,9 @@
             tsneRunning = true;
 
             const dataType = document.getElementById('tsneDataType').value;
-            const perplexity = parseFloat(document.getElementById('tsnePerplexity').value) || 15;
+            const perplexity = parseFloat(document.getElementById('tsnePerplexity').value) || 30;
             const lr = parseFloat(document.getElementById('tsneLR').value) || 200;
-            const maxIter = parseInt(document.getElementById('tsneIter').value) || 500;
+            const maxIter = parseInt(document.getElementById('tsneIter').value) || 1000;
             const earlyExagg = parseFloat(document.getElementById('tsneExagg').value) || 4;
 
             const btn = document.getElementById('runTsneBtn');
