@@ -1427,6 +1427,16 @@
             ctx.textAlign = 'center';
             ctx.fillText(colorbarLabel || '', 0, 0);
             ctx.restore();
+
+            // Semi-transparent "See Colab Code" overlay
+            ctx.save();
+            ctx.globalAlpha = 0.25;
+            ctx.font = 'bold 72px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#555555';
+            ctx.fillText('See Colab Code', bmW / 2, titleH + bmH / 2);
+            ctx.restore();
         }
 
         function drawRegionOnBrainMap(canvasId, brainMapIds, regionName) {
