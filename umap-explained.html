@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UMAP Explained – PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Navigation */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: #0779be; }
+
+    /* Hero / Title Banner */
+    .hero {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 40px 30px 36px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .hero-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-logo svg {
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+    }
+
+    .hero-logo-text {
+      text-align: left;
+    }
+
+    .hero-logo-text .overline {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #5a7d9e;
+      margin-bottom: 2px;
+    }
+
+    .hero-logo-text .brand {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .hero-logo-text .tagline {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #0779be;
+      margin-top: 4px;
+    }
+
+    .hero h1 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #b0c4de;
+      margin-top: 12px;
+    }
+
+    .hero .subtitle-line {
+      width: 60px;
+      height: 2px;
+      background: #0779be;
+      margin: 16px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 36px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      animation: fadeInUp 0.5s ease-out both;
+    }
+
+    .section:nth-child(3) { animation-delay: 0.1s; }
+    .section:nth-child(4) { animation-delay: 0.15s; }
+    .section:nth-child(5) { animation-delay: 0.2s; }
+    .section:nth-child(6) { animation-delay: 0.25s; }
+    .section:nth-child(7) { animation-delay: 0.3s; }
+    .section:nth-child(8) { animation-delay: 0.35s; }
+
+    .section-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #0779be;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #e8eef5;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 24px 0 10px;
+      color: #e8eef5;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #b0c4de;
+      margin-bottom: 12px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    strong { color: #e8eef5; }
+
+    /* Highlighted callout boxes */
+    .callout {
+      padding: 18px 22px;
+      border-radius: 10px;
+      margin: 18px 0;
+      font-size: 0.93rem;
+    }
+
+    .callout-warning {
+      background: rgba(220, 160, 50, 0.1);
+      border: 1px solid rgba(220, 160, 50, 0.35);
+      color: #e8d090;
+    }
+
+    .callout-warning strong { color: #f0d060; }
+
+    .callout-info {
+      background: rgba(7, 121, 190, 0.1);
+      border: 1px solid rgba(7, 121, 190, 0.3);
+      color: #a0c8e0;
+    }
+
+    .callout-info strong { color: #60b0e0; }
+
+    .callout-danger {
+      background: rgba(220, 70, 70, 0.1);
+      border: 1px solid rgba(220, 70, 70, 0.35);
+      color: #f0b0b0;
+    }
+
+    .callout-danger strong { color: #ff8888; }
+
+    /* Resource link cards */
+    .resource-card {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin: 16px 0;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .resource-card:hover {
+      border-color: #0779be;
+      background: rgba(7, 121, 190, 0.08);
+      transform: translateX(4px);
+    }
+
+    .resource-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(7, 121, 190, 0.2);
+      border: 1px solid rgba(7, 121, 190, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .resource-card:hover .resource-icon {
+      background: rgba(7, 121, 190, 0.35);
+    }
+
+    .resource-body h3 {
+      font-size: 1rem;
+      margin: 0 0 6px;
+      color: #ffffff;
+    }
+
+    .resource-body p {
+      font-size: 0.88rem;
+      color: #8aacc8;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .resource-body .url-hint {
+      font-size: 0.78rem;
+      color: #0779be;
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* Recipe cards */
+    .recipe {
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin: 16px 0;
+    }
+
+    .recipe-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .recipe-title .emoji { font-size: 1.1rem; }
+
+    .recipe-settings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 12px;
+    }
+
+    .recipe-tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      background: rgba(7, 121, 190, 0.15);
+      border: 1px solid rgba(7, 121, 190, 0.3);
+      color: #60b0e0;
+      padding: 3px 10px;
+      border-radius: 5px;
+    }
+
+    .recipe p {
+      font-size: 0.9rem;
+      color: #8aacc8;
+    }
+
+    /* Ordered steps inside warnings */
+    .step-list {
+      counter-reset: step-counter;
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      position: relative;
+      padding-left: 32px;
+      margin-bottom: 10px;
+      font-size: 0.93rem;
+      color: #b0c4de;
+      line-height: 1.6;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(7, 121, 190, 0.2);
+      border: 1px solid rgba(7, 121, 190, 0.4);
+      color: #0779be;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: #5a7d9e;
+      font-size: 0.85rem;
+      animation: fadeIn 0.6s ease-out 0.5s both;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .hero { padding: 24px 16px 20px; }
+      .hero-logo { flex-direction: column; gap: 12px; }
+      .hero-logo svg { width: 72px; height: 72px; }
+      .hero-logo-text { text-align: center; }
+      .hero-logo-text .brand { font-size: 2rem; }
+      .section { padding: 20px 16px; }
+      h2 { font-size: 1.25rem; }
+      .resource-card { flex-direction: column; gap: 12px; }
+      .recipe-settings { gap: 6px; }
+    }
+    @media (max-width: 768px) and (min-width: 481px) {
+      .hero { padding: 30px 24px 26px; }
+      .hero-logo svg { width: 85px; height: 85px; }
+      .hero-logo-text .brand { font-size: 2.4rem; }
+      .section { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <a class="back-link" href="module1-tutorials.html">&#8592; Back to Module 1 Tutorials</a>
+
+    <!-- ====== Hero Title with UMAP Logo ====== -->
+    <div class="hero">
+      <div class="hero-logo">
+        <!-- Stylized UMAP triangle adapted to site palette -->
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer triangle (dark blue) -->
+          <polygon points="60,8 112,100 8,100" fill="none" stroke="#2a6496" stroke-width="5" stroke-linejoin="round"/>
+          <!-- Inner triangle (lighter blue) -->
+          <polygon points="60,30 92,88 28,88" fill="rgba(7,121,190,0.25)" stroke="#0779be" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Accent slash (gold/amber) -->
+          <line x1="52" y1="22" x2="38" y2="92" stroke="#d4a030" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+          <!-- Manifold curve hint -->
+          <path d="M30,75 Q60,50 90,75" fill="none" stroke="rgba(7,121,190,0.4)" stroke-width="2" stroke-dasharray="4,3"/>
+          <!-- Data points -->
+          <circle cx="35" cy="78" r="3.5" fill="#0779be" opacity="0.8"/>
+          <circle cx="52" cy="62" r="3" fill="#60b0e0" opacity="0.7"/>
+          <circle cx="68" cy="65" r="3.5" fill="#0779be" opacity="0.8"/>
+          <circle cx="85" cy="78" r="3" fill="#60b0e0" opacity="0.7"/>
+          <circle cx="60" cy="55" r="2.5" fill="#d4a030" opacity="0.8"/>
+        </svg>
+        <div class="hero-logo-text">
+          <div class="overline">Uniform Manifold</div>
+          <div class="brand">UMAP</div>
+          <div class="tagline">Approximation &amp; Projection</div>
+        </div>
+      </div>
+      <h1>Uniform Manifold Approximation and Projection for Dimension Reduction</h1>
+      <div class="subtitle-line"></div>
+    </div>
+
+    <!-- ====== What Is UMAP? ====== -->
+    <div class="section">
+      <div class="section-label">Overview</div>
+      <h2>What Is UMAP?</h2>
+      <p>UMAP is a dimensionality reduction technique developed by Leland McInnes, John Healy, and James Melville (2018). It takes high-dimensional data &mdash; like the expression levels of thousands of genes across dozens of brain regions &mdash; and projects it into two dimensions so you can see it as a scatter plot. Points that were similar in the original high-dimensional space tend to land near each other in the 2D projection.</p>
+      <p>UMAP works in two stages. First, it builds a weighted graph of nearest neighbors in the original space, capturing the local relationships around each data point. It models this graph using concepts from topology, treating each neighborhood as a fuzzy simplicial set. Second, it optimizes a low-dimensional layout that preserves those neighborhood relationships as faithfully as possible, using stochastic gradient descent with attractive forces between neighbors and repulsive forces between non-neighbors.</p>
+      <p>Compared to earlier methods like t-SNE, UMAP tends to preserve more of the global structure of data (the relative arrangement of clusters), runs faster on large datasets, and offers a more principled mathematical foundation rooted in Riemannian geometry and algebraic topology.</p>
+    </div>
+
+    <!-- ====== Key Takeaways ====== -->
+    <div class="section">
+      <div class="section-label">Core Concepts</div>
+      <h2>Key Takeaways</h2>
+
+      <h3>UMAP preserves neighborhood structure, not exact distances</h3>
+      <p>The primary goal of UMAP is to maintain the <strong>local topology</strong> of your data. If two brain regions have very similar gene expression profiles, they will almost certainly appear close together in the UMAP plot. However, the exact pixel distance between two points in the plot does not correspond to a meaningful quantity &mdash; it is the relative neighborhood relationships that are preserved, not the absolute distances.</p>
+
+      <h3>Global structure is approximate but informative</h3>
+      <p>Unlike t-SNE, UMAP does a better job of placing groups of related points in roughly the right arrangement relative to each other. If three clusters of brain regions form a triangle in the UMAP plot, there is likely a real structural relationship behind that arrangement. However, the precise spacing between clusters can be influenced by the algorithm's parameters and random initialization, so treat inter-cluster distances as suggestive rather than quantitative.</p>
+
+      <h3>Clusters reflect genuine similarity, but verify them</h3>
+      <p>When you see a tight cluster of brain regions in a UMAP plot, those regions genuinely share similar profiles in the input data. But the inverse is not always true: points that appear separated might still be quite similar if the algorithm chose to pull them toward different local attractors during optimization. Always cross-reference clusters with the original data (for example, using the clustergram on the analysis page).</p>
+
+      <h3>UMAP results depend on hyperparameters</h3>
+      <p>The shape, compactness, and separation of clusters in a UMAP plot can change substantially when you adjust settings like <strong>n_neighbors</strong>, <strong>min_dist</strong>, <strong>spread</strong>, and <strong>n_epochs</strong>. No single set of parameters is "correct." Instead, exploring multiple settings and noting which structures are stable across settings gives you the most reliable interpretation.</p>
+    </div>
+
+    <!-- ====== Warnings ====== -->
+    <div class="section">
+      <div class="section-label">Critical Caveats</div>
+      <h2>Common Misinterpretations to Avoid</h2>
+
+      <div class="callout callout-danger">
+        <strong>Do not interpret distances between clusters as meaningful magnitudes.</strong> The space between two clusters in a UMAP plot is not proportional to how different those groups are in the original data. Two clusters that appear far apart may be only marginally more different than two clusters that appear close together. The algorithm optimizes local neighborhoods, not global metric relationships.
+      </div>
+
+      <div class="callout callout-danger">
+        <strong>Do not interpret cluster sizes as reflecting density or variance.</strong> A tight, compact cluster does not necessarily mean those points are more similar to each other than a spread-out cluster. UMAP's repulsive forces can compress or expand clusters depending on their local neighborhood topology and the choice of <em>min_dist</em> and <em>spread</em>.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Do not read meaning into the shape of clusters.</strong> Elongated, circular, or irregular cluster shapes are artifacts of the optimization process and the random initialization. The same data can produce round clusters in one run and elongated ones in another. Shape carries no biological information.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Do not assume that the axes mean anything.</strong> The x-axis and y-axis of a UMAP plot are arbitrary embedding dimensions. They do not correspond to principal components, anatomical axes, or any interpretable quantity. Rotations and reflections of the entire plot are equally valid.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Beware of over-interpreting single runs.</strong> UMAP is stochastic: it will produce slightly different layouts each time you run it with different random seeds. Structures that appear in one run but disappear in another are noise. Structures that are stable across multiple runs with different random seeds are more likely to reflect genuine patterns in the data.
+      </div>
+
+      <div class="callout callout-info">
+        <strong>Always triangulate with other methods.</strong> UMAP is best used as an exploratory tool for generating hypotheses, not as a definitive analysis. Confirm any groupings you observe with complementary methods such as PCA, hierarchical clustering, or statistical tests on the original high-dimensional data.
+      </div>
+    </div>
+
+    <!-- ====== Parameter Guide ====== -->
+    <div class="section">
+      <div class="section-label">Parameters</div>
+      <h2>What Each Setting Controls</h2>
+
+      <h3>n_neighbors</h3>
+      <p>This is the most important parameter. It controls how many surrounding data points UMAP considers when building the neighborhood graph for each point. <strong>Low values (5&ndash;10)</strong> focus the algorithm tightly on very local structure, often producing many small, fragmented clusters. <strong>High values (30&ndash;100)</strong> incorporate broader context, producing smoother layouts that emphasize large-scale organization at the cost of fine local detail. Think of it as a zoom knob: low n_neighbors zooms into the details, high n_neighbors zooms out to the big picture.</p>
+
+      <h3>min_dist</h3>
+      <p>Controls how tightly UMAP is allowed to pack points together in the output. <strong>Values near 0</strong> permit extremely tight clusters with clear visual separation between groups &mdash; good for identifying discrete categories, but can exaggerate the apparent distinctness of groups. <strong>Values of 0.5&ndash;1.0</strong> spread points more evenly, revealing the continuous gradients and transitions between groups that might be hidden at low min_dist settings. For brain region data, moderate values (0.1&ndash;0.3) are often a good starting point.</p>
+
+      <h3>spread</h3>
+      <p>Works in concert with min_dist to set the overall scale of the embedding. Higher spread values (2&ndash;3) push clusters further apart, making boundaries between groups more visually obvious. The default of 1.0 is suitable for most explorations. You may want to increase spread when clusters are overlapping and you want a clearer view of the between-cluster gaps.</p>
+
+      <h3>n_epochs</h3>
+      <p>The number of optimization iterations. More epochs allow the layout to converge more fully, producing a more stable result. For small datasets like brain region profiles (tens to hundreds of points), <strong>200&ndash;500 epochs</strong> is usually sufficient. If the layout still looks noisy or unstable, try increasing to 1000. Extremely high values offer diminishing returns and just slow things down.</p>
+    </div>
+
+    <!-- ====== Recipe Book ====== -->
+    <div class="section">
+      <div class="section-label">Practical Guide</div>
+      <h2>UMAP Settings Recipe Book</h2>
+      <p>Use these starting configurations for common analysis goals. Experiment by adjusting one parameter at a time to see how the visualization changes.</p>
+
+      <div class="recipe">
+        <div class="recipe-title"><span class="emoji">&#128269;</span> Discovery Mode &mdash; First Look at Your Data</div>
+        <div class="recipe-settings">
+          <span class="recipe-tag">n_neighbors = 15</span>
+          <span class="recipe-tag">min_dist = 0.1</span>
+          <span class="recipe-tag">spread = 1.0</span>
+          <span class="recipe-tag">n_epochs = 500</span>
+        </div>
+        <p>The default settings. A balanced view that reveals both local cluster structure and broad global organization. Start here whenever you encounter a new dataset or data type.</p>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-title"><span class="emoji">&#128300;</span> Fine Detail &mdash; Finding Subtle Subgroups</div>
+        <div class="recipe-settings">
+          <span class="recipe-tag">n_neighbors = 5</span>
+          <span class="recipe-tag">min_dist = 0.0</span>
+          <span class="recipe-tag">spread = 1.0</span>
+          <span class="recipe-tag">n_epochs = 500</span>
+        </div>
+        <p>Very local focus. Maximizes the separation of small subgroups and reveals fine-grained distinctions between individual brain regions. Useful when you suspect that a large cluster in the default view actually contains meaningful substructure. Be cautious: some of the small groups you see may be artifacts of noise.</p>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-title"><span class="emoji">&#127758;</span> Big Picture &mdash; Major Organizational Axes</div>
+        <div class="recipe-settings">
+          <span class="recipe-tag">n_neighbors = 50</span>
+          <span class="recipe-tag">min_dist = 0.5</span>
+          <span class="recipe-tag">spread = 2.0</span>
+          <span class="recipe-tag">n_epochs = 500</span>
+        </div>
+        <p>Broad, global view. Emphasizes the large-scale relationships between brain systems (e.g., cortical vs. subcortical, sensory vs. motor). Clusters blend together more because the algorithm is weighing global topology over local detail. Good for seeing where the brain's major organizational boundaries fall.</p>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-title"><span class="emoji">&#127752;</span> Continuous Gradients &mdash; Seeing Transitions</div>
+        <div class="recipe-settings">
+          <span class="recipe-tag">n_neighbors = 20</span>
+          <span class="recipe-tag">min_dist = 0.8</span>
+          <span class="recipe-tag">spread = 1.5</span>
+          <span class="recipe-tag">n_epochs = 500</span>
+        </div>
+        <p>Spreads points evenly to reveal continuous variation rather than discrete clusters. Particularly useful with gene expression data, where brain regions often form gradients rather than hard categories. If the biology is truly continuous, this view will show it better than a tight-clustering setting that imposes artificial boundaries.</p>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-title"><span class="emoji">&#9989;</span> Stability Check &mdash; Which Structures Are Real?</div>
+        <div class="recipe-settings">
+          <span class="recipe-tag">n_neighbors = 15</span>
+          <span class="recipe-tag">min_dist = 0.1</span>
+          <span class="recipe-tag">spread = 1.0</span>
+          <span class="recipe-tag">n_epochs = 500</span>
+        </div>
+        <p>Run the default settings multiple times (press "Run UMAP" repeatedly on the analysis page). Each run uses a different random initialization. Structures that reappear consistently &mdash; the same brain regions clustering together, the same groups staying separate &mdash; are robust features of your data. Structures that shift or break apart between runs are likely noise or weak signals.</p>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-title"><span class="emoji">&#128260;</span> Comparing Modalities &mdash; Gene vs. DTI vs. fMRI</div>
+        <div class="recipe-settings">
+          <span class="recipe-tag">n_neighbors = 15</span>
+          <span class="recipe-tag">min_dist = 0.1</span>
+          <span class="recipe-tag">spread = 1.0</span>
+          <span class="recipe-tag">n_epochs = 500</span>
+        </div>
+        <p>Keep settings constant and switch between Gene Expression, DTI Connectivity, and fMRI Functions using the Data Type dropdown. With identical parameters, any differences in clustering reflect genuine differences in how each modality organizes brain regions. Brain areas that cluster together across all three modalities are very likely biologically related.</p>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-title"><span class="emoji">&#128256;</span> Feature Perspective &mdash; Genes / Functions as Points</div>
+        <div class="recipe-settings">
+          <span class="recipe-tag">Points represent = Genes / Features</span>
+          <span class="recipe-tag">n_neighbors = 10</span>
+          <span class="recipe-tag">min_dist = 0.1</span>
+          <span class="recipe-tag">spread = 1.0</span>
+          <span class="recipe-tag">n_epochs = 500</span>
+        </div>
+        <p>Flip the perspective: instead of plotting brain regions in gene-expression space, plot genes in brain-region space. Genes that cluster together here have similar expression profiles across the brain. This can reveal gene co-expression modules &mdash; groups of genes that tend to be up-regulated or down-regulated together. Use lower n_neighbors since there are usually more features than brain regions.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <strong>General tip:</strong> Change one parameter at a time. If you change n_neighbors and min_dist simultaneously, you cannot tell which parameter caused the change in the plot. Systematic exploration is the key to building reliable intuition about your data.
+      </div>
+    </div>
+
+    <!-- ====== How to Read a UMAP Plot ====== -->
+    <div class="section">
+      <div class="section-label">Interpretation Guide</div>
+      <h2>How to Read a UMAP Plot: A Step-by-Step Approach</h2>
+
+      <ol class="step-list">
+        <li><strong>Identify stable clusters.</strong> Run UMAP multiple times and note which groups of brain regions consistently appear together. These are your most reliable groupings.</li>
+        <li><strong>Name the clusters biologically.</strong> Look at which brain regions fall into each cluster. Do they share anatomical proximity, functional roles, or developmental origins? The coloring by brain structure on the analysis page can help here.</li>
+        <li><strong>Note the relative positions.</strong> While exact distances are not meaningful, the general arrangement of clusters (which are close, which are far) can suggest relationships. Cortical regions that always land away from subcortical regions reflect a real organizational axis.</li>
+        <li><strong>Look for outliers.</strong> Brain regions that consistently sit between clusters or isolated from all groups may have unique profiles worth investigating in the clustergram or gene-level data.</li>
+        <li><strong>Compare across modalities.</strong> Switch between gene expression, DTI, and fMRI data. Regions that cluster together in all three are related at multiple biological levels. Regions that cluster together in one modality but not others tell you something about which biological axis drives their similarity.</li>
+        <li><strong>Cross-reference with the clustergram.</strong> The hierarchical clustering on the analysis page provides a complementary view. If UMAP and the dendrogram agree on a grouping, you can be more confident it is a genuine pattern.</li>
+      </ol>
+    </div>
+
+    <!-- ====== Interactive Demonstrations ====== -->
+    <div class="section">
+      <div class="section-label">External Resources</div>
+      <h2>Interactive Demonstrations</h2>
+      <p>These external tools let you experiment with UMAP on various datasets and see how the algorithm behaves in real time.</p>
+
+      <a class="resource-card" href="https://pair-code.github.io/understanding-umap/" target="_blank" rel="noopener">
+        <div class="resource-icon">&#128218;</div>
+        <div class="resource-body">
+          <h3>Understanding UMAP</h3>
+          <p>A comprehensive visual essay by Google PAIR that walks through how UMAP works, what the hyperparameters do, and the key pitfalls of interpretation. Features interactive diagrams that let you manipulate settings and watch the embedding change. Highly recommended as a first resource for building intuition.</p>
+          <span class="url-hint">pair-code.github.io/understanding-umap &rarr;</span>
+        </div>
+      </a>
+
+      <a class="resource-card" href="https://grantcuster.github.io/umap-explorer/" target="_blank" rel="noopener">
+        <div class="resource-icon">&#127912;</div>
+        <div class="resource-body">
+          <h3>UMAP Explorer</h3>
+          <p>An interactive 3D visualization tool that lets you explore UMAP embeddings of large image datasets. Fly through the point cloud and see how visually similar images cluster together. A powerful way to build intuition about how UMAP organizes high-dimensional data by exploring familiar visual content like fashion items and handwritten digits.</p>
+          <span class="url-hint">grantcuster.github.io/umap-explorer &rarr;</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- ====== Further Reading ====== -->
+    <div class="section">
+      <div class="section-label">Reference</div>
+      <h2>Further Reading</h2>
+      <p>McInnes, L., Healy, J., &amp; Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction. <em>arXiv:1802.03426</em>. The original paper describes the mathematical foundations &mdash; how UMAP models data as lying on a Riemannian manifold, constructs fuzzy simplicial sets from nearest-neighbor graphs, and optimizes the low-dimensional layout via cross-entropy minimization.</p>
+      <p>For a more accessible introduction, the <a href="https://umap-learn.readthedocs.io/en/latest/" target="_blank" rel="noopener" style="color:#0779be;">UMAP documentation</a> provides practical guidance on parameter selection, performance tuning, and interpretation alongside worked examples.</p>
+    </div>
+
+    <footer>
+      PSYCH 332 &mdash; University of Washington
+    </footer>
+
+  </div>
+</body>
+</html>
