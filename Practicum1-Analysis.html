@@ -1067,7 +1067,7 @@
                     </div>
                 </div>
 
-                <p style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">Hierarchically clustered heatmap with dendrograms. Rows (brain regions) and columns (features) are reordered by similarity. Zoom into the heatmap and the dendrograms will follow. Use the inputs below to measure the distance between any two genes or brain areas.</p>
+                <p style="color: #8aacc8; font-size: 14px; margin-bottom: 12px;">Hierarchically clustered heatmap with dendrograms. Rows (brain regions) and columns (features) are reordered by similarity. Zoom into the heatmap and the dendrograms will follow. <strong>Click any label</strong> on the x or y axis (or click a dendrogram branch) to select items for distance measurement &mdash; first click fills Item 1, second click fills Item 2 and auto-calculates. You can also type names in the inputs below.</p>
 
                 <!-- Distance calculator inputs -->
                 <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
@@ -2356,9 +2356,11 @@
             return { lcaNode: pathA[lcaIdx], distance: pathA[lcaIdx].height };
         }
 
+        let cgClickCount = 0;
         function clearDendroPath() {
             document.getElementById('cgPathDisplay').style.display = 'none';
             document.getElementById('cgPathText').textContent = '';
+            cgClickCount = 0;
         }
 
         // --- Autocomplete for distance inputs ---
@@ -2456,6 +2458,26 @@
             html += `<strong>Direct ${metric} distance:</strong> ${directDist.toFixed(4)}`;
             if (lcaDist !== null) html += ` &nbsp;|&nbsp; <strong>Dendrogram LCA height:</strong> ${lcaDist.toFixed(4)}`;
             document.getElementById('cgPathText').innerHTML = html;
+        }
+
+        // --- Click-to-select handler for axis labels and dendrograms ---
+        // First click fills input 1, second fills input 2 and auto-calculates
+        function cgTickClicked(name) {
+            if (cgClickCount === 0) {
+                document.getElementById('cgDistInput1').value = name;
+                document.getElementById('cgDistInput2').value = '';
+                clearDendroPath();
+                cgClickCount = 1;
+                // Brief highlight on input 2 to cue user
+                const inp2 = document.getElementById('cgDistInput2');
+                inp2.style.borderColor = '#0779be';
+                inp2.placeholder = 'Click another label…';
+                setTimeout(() => { inp2.style.borderColor = ''; inp2.placeholder = 'e.g. Hippocampus or HTR2A'; }, 3000);
+            } else {
+                document.getElementById('cgDistInput2').value = name;
+                cgClickCount = 0;
+                calcCgItemDistance();
+            }
         }
 
         // --- Main clustergram render function (single Plotly figure with subplots) ---
@@ -2556,7 +2578,14 @@
                 ygap: 0.5,
                 xaxis: 'x',
                 yaxis: 'y',
-                colorbar: { len: 0.15, thickness: 12, x: 1.01, y: 0.5, tickfont: { color: '#b0c4de', size: 9 } },
+                colorbar: {
+                    len: 0.3, thickness: 12,
+                    x: 1.12, y: 0.4,
+                    title: { text: 'Z-score', side: 'right', font: { color: '#8aacc8', size: 10 } },
+                    tickmode: 'auto', nticks: 5,
+                    tickfont: { color: '#b0c4de', size: 9 },
+                    outlinecolor: 'rgba(255,255,255,0.15)', outlinewidth: 1
+                },
                 hovertemplate: '<b>Region:</b> %{customdata[0]}<br><b>Feature:</b> %{customdata[1]}<br><b>Z-score:</b> %{z:.3f}<extra></extra>',
                 customdata: orderedRows.map((r, ri) => orderedCols.map((c, ci) => [r, c]))
             };
@@ -2571,7 +2600,7 @@
                 line: { color: 'rgba(180,200,220,0.6)', width: 1.2 },
                 xaxis: 'x2',
                 yaxis: 'y',
-                hoverinfo: 'skip',
+                hoverinfo: 'none',
                 showlegend: false
             };
 
@@ -2584,13 +2613,13 @@
                 line: { color: 'rgba(180,200,220,0.6)', width: 1.2 },
                 xaxis: 'x',
                 yaxis: 'y3',
-                hoverinfo: 'skip',
+                hoverinfo: 'none',
                 showlegend: false
             };
 
             // Sizing
             const totalH = Math.max(600, nRows * 12 + 200);
-            const marginR = Math.max(140, 7.5 * Math.max(...orderedRows.map(r => r.length)));
+            const marginR = Math.max(180, 7.5 * Math.max(...orderedRows.map(r => r.length)) + 50);
             const marginB = Math.max(100, nCols * 5);
 
             const plotDiv = document.getElementById('clustergramPlot');
@@ -2620,7 +2649,7 @@
                     side: 'right',
                     tickfont: {
                         size: Math.max(7, Math.min(11, 700 / nRows)),
-                        color: rowColors.map(c => `rgb(${c[0]},${c[1]},${c[2]})`)
+                        color: rowColors
                     },
                     autorange: 'reversed',
                     showgrid: false,
@@ -2652,6 +2681,48 @@
             setupCgAutocomplete('cgDistInput1', 'cgDistAC1');
             setupCgAutocomplete('cgDistInput2', 'cgDistAC2');
             clearDendroPath();
+
+            // --- Make axis tick labels clickable for distance tracing ---
+            // After Plotly renders, find all tick text elements and add click handlers
+            setTimeout(() => {
+                const plotEl = document.getElementById('clustergramPlot');
+                // Y-axis ticks (row labels = brain areas, on right side)
+                const yTicks = plotEl.querySelectorAll('.yaxislayer-above .ytick text, .yaxislayer-above .y text');
+                yTicks.forEach(el => {
+                    el.style.cursor = 'pointer';
+                    el.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        cgTickClicked(this.textContent.trim());
+                    });
+                });
+                // X-axis ticks (col labels = genes/features, on bottom)
+                const xTicks = plotEl.querySelectorAll('.xaxislayer-above .xtick text, .xaxislayer-above .x text');
+                xTicks.forEach(el => {
+                    el.style.cursor = 'pointer';
+                    el.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        cgTickClicked(this.textContent.trim());
+                    });
+                });
+            }, 300);
+
+            // --- Make dendrogram clickable: click near a branch to select its closest leaf ---
+            plotDiv.on('plotly_click', function(data) {
+                if (!data || !data.points || data.points.length === 0) return;
+                const pt = data.points[0];
+                // Row dendrogram trace (index 1) or col dendrogram trace (index 2)
+                if (pt.curveNumber === 1) {
+                    // Row dendro click — find nearest row label by y coordinate
+                    const yVal = pt.y;
+                    const nearestIdx = Math.round(Math.max(0, Math.min(nRows - 1, yVal)));
+                    cgTickClicked(orderedRows[nearestIdx]);
+                } else if (pt.curveNumber === 2) {
+                    // Col dendro click — find nearest col label by x coordinate
+                    const xVal = pt.x;
+                    const nearestIdx = Math.round(Math.max(0, Math.min(nCols - 1, xVal)));
+                    cgTickClicked(orderedCols[nearestIdx]);
+                }
+            });
         }
 
         // Wrapper for data type change
