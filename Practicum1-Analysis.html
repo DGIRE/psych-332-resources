@@ -3253,6 +3253,7 @@
 
             // Brain map
             html += `<canvas id="structureBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
 
             // Gene expression bar plot
             html += `<div id="structureGeneBar" class="chart-container"></div>`;
@@ -3340,6 +3341,7 @@
             html += `<div id="geneBarPlot" class="chart-container"></div>`;
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('geneBarPlot', 'gene_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('geneBarPlot', 'gene_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<canvas id="geneBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
 
             document.getElementById('geneContent').innerHTML = html;
 
@@ -3402,6 +3404,7 @@
             html += `<div id="dtiBarPlot" class="chart-container"></div>`;
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('dtiBarPlot', 'dti_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('dtiBarPlot', 'dti_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<canvas id="dtiBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
 
             document.getElementById('dtiContent').innerHTML = html;
 
@@ -3465,6 +3468,7 @@
             html += `<div id="fmriBarPlot" class="chart-container"></div>`;
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('fmriBarPlot', 'fmri_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('fmriBarPlot', 'fmri_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<canvas id="fmriBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
 
             document.getElementById('fmriContent').innerHTML = html;
 
