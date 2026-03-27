@@ -484,6 +484,27 @@
       </ol>
     </div>
 
+    <!-- ====== Reading the Biplot and Loadings Chart ====== -->
+    <div class="section">
+      <div class="section-label">Your Analysis Plots</div>
+      <h2>Reading the Biplot and Loadings Bar Chart</h2>
+      <p>On the Data Analysis page, two auxiliary plots appear below the main PCA scatter plot. These help you understand <em>why</em> brain regions separate the way they do.</p>
+
+      <h3 id="biplots">The Biplot</h3>
+      <p>The biplot overlays two layers of information on a single plot. The <strong>points</strong> are the brain regions (or features), identical to the main PCA scatter plot. The <strong>gold arrows</strong> represent the top loading variables &mdash; these are the original measurements (genes, connectivity targets, or fMRI functions) that contribute most strongly to PC1 and PC2.</p>
+      <p>Each arrow starts at the origin and points in the direction of that variable's loadings on PC1 (horizontal) and PC2 (vertical). A longer arrow means that variable has a larger influence on the plotted components. Brain regions that lie in the direction an arrow points tend to have high values for that variable relative to other regions.</p>
+      <p>To interpret a biplot, look for arrows that point toward clusters of brain regions. If an arrow labeled "SLC17A7" points toward cortical regions, that gene is more highly expressed in cortex. If two arrows point in similar directions, those variables tend to co-vary across brain regions. Arrows pointing in opposite directions indicate variables with an inverse relationship.</p>
+
+      <div class="callout callout-info">
+        <strong>Scaling note:</strong> The arrow lengths are scaled to fit on the same axes as the scores. This means you can compare arrow directions and relative lengths, but you should not directly compare an arrow length to a score distance. The biplot shows patterns of association, not absolute magnitudes.
+      </div>
+
+      <h3 id="loadings">The Loadings Bar Chart</h3>
+      <p>The loadings bar chart shows the top variables ranked by their absolute loading on PC1. Each bar extends to the left (negative loading) or right (positive loading). Variables with large positive loadings on PC1 are highest in brain regions with large positive PC1 scores, and lowest in regions with large negative PC1 scores. Negative-loading variables follow the opposite pattern.</p>
+      <p>This chart answers a direct question: <strong>which specific variables drive the primary axis of variation?</strong> For gene expression data, the top PC1 loadings typically include genes with strong cortical-versus-subcortical expression gradients. For DTI connectivity, the top loadings reveal which connection targets most strongly differentiate brain regions along the major organizational axis.</p>
+      <p>When writing your practicum report, the loadings bar chart is a key resource for identifying which biological variables underlie the groupings you observe. Naming specific top-loading genes or connections strengthens your analysis by connecting statistical patterns to biological function.</p>
+    </div>
+
     <!-- ====== Video Guide ====== -->
     <div class="section">
       <div class="section-label">Video Guides</div>
@@ -492,33 +513,58 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 16px;">
         <div>
           <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-            <iframe src="https://drive.google.com/file/d/1vb1vAPCRAH8G781YVnMdtGU2VD6u5aR0/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe src="https://drive.google.com/file/d/1vb1vAPCRAH8G781YVnMdtGU2VD6u5aR0/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
           </div>
-          <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 8px; text-align: center;">The "Big Five" of Biology: Decoding PCA</p>
+          <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 8px; text-align: center;">The "Big Five" of Biology: Decoding PCA
+            <a href="https://drive.google.com/file/d/1vb1vAPCRAH8G781YVnMdtGU2VD6u5aR0/view" target="_blank" rel="noopener" style="color: #0779be; font-size: 0.78rem; margin-left: 6px;">(open in Drive)</a>
+          </p>
         </div>
         <div>
           <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-            <iframe src="https://drive.google.com/file/d/1jyVUXQXcshX98U4grZixN0n9JIshm5xL/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe src="https://drive.google.com/file/d/1jyVUXQXcshX98U4grZixN0n9JIshm5xL/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
           </div>
-          <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 8px; text-align: center;">Demystifying PCA Loadings: The Personality Recipe</p>
+          <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 8px; text-align: center;">Demystifying PCA Loadings: The Personality Recipe
+            <a href="https://drive.google.com/file/d/1jyVUXQXcshX98U4grZixN0n9JIshm5xL/view" target="_blank" rel="noopener" style="color: #0779be; font-size: 0.78rem; margin-left: 6px;">(open in Drive)</a>
+          </p>
         </div>
+      </div>
+      <p style="color: #5a7d9e; font-size: 0.8rem; margin-top: 12px;">Videos not loading? Try opening them directly in Google Drive using the links above, or check that third-party cookies are enabled in your browser settings.</p>
+    </div>
+
+    <!-- ====== Interactive Exploration ====== -->
+    <div class="section">
+      <div class="section-label">Hands-On Learning</div>
+      <h2>Try It Yourself: Interactive PCA</h2>
+      <p>The best way to understand PCA is to see it respond to your input in real time. The interactive tool below lets you manipulate data and watch the principal components adjust instantly.</p>
+
+      <a class="resource-card" href="https://setosa.io/ev/principal-component-analysis/" target="_blank" rel="noopener">
+        <div class="resource-icon">&#127919;</div>
+        <div class="resource-body">
+          <h3>Explained Visually: PCA</h3>
+          <p>An interactive visualization where you can drag data points, change the number of dimensions, and watch principal components recalculate in real time. The tool shows you the original data, the projected data, and the reconstruction error simultaneously.</p>
+          <span class="url-hint">setosa.io/ev/principal-component-analysis &rarr;</span>
+        </div>
+      </a>
+
+      <h3>Suggested Activities</h3>
+      <p>Open the Setosa tool and work through these exercises to build your intuition about PCA:</p>
+      <ol class="step-list">
+        <li><strong>Observe the default 2D example.</strong> Notice the red line (PC1) passing through the direction of greatest spread. The blue projections show how each point maps onto PC1. Hover over individual points to see their original position and their projected position on the component.</li>
+        <li><strong>Drag a point far away from the cluster.</strong> Watch how the principal component axis rotates to accommodate the outlier. This demonstrates why PCA is sensitive to outliers &mdash; a single extreme value can shift the direction of maximum variance.</li>
+        <li><strong>Create a tight circular cluster.</strong> Drag all points into a roughly circular arrangement. Notice that PC1 and PC2 now explain similar amounts of variance, and the component directions become somewhat arbitrary. This shows that PCA is most useful when data has a clear directional spread.</li>
+        <li><strong>Stretch the data into an elongated ellipse.</strong> Arrange points in a long, narrow shape. PC1 will align with the long axis, capturing most of the variance, while PC2 captures the small amount of perpendicular spread. This is the ideal case for PCA &mdash; most information can be represented along a single axis.</li>
+        <li><strong>Explore the 3D example.</strong> Switch to 3D mode and rotate the view. Observe how PCA finds a 2D plane that captures the most variance. Think about how this relates to your brain data analysis: you have thousands of gene expression dimensions being reduced to just two principal components.</li>
+      </ol>
+
+      <div class="callout callout-info">
+        <strong>Connection to your practicum:</strong> When you see brain regions spread along PC1 in your analysis, the same principle is at work &mdash; PC1 has found the single direction in gene expression space along which brain regions differ the most. The Setosa tool lets you see this process with 2&ndash;3 variables; your practicum data applies the same math to thousands.
       </div>
     </div>
 
     <!-- ====== External Resources ====== -->
     <div class="section">
       <div class="section-label">External Resources</div>
-      <h2>Interactive Demonstrations</h2>
-      <p>These external tools let you explore PCA visually and build intuition for how it works.</p>
-
-      <a class="resource-card" href="https://setosa.io/ev/principal-component-analysis/" target="_blank" rel="noopener">
-        <div class="resource-icon">&#128218;</div>
-        <div class="resource-body">
-          <h3>Explained Visually: PCA</h3>
-          <p>An interactive visual explanation of PCA that lets you drag data points around and watch the principal components update in real time. One of the best resources for building geometric intuition about what PCA actually does to your data.</p>
-          <span class="url-hint">setosa.io/ev/principal-component-analysis &rarr;</span>
-        </div>
-      </a>
+      <h2>Additional Resources</h2>
 
       <a class="resource-card" href="https://bioturing.medium.com/how-to-read-pca-biplots-and-scree-plots-186246aae063" target="_blank" rel="noopener">
         <div class="resource-icon">&#128202;</div>
