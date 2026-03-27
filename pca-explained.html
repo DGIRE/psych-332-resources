@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCA Explained – PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Navigation */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: #0779be; }
+
+    /* Hero / Title Banner */
+    .hero {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 40px 30px 36px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .hero-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-logo svg {
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+    }
+
+    .hero-logo-text { text-align: left; }
+
+    .hero-logo-text .overline {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #5a7d9e;
+      margin-bottom: 2px;
+    }
+
+    .hero-logo-text .brand {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .hero-logo-text .tagline {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #0779be;
+      margin-top: 4px;
+    }
+
+    .hero h1 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #b0c4de;
+      margin-top: 12px;
+    }
+
+    .hero .subtitle-line {
+      width: 60px;
+      height: 2px;
+      background: #0779be;
+      margin: 16px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 36px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      animation: fadeInUp 0.5s ease-out both;
+    }
+
+    .section:nth-child(3) { animation-delay: 0.1s; }
+    .section:nth-child(4) { animation-delay: 0.15s; }
+    .section:nth-child(5) { animation-delay: 0.2s; }
+    .section:nth-child(6) { animation-delay: 0.25s; }
+    .section:nth-child(7) { animation-delay: 0.3s; }
+    .section:nth-child(8) { animation-delay: 0.35s; }
+    .section:nth-child(9) { animation-delay: 0.4s; }
+
+    .section-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #0779be;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #e8eef5;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 24px 0 10px;
+      color: #e8eef5;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #b0c4de;
+      margin-bottom: 12px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    strong { color: #e8eef5; }
+
+    /* Highlighted callout boxes */
+    .callout {
+      padding: 18px 22px;
+      border-radius: 10px;
+      margin: 18px 0;
+      font-size: 0.93rem;
+    }
+
+    .callout-warning {
+      background: rgba(220, 160, 50, 0.1);
+      border: 1px solid rgba(220, 160, 50, 0.35);
+      color: #e8d090;
+    }
+
+    .callout-warning strong { color: #f0d060; }
+
+    .callout-info {
+      background: rgba(7, 121, 190, 0.1);
+      border: 1px solid rgba(7, 121, 190, 0.3);
+      color: #a0c8e0;
+    }
+
+    .callout-info strong { color: #60b0e0; }
+
+    .callout-danger {
+      background: rgba(220, 70, 70, 0.1);
+      border: 1px solid rgba(220, 70, 70, 0.35);
+      color: #f0b0b0;
+    }
+
+    .callout-danger strong { color: #ff8888; }
+
+    /* Diagram container */
+    .diagram-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 18px 0;
+      text-align: center;
+    }
+
+    .diagram-box svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .diagram-caption {
+      font-size: 0.82rem;
+      color: #5a7d9e;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    /* Resource link cards */
+    .resource-card {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin: 16px 0;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .resource-card:hover {
+      border-color: #0779be;
+      background: rgba(7, 121, 190, 0.08);
+      transform: translateX(4px);
+    }
+
+    .resource-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(7, 121, 190, 0.2);
+      border: 1px solid rgba(7, 121, 190, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .resource-card:hover .resource-icon {
+      background: rgba(7, 121, 190, 0.35);
+    }
+
+    .resource-body h3 {
+      font-size: 1rem;
+      margin: 0 0 6px;
+      color: #ffffff;
+    }
+
+    .resource-body p {
+      font-size: 0.88rem;
+      color: #8aacc8;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .resource-body .url-hint {
+      font-size: 0.78rem;
+      color: #0779be;
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* Ordered steps */
+    .step-list {
+      counter-reset: step-counter;
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      position: relative;
+      padding-left: 32px;
+      margin-bottom: 10px;
+      font-size: 0.93rem;
+      color: #b0c4de;
+      line-height: 1.6;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(7, 121, 190, 0.2);
+      border: 1px solid rgba(7, 121, 190, 0.4);
+      color: #0779be;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: #5a7d9e;
+      font-size: 0.85rem;
+      animation: fadeIn 0.6s ease-out 0.5s both;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .hero { padding: 24px 16px 20px; }
+      .hero-logo { flex-direction: column; gap: 12px; }
+      .hero-logo svg { width: 72px; height: 72px; }
+      .hero-logo-text { text-align: center; }
+      .hero-logo-text .brand { font-size: 2rem; }
+      .section { padding: 20px 16px; }
+      h2 { font-size: 1.25rem; }
+      .resource-card { flex-direction: column; gap: 12px; }
+    }
+    @media (max-width: 768px) and (min-width: 481px) {
+      .hero { padding: 30px 24px 26px; }
+      .hero-logo svg { width: 85px; height: 85px; }
+      .hero-logo-text .brand { font-size: 2.4rem; }
+      .section { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <a class="back-link" href="module1-tutorials.html">&#8592; Back to Module 1 Tutorials</a>
+
+    <!-- ====== Hero Title ====== -->
+    <div class="hero">
+      <div class="hero-logo">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Axis lines -->
+          <line x1="20" y1="100" x2="110" y2="100" stroke="#2a6496" stroke-width="3" stroke-linecap="round"/>
+          <line x1="20" y1="100" x2="20" y2="10" stroke="#2a6496" stroke-width="3" stroke-linecap="round"/>
+          <!-- PC1 arrow (main axis of variance) -->
+          <line x1="25" y1="90" x2="100" y2="30" stroke="#0779be" stroke-width="3.5" stroke-linecap="round"/>
+          <polygon points="100,30 90,38 95,42" fill="#0779be"/>
+          <!-- PC2 arrow (perpendicular) -->
+          <line x1="55" y1="55" x2="35" y2="30" stroke="#d4a030" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+          <polygon points="35,30 42,36 38,40" fill="#d4a030" opacity="0.8"/>
+          <!-- Scattered data points along PC1 -->
+          <circle cx="30" cy="85" r="3.5" fill="#60b0e0" opacity="0.7"/>
+          <circle cx="38" cy="78" r="3" fill="#0779be" opacity="0.8"/>
+          <circle cx="45" cy="72" r="3.5" fill="#60b0e0" opacity="0.7"/>
+          <circle cx="50" cy="65" r="3" fill="#0779be" opacity="0.8"/>
+          <circle cx="58" cy="60" r="3.5" fill="#60b0e0" opacity="0.7"/>
+          <circle cx="65" cy="52" r="3" fill="#0779be" opacity="0.8"/>
+          <circle cx="72" cy="48" r="3.5" fill="#60b0e0" opacity="0.7"/>
+          <circle cx="80" cy="42" r="3" fill="#d4a030" opacity="0.7"/>
+          <circle cx="90" cy="35" r="3.5" fill="#60b0e0" opacity="0.7"/>
+          <!-- Outlier points off axis -->
+          <circle cx="42" cy="62" r="2.5" fill="#0779be" opacity="0.5"/>
+          <circle cx="55" cy="70" r="2.5" fill="#0779be" opacity="0.5"/>
+          <circle cx="70" cy="40" r="2.5" fill="#d4a030" opacity="0.5"/>
+          <!-- Labels -->
+          <text x="103" y="28" fill="#0779be" font-size="9" font-weight="700" font-family="Inter, sans-serif">PC1</text>
+          <text x="26" y="28" fill="#d4a030" font-size="9" font-weight="700" font-family="Inter, sans-serif">PC2</text>
+        </svg>
+        <div class="hero-logo-text">
+          <div class="overline">Principal Component</div>
+          <div class="brand">PCA</div>
+          <div class="tagline">Analysis</div>
+        </div>
+      </div>
+      <h1>Finding the Major Axes of Variation in High-Dimensional Brain Data</h1>
+      <div class="subtitle-line"></div>
+    </div>
+
+    <!-- ====== What Is PCA? ====== -->
+    <div class="section">
+      <div class="section-label">Overview</div>
+      <h2>What Is PCA?</h2>
+      <p>Principal Component Analysis is a mathematical technique that takes a dataset with many variables &mdash; such as the expression levels of thousands of genes measured across dozens of brain regions &mdash; and identifies the directions along which the data varies the most. These directions are called <strong>principal components</strong> (PCs). The first principal component (PC1) captures the single largest axis of variation in the data, PC2 captures the second largest axis that is perpendicular to PC1, and so on.</p>
+      <p>PCA works by computing the <strong>covariance matrix</strong> of the data and then finding its <strong>eigenvectors</strong> and <strong>eigenvalues</strong>. Each eigenvector defines a principal component direction, and its corresponding eigenvalue tells you how much of the total variance in the data that component explains. PCA then rotates the coordinate system so that the new axes (the principal components) align with these directions of maximum variance.</p>
+      <p>The result is a new set of coordinates for each data point. Instead of being described by thousands of gene expression values, each brain region can now be described by its position along just the first few principal components &mdash; the ones that capture the most variance. This makes it possible to visualize high-dimensional data in two or three dimensions while retaining as much of the original information as possible.</p>
+    </div>
+
+    <!-- ====== Key Concepts ====== -->
+    <div class="section">
+      <div class="section-label">Core Concepts</div>
+      <h2>Key Concepts</h2>
+
+      <h3>Variance explained</h3>
+      <p>Each principal component captures a fraction of the total variance in the dataset. PC1 always captures the most, PC2 the second most, and so on. If PC1 explains 45% of the variance and PC2 explains 20%, then a scatter plot of PC1 vs. PC2 represents 65% of the total variation in the data. The remaining 35% is spread across the higher components. A <strong>scree plot</strong> shows the variance explained by each component in descending order, helping you judge how many components are needed to capture the essential structure of the data.</p>
+
+      <h3>Loadings</h3>
+      <p>Each principal component is a weighted combination of the original variables. These weights are called <strong>loadings</strong>. A loading tells you how much a specific original variable (for example, the expression of a particular gene) contributes to that component. If a gene has a large positive loading on PC1, it means that gene's expression level is strongly associated with the direction of maximum variation. Genes with large loadings (positive or negative) on the same component tend to co-vary together across brain regions.</p>
+      <p>In the context of brain data, inspecting the top loadings on PC1 can reveal which genes, connectivity features, or functional activations drive the largest organizational distinction among brain regions &mdash; often the cortical versus subcortical divide.</p>
+
+      <h3>Scores</h3>
+      <p>The <strong>score</strong> of a data point on a principal component is its coordinate in the new rotated space. When you plot brain regions on a PCA scatter plot, you are plotting their scores on two components. Regions with similar scores on PC1 and PC2 have similar overall profiles in the original high-dimensional data. The spread of scores along a component reflects how much the data points vary along that axis.</p>
+
+      <h3>Biplots</h3>
+      <p>A <strong>biplot</strong> overlays the scores (data points) and the loadings (variable arrows) on the same plot. Each arrow represents an original variable, pointing in the direction of its loading. Brain regions that lie in the direction an arrow points tend to have high values for that variable. Biplots let you simultaneously see which brain regions group together and which original variables are responsible for that grouping.</p>
+
+      <h3>Orthogonality</h3>
+      <p>Principal components are always <strong>orthogonal</strong> (perpendicular) to each other. This means they capture completely independent patterns of variation. The information in PC1 has zero overlap with the information in PC2. This is a mathematical guarantee that makes PCA components non-redundant &mdash; each component tells you something genuinely new about the structure of the data.</p>
+    </div>
+
+    <!-- ====== PCA vs UMAP ====== -->
+    <div class="section">
+      <div class="section-label">Comparison</div>
+      <h2>PCA vs. UMAP</h2>
+      <p>PCA and UMAP are both dimensionality reduction methods, but they work very differently and have complementary strengths.</p>
+
+      <p><strong>PCA is linear.</strong> It can only find straight-line axes of variation. If the structure of your data lies along curved surfaces or complex manifolds in high-dimensional space, PCA will miss it or distort it. UMAP can capture nonlinear relationships because it works by preserving local neighborhood structure rather than global linear axes.</p>
+
+      <p><strong>PCA is deterministic.</strong> Given the same data, PCA always produces the same result. There are no random seeds, no stochastic optimization, and no hyperparameters to tune. This makes PCA results perfectly reproducible and removes the need for stability checks across multiple runs.</p>
+
+      <p><strong>PCA preserves global structure quantitatively.</strong> Distances and angles in a PCA plot have precise mathematical meanings tied to variance and correlation. UMAP preserves local neighborhoods well but distorts global distances. If you need to make quantitative statements about how different two brain regions are, PCA is the better choice.</p>
+
+      <p><strong>PCA components are interpretable.</strong> You can inspect the loadings to understand exactly what biological variables drive each axis. UMAP dimensions have no such interpretable meaning &mdash; the x and y axes are arbitrary embedding coordinates.</p>
+
+      <div class="callout callout-info">
+        <strong>When to use which:</strong> Use PCA when you need interpretable axes, quantitative distances, or want to know which variables drive the major patterns. Use UMAP when you want to visualize complex, nonlinear cluster structure or when PCA's first two components capture too little variance to be informative. Best practice is to use both and compare: patterns that emerge in both PCA and UMAP are the most trustworthy.
+      </div>
+    </div>
+
+    <!-- ====== Common Misinterpretations ====== -->
+    <div class="section">
+      <div class="section-label">Critical Caveats</div>
+      <h2>Common Misinterpretations to Avoid</h2>
+
+      <div class="callout callout-danger">
+        <strong>Do not assume PCA components correspond to single biological processes.</strong> A principal component is a weighted mixture of all original variables. PC1 might reflect a combination of cell-type composition, developmental origin, and metabolic activity all at once. It is rarely the case that a single clean biological story explains an entire component.
+      </div>
+
+      <div class="callout callout-danger">
+        <strong>Do not ignore the variance explained.</strong> If PC1 and PC2 together explain only 15% of the total variance, the scatter plot is showing you a small fraction of the data's structure. Important groupings may exist in higher components that are not visible in the standard 2D plot.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>PCA is sensitive to the scale of variables.</strong> If one variable has values ranging from 0 to 10,000 while another ranges from 0 to 1, the large-range variable will dominate the principal components regardless of its biological importance. This is why data is typically <strong>z-score normalized</strong> before PCA &mdash; to put all variables on the same scale. Without normalization, PCA results can be misleading.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Outliers can distort PCA.</strong> Because PCA maximizes variance, a single extreme data point can pull an entire principal component toward itself. Always check for outliers before interpreting PCA results, and consider whether extreme values reflect genuine biology or measurement artifacts.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>The sign of a component is arbitrary.</strong> Multiplying all loadings and scores on a component by &minus;1 produces an equally valid solution. If PC1 has positive loadings for cortical genes, an equivalent analysis might show negative loadings for those same genes with all the scores flipped. The relationships between data points remain identical &mdash; only the direction of the axis is reversed.
+      </div>
+    </div>
+
+    <!-- ====== How to Read a PCA Plot ====== -->
+    <div class="section">
+      <div class="section-label">Interpretation Guide</div>
+      <h2>How to Read a PCA Plot: A Step-by-Step Approach</h2>
+
+      <ol class="step-list">
+        <li><strong>Check the variance explained.</strong> Look at the axis labels: they should tell you how much variance PC1 and PC2 capture. If the two components together explain less than about 30% of the total variance, the plot is showing you only a partial picture and you should explore higher components as well.</li>
+        <li><strong>Identify clusters and gradients.</strong> Look for groups of brain regions that cluster together. Also look for continuous gradients where regions are spread along an axis rather than forming discrete clumps. Both patterns are biologically meaningful.</li>
+        <li><strong>Interpret the axes using loadings.</strong> Examine which original variables have the largest loadings on PC1 and PC2. These are the variables that drive the separation you see in the plot. For gene expression data, the top-loading genes on PC1 often relate to the cortical vs. subcortical distinction.</li>
+        <li><strong>Check for outliers.</strong> Brain regions that sit far from all others may have unusual profiles. Determine whether they represent genuine biological outliers (like the cerebellum, which has a highly distinct gene expression signature) or possible data quality issues.</li>
+        <li><strong>Examine higher components.</strong> PC3, PC4, and beyond may reveal additional structure that is invisible in the PC1 vs. PC2 plot. Plotting PC1 vs. PC3 or PC2 vs. PC3 can expose groupings that the first two components miss.</li>
+        <li><strong>Cross-reference with other methods.</strong> Compare PCA groupings with UMAP clusters and dendrogram branches. Patterns that are consistent across methods are the most reliable.</li>
+      </ol>
+    </div>
+
+    <!-- ====== Video Guide ====== -->
+    <div class="section">
+      <div class="section-label">Video Guides</div>
+      <h2>PCA Video Walkthroughs</h2>
+      <p>These videos walk through PCA concepts using intuitive analogies and show how to interpret PCA results in the context of brain organization data.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 16px;">
+        <div>
+          <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+            <iframe src="https://drive.google.com/file/d/1vb1vAPCRAH8G781YVnMdtGU2VD6u5aR0/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+          <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 8px; text-align: center;">The "Big Five" of Biology: Decoding PCA</p>
+        </div>
+        <div>
+          <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+            <iframe src="https://drive.google.com/file/d/1jyVUXQXcshX98U4grZixN0n9JIshm5xL/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+          <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 8px; text-align: center;">Demystifying PCA Loadings: The Personality Recipe</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== External Resources ====== -->
+    <div class="section">
+      <div class="section-label">External Resources</div>
+      <h2>Interactive Demonstrations</h2>
+      <p>These external tools let you explore PCA visually and build intuition for how it works.</p>
+
+      <a class="resource-card" href="https://setosa.io/ev/principal-component-analysis/" target="_blank" rel="noopener">
+        <div class="resource-icon">&#128218;</div>
+        <div class="resource-body">
+          <h3>Explained Visually: PCA</h3>
+          <p>An interactive visual explanation of PCA that lets you drag data points around and watch the principal components update in real time. One of the best resources for building geometric intuition about what PCA actually does to your data.</p>
+          <span class="url-hint">setosa.io/ev/principal-component-analysis &rarr;</span>
+        </div>
+      </a>
+
+      <a class="resource-card" href="https://bioturing.medium.com/how-to-read-pca-biplots-and-scree-plots-186246aae063" target="_blank" rel="noopener">
+        <div class="resource-icon">&#128202;</div>
+        <div class="resource-body">
+          <h3>How to Read PCA Biplots and Scree Plots</h3>
+          <p>A practical guide to interpreting the two most common PCA visualizations, with biological examples. Covers how to read loading arrows, what the scree plot tells you about data dimensionality, and when to look beyond the first two components.</p>
+          <span class="url-hint">bioturing.medium.com &rarr;</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- ====== Further Reading ====== -->
+    <div class="section">
+      <div class="section-label">Reference</div>
+      <h2>Further Reading</h2>
+      <p>Jolliffe, I. T., &amp; Cadima, J. (2016). Principal component analysis: a review and recent developments. <em>Philosophical Transactions of the Royal Society A</em>, 374(2065), 20150202. This review covers the mathematical foundations of PCA, modern extensions including sparse and robust variants, and practical guidance on interpretation in the biological sciences.</p>
+      <p>Ringnér, M. (2008). What is principal component analysis? <em>Nature Biotechnology</em>, 26(3), 303&ndash;304. A concise, accessible primer written specifically for biologists who need to understand PCA outputs in genomic and transcriptomic studies.</p>
+    </div>
+
+    <footer>
+      PSYCH 332 &mdash; University of Washington
+    </footer>
+
+  </div>
+</body>
+</html>

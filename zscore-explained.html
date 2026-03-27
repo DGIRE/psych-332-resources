@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Z-Score Normalization Explained – PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: #0779be; }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 40px 30px 36px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .hero-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-logo svg {
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+    }
+
+    .hero-logo-text { text-align: left; }
+
+    .hero-logo-text .overline {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #5a7d9e;
+      margin-bottom: 2px;
+    }
+
+    .hero-logo-text .brand {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .hero-logo-text .tagline {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #0779be;
+      margin-top: 4px;
+    }
+
+    .hero h1 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #b0c4de;
+      margin-top: 12px;
+    }
+
+    .hero .subtitle-line {
+      width: 60px;
+      height: 2px;
+      background: #0779be;
+      margin: 16px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 36px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      animation: fadeInUp 0.5s ease-out both;
+    }
+
+    .section:nth-child(3) { animation-delay: 0.1s; }
+    .section:nth-child(4) { animation-delay: 0.15s; }
+    .section:nth-child(5) { animation-delay: 0.2s; }
+    .section:nth-child(6) { animation-delay: 0.25s; }
+    .section:nth-child(7) { animation-delay: 0.3s; }
+    .section:nth-child(8) { animation-delay: 0.35s; }
+    .section:nth-child(9) { animation-delay: 0.4s; }
+
+    .section-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #0779be;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #e8eef5;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 24px 0 10px;
+      color: #e8eef5;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #b0c4de;
+      margin-bottom: 12px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    strong { color: #e8eef5; }
+
+    .callout {
+      padding: 18px 22px;
+      border-radius: 10px;
+      margin: 18px 0;
+      font-size: 0.93rem;
+    }
+
+    .callout-warning {
+      background: rgba(220, 160, 50, 0.1);
+      border: 1px solid rgba(220, 160, 50, 0.35);
+      color: #e8d090;
+    }
+    .callout-warning strong { color: #f0d060; }
+
+    .callout-info {
+      background: rgba(7, 121, 190, 0.1);
+      border: 1px solid rgba(7, 121, 190, 0.3);
+      color: #a0c8e0;
+    }
+    .callout-info strong { color: #60b0e0; }
+
+    .callout-danger {
+      background: rgba(220, 70, 70, 0.1);
+      border: 1px solid rgba(220, 70, 70, 0.35);
+      color: #f0b0b0;
+    }
+    .callout-danger strong { color: #ff8888; }
+
+    /* Formula box */
+    .formula-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(7, 121, 190, 0.3);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .formula {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #ffffff;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .formula-var {
+      font-style: italic;
+      color: #60b0e0;
+    }
+
+    .formula-caption {
+      font-size: 0.85rem;
+      color: #8aacc8;
+      line-height: 1.6;
+    }
+
+    /* Example table */
+    .example-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 0.88rem;
+    }
+
+    .example-table th {
+      text-align: center;
+      padding: 10px 14px;
+      background: rgba(7, 121, 190, 0.15);
+      color: #e8eef5;
+      font-weight: 600;
+      border-bottom: 2px solid rgba(7, 121, 190, 0.3);
+    }
+
+    .example-table td {
+      text-align: center;
+      padding: 10px 14px;
+      color: #b0c4de;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .example-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .val-high { color: #ff8888; font-weight: 600; }
+    .val-low { color: #60b0e0; font-weight: 600; }
+    .val-avg { color: #b0c4de; }
+
+    /* Diagram */
+    .diagram-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 18px 0;
+      text-align: center;
+    }
+
+    .diagram-box svg { max-width: 100%; height: auto; }
+
+    .diagram-caption {
+      font-size: 0.82rem;
+      color: #5a7d9e;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    /* Ordered steps */
+    .step-list {
+      counter-reset: step-counter;
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      position: relative;
+      padding-left: 32px;
+      margin-bottom: 10px;
+      font-size: 0.93rem;
+      color: #b0c4de;
+      line-height: 1.6;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(7, 121, 190, 0.2);
+      border: 1px solid rgba(7, 121, 190, 0.4);
+      color: #0779be;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: #5a7d9e;
+      font-size: 0.85rem;
+      animation: fadeIn 0.6s ease-out 0.5s both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .hero { padding: 24px 16px 20px; }
+      .hero-logo { flex-direction: column; gap: 12px; }
+      .hero-logo svg { width: 72px; height: 72px; }
+      .hero-logo-text { text-align: center; }
+      .hero-logo-text .brand { font-size: 2rem; }
+      .section { padding: 20px 16px; }
+      h2 { font-size: 1.25rem; }
+      .formula { font-size: 1.2rem; }
+      .example-table { font-size: 0.8rem; }
+      .example-table th, .example-table td { padding: 8px 8px; }
+    }
+    @media (max-width: 768px) and (min-width: 481px) {
+      .hero { padding: 30px 24px 26px; }
+      .hero-logo svg { width: 85px; height: 85px; }
+      .hero-logo-text .brand { font-size: 2.4rem; }
+      .section { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <a class="back-link" href="module1-tutorials.html">&#8592; Back to Module 1 Tutorials</a>
+
+    <!-- ====== Hero ====== -->
+    <div class="hero">
+      <div class="hero-logo">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Bell curve (normal distribution) -->
+          <path d="M10,95 Q20,95 30,90 Q40,70 50,40 Q55,20 60,15 Q65,20 70,40 Q80,70 90,90 Q100,95 110,95" fill="rgba(7,121,190,0.2)" stroke="#0779be" stroke-width="2.5"/>
+          <!-- Baseline -->
+          <line x1="10" y1="95" x2="110" y2="95" stroke="#2a6496" stroke-width="2"/>
+          <!-- Mean line -->
+          <line x1="60" y1="15" x2="60" y2="95" stroke="#d4a030" stroke-width="2" stroke-dasharray="4,3" opacity="0.8"/>
+          <!-- Standard deviation markers -->
+          <line x1="38" y1="75" x2="38" y2="95" stroke="#60b0e0" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
+          <line x1="82" y1="75" x2="82" y2="95" stroke="#60b0e0" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
+          <!-- Labels -->
+          <text x="56" y="108" fill="#d4a030" font-size="9" font-weight="700" font-family="Inter, sans-serif">&#956;</text>
+          <text x="32" y="108" fill="#60b0e0" font-size="8" font-weight="600" font-family="Inter, sans-serif">-1&#963;</text>
+          <text x="77" y="108" fill="#60b0e0" font-size="8" font-weight="600" font-family="Inter, sans-serif">+1&#963;</text>
+          <!-- Data points along curve -->
+          <circle cx="35" cy="82" r="3" fill="#60b0e0" opacity="0.7"/>
+          <circle cx="45" cy="55" r="3" fill="#0779be" opacity="0.8"/>
+          <circle cx="55" cy="25" r="3" fill="#d4a030" opacity="0.8"/>
+          <circle cx="65" cy="25" r="3" fill="#d4a030" opacity="0.8"/>
+          <circle cx="75" cy="55" r="3" fill="#0779be" opacity="0.8"/>
+          <circle cx="88" cy="88" r="3" fill="#60b0e0" opacity="0.7"/>
+          <!-- Z-score arrow -->
+          <line x1="60" y1="78" x2="82" y2="78" stroke="#e8eef5" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <defs>
+            <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+              <polygon points="0 0, 6 2, 0 4" fill="#e8eef5"/>
+            </marker>
+          </defs>
+          <text x="65" y="74" fill="#e8eef5" font-size="8" font-weight="600" font-family="Inter, sans-serif">z = 1.0</text>
+        </svg>
+        <div class="hero-logo-text">
+          <div class="overline">Standardization</div>
+          <div class="brand">Z-Score</div>
+          <div class="tagline">Normalization</div>
+        </div>
+      </div>
+      <h1>Putting All Variables on the Same Scale Before Analysis</h1>
+      <div class="subtitle-line"></div>
+    </div>
+
+    <!-- ====== What Is Z-Score Normalization? ====== -->
+    <div class="section">
+      <div class="section-label">Overview</div>
+      <h2>What Is Z-Score Normalization?</h2>
+      <p>Z-score normalization (also called standardization) is a preprocessing step that transforms each variable so that it has a <strong>mean of 0</strong> and a <strong>standard deviation of 1</strong>. For every value in the dataset, you subtract the variable's mean and divide by its standard deviation. The result is a dimensionless number &mdash; the z-score &mdash; that tells you how many standard deviations that value is above or below the mean.</p>
+      <p>This transformation is essential when your data contains variables measured on different scales. In brain data, gene expression values might range from 0 to 50,000, structural connectivity strengths from 0 to 1, and fMRI activation z-statistics from &minus;5 to +5. Without normalization, any multi-variable analysis (PCA, clustering, UMAP) would be dominated by whichever variable has the largest numerical range, regardless of its biological importance.</p>
+
+      <div class="formula-box">
+        <div class="formula">
+          <span class="formula-var">z</span> = (<span class="formula-var">x</span> &minus; <span class="formula-var">&mu;</span>) / <span class="formula-var">&sigma;</span>
+        </div>
+        <div class="formula-caption">
+          where <em>x</em> is the original value, <em>&mu;</em> is the mean of that variable across all data points, and <em>&sigma;</em> is the standard deviation.
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Why It Matters ====== -->
+    <div class="section">
+      <div class="section-label">Motivation</div>
+      <h2>Why Normalization Matters for Brain Data</h2>
+
+      <h3>The scale problem</h3>
+      <p>Imagine you are comparing brain regions using two genes: Gene A has expression values between 100 and 50,000, while Gene B ranges between 2 and 8. Without normalization, a distance calculation between two brain regions would be almost entirely determined by Gene A, because the numbers are so much larger. Gene B's contribution would be negligible even if it is the more biologically meaningful variable. Z-score normalization eliminates this problem by putting both genes on the same scale.</p>
+
+      <h3>A concrete example</h3>
+      <table class="example-table">
+        <thead>
+          <tr>
+            <th>Brain Region</th>
+            <th>Gene A (raw)</th>
+            <th>Gene B (raw)</th>
+            <th>Gene A (z-score)</th>
+            <th>Gene B (z-score)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hippocampus</td>
+            <td class="val-high">45,000</td>
+            <td class="val-high">7.5</td>
+            <td class="val-high">+1.8</td>
+            <td class="val-high">+1.6</td>
+          </tr>
+          <tr>
+            <td>V1 (visual cortex)</td>
+            <td class="val-avg">25,000</td>
+            <td class="val-avg">5.0</td>
+            <td class="val-avg">+0.0</td>
+            <td class="val-avg">+0.0</td>
+          </tr>
+          <tr>
+            <td>Thalamus</td>
+            <td class="val-low">8,000</td>
+            <td class="val-low">2.5</td>
+            <td class="val-low">&minus;1.5</td>
+            <td class="val-low">&minus;1.6</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>After z-scoring, both genes contribute equally to distance calculations. The hippocampus and thalamus are now recognized as being far apart on both variables, while V1 sits near the average on both. Without normalization, the Euclidean distance would be dominated by the 37,000-unit gap in Gene A, and the biologically meaningful 5-unit difference in Gene B would be invisible.</p>
+
+      <h3>Enabling cross-variable comparisons</h3>
+      <p>Z-scores let you directly compare values across different variables. A z-score of +2.0 means the same thing whether it came from gene expression, connectivity strength, or fMRI activation: the value is 2 standard deviations above that variable's mean. This common scale is what makes heatmaps in clustergrams interpretable &mdash; the color coding (typically blue for negative, red for positive z-scores) shows you at a glance which brain regions have unusually high or low values for each variable.</p>
+    </div>
+
+    <!-- ====== How Z-Scoring Works ====== -->
+    <div class="section">
+      <div class="section-label">Step by Step</div>
+      <h2>How Z-Score Normalization Works</h2>
+
+      <ol class="step-list">
+        <li><strong>Choose the direction of normalization.</strong> You must decide whether to normalize across rows (brain regions) or across columns (variables/genes). In most brain data analyses, you normalize <strong>each variable (column) independently</strong>, so that every gene, connection, or function has a mean of 0 and a standard deviation of 1 across all brain regions.</li>
+        <li><strong>Compute the mean.</strong> For each variable, calculate the average value across all brain regions. This is the <em>&mu;</em> in the formula.</li>
+        <li><strong>Compute the standard deviation.</strong> For each variable, calculate how spread out the values are. This is the <em>&sigma;</em> in the formula. A large standard deviation means the variable varies widely across brain regions; a small one means it is relatively uniform.</li>
+        <li><strong>Subtract the mean and divide by the standard deviation.</strong> For each value, apply the formula: z = (x &minus; &mu;) / &sigma;. After this transformation, each variable has a mean of exactly 0 and a standard deviation of exactly 1.</li>
+        <li><strong>Interpret the z-scores.</strong> A z-score of 0 means the value is average for that variable. Positive z-scores indicate above-average values; negative z-scores indicate below-average values. The magnitude tells you how unusual the value is: z-scores beyond &plusmn;2 are in the top or bottom ~2.5% of the distribution.</li>
+      </ol>
+    </div>
+
+    <!-- ====== When to Normalize ====== -->
+    <div class="section">
+      <div class="section-label">Practical Guide</div>
+      <h2>When to Normalize (and When Not To)</h2>
+
+      <div class="callout callout-info">
+        <strong>Always normalize before PCA.</strong> PCA finds directions of maximum variance. Without normalization, the components will be dominated by whichever variables have the largest numerical range. Z-scoring ensures that every variable contributes proportionally to its biological variability, not its arbitrary measurement scale.
+      </div>
+
+      <div class="callout callout-info">
+        <strong>Always normalize before Euclidean-distance-based clustering.</strong> Euclidean distance sums the squared differences across all variables. Variables with large ranges will dominate the distance calculation. Z-scoring puts all variables on equal footing so that the clustering reflects the full profile of each brain region.
+      </div>
+
+      <div class="callout callout-info">
+        <strong>Always normalize before UMAP with Euclidean distance.</strong> UMAP constructs nearest-neighbor graphs using the chosen distance metric. If that metric is Euclidean, the same scale-sensitivity problem applies.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Correlation-based methods may not require normalization.</strong> Correlation distance is inherently scale-invariant because it standardizes internally. If you are using correlation distance for clustering, z-scoring will not change the results. However, it does not hurt, and it makes the raw values easier to interpret in a heatmap.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Be cautious with variables that have zero or near-zero variance.</strong> If a gene is expressed at nearly the same level in every brain region, its standard deviation will be very small, and z-scoring will amplify noise in that variable. Many analysis pipelines filter out low-variance variables before normalization to avoid this problem.
+      </div>
+    </div>
+
+    <!-- ====== Common Misinterpretations ====== -->
+    <div class="section">
+      <div class="section-label">Critical Caveats</div>
+      <h2>Common Misinterpretations to Avoid</h2>
+
+      <div class="callout callout-danger">
+        <strong>Z-scores are relative, not absolute.</strong> A z-score of +2 does not mean the value is "high" in any absolute sense. It means it is 2 standard deviations above the mean <em>of that particular variable in that particular dataset</em>. If you add more brain regions to the dataset, all the z-scores will change because the mean and standard deviation will change.
+      </div>
+
+      <div class="callout callout-danger">
+        <strong>Z-scoring does not make data normally distributed.</strong> Z-score normalization shifts and rescales the data but does not change its shape. If the original distribution was skewed (as gene expression data often is), the z-scored distribution will be equally skewed. The transformation guarantees mean = 0 and SD = 1, not normality.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>The direction of normalization matters.</strong> Normalizing each gene across brain regions (column-wise) answers a different question than normalizing each brain region across genes (row-wise). Column-wise normalization asks "which brain regions have unusually high or low expression of this gene?" Row-wise normalization asks "which genes are unusually expressed in this brain region relative to its other genes?" Most analyses use column-wise normalization, but be aware of which direction was applied.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Outliers can distort z-scores.</strong> Because z-scoring uses the mean and standard deviation, a single extreme value can pull the mean toward itself and inflate the standard deviation, compressing the z-scores of all other data points. If your data contains strong outliers, consider robust alternatives like median-based normalization or rank-based transformations before applying z-scoring.
+      </div>
+    </div>
+
+    <!-- ====== Connection to Other Methods ====== -->
+    <div class="section">
+      <div class="section-label">Integration</div>
+      <h2>How Z-Scoring Connects to the Other Techniques</h2>
+
+      <p>Z-score normalization is the preprocessing foundation that makes the other computational techniques in this module work correctly. Here is how it fits into the analysis pipeline:</p>
+
+      <p><strong>Z-scoring &rarr; PCA:</strong> After z-scoring, PCA can correctly identify the principal components based on biological variance rather than measurement-scale artifacts. The variance explained by each component reflects genuine patterns in the data, not the dominance of a high-range variable.</p>
+
+      <p><strong>Z-scoring &rarr; Hierarchical Clustering:</strong> Z-scored values ensure that the distance matrix used for clustering treats all variables equally. The resulting dendrogram and clustergram reflect multi-variable similarity rather than being driven by one or two high-range variables.</p>
+
+      <p><strong>Z-scoring &rarr; UMAP:</strong> With z-scored input, UMAP's nearest-neighbor calculations properly account for all variables. The clusters and gradients in the UMAP plot reflect the full profile of each brain region rather than a distorted view dominated by large-range variables.</p>
+
+      <p><strong>Z-scoring &rarr; Heatmaps:</strong> In a clustergram heatmap, z-scored values produce a meaningful color scale: blue cells indicate below-average values and red cells indicate above-average values for each variable. Without z-scoring, the color scale would be different for every variable, making the heatmap uninterpretable.</p>
+
+      <div class="callout callout-info">
+        <strong>Think of z-scoring as leveling the playing field.</strong> It ensures that no single variable drowns out the others just because it happens to be measured in larger numbers. Every downstream analysis benefits from this equal treatment of variables.
+      </div>
+    </div>
+
+    <!-- ====== Further Reading ====== -->
+    <div class="section">
+      <div class="section-label">Reference</div>
+      <h2>Further Reading</h2>
+      <p>Jain, A., Nandakumar, K., &amp; Ross, A. (2005). Score normalization in multimodal biometric systems. <em>Pattern Recognition</em>, 38(12), 2270&ndash;2285. While focused on biometrics, this paper provides an excellent overview of normalization techniques including z-score, min-max, and decimal scaling, with clear explanations of when each is appropriate.</p>
+      <p>Välikangas, T., Suomi, T., &amp; Elo, L. L. (2018). A systematic evaluation of normalization methods in quantitative label-free proteomics. <em>Briefings in Bioinformatics</em>, 19(1), 1&ndash;11. A practical comparison of normalization methods for high-dimensional biological data, showing how the choice of normalization affects downstream analyses including clustering and differential expression testing.</p>
+    </div>
+
+    <footer>
+      PSYCH 332 &mdash; University of Washington
+    </footer>
+
+  </div>
+</body>
+</html>

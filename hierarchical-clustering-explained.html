@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hierarchical Clustering Explained – PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #5a7d9e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: #0779be; }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 40px 30px 36px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .hero-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-logo svg {
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+    }
+
+    .hero-logo-text { text-align: left; }
+
+    .hero-logo-text .overline {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #5a7d9e;
+      margin-bottom: 2px;
+    }
+
+    .hero-logo-text .brand {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1px;
+      line-height: 1.1;
+    }
+
+    .hero-logo-text .tagline {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #0779be;
+      margin-top: 4px;
+    }
+
+    .hero h1 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #b0c4de;
+      margin-top: 12px;
+    }
+
+    .hero .subtitle-line {
+      width: 60px;
+      height: 2px;
+      background: #0779be;
+      margin: 16px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 36px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      animation: fadeInUp 0.5s ease-out both;
+    }
+
+    .section:nth-child(3) { animation-delay: 0.1s; }
+    .section:nth-child(4) { animation-delay: 0.15s; }
+    .section:nth-child(5) { animation-delay: 0.2s; }
+    .section:nth-child(6) { animation-delay: 0.25s; }
+    .section:nth-child(7) { animation-delay: 0.3s; }
+    .section:nth-child(8) { animation-delay: 0.35s; }
+    .section:nth-child(9) { animation-delay: 0.4s; }
+
+    .section-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #0779be;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #e8eef5;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 24px 0 10px;
+      color: #e8eef5;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #b0c4de;
+      margin-bottom: 12px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    strong { color: #e8eef5; }
+
+    .callout {
+      padding: 18px 22px;
+      border-radius: 10px;
+      margin: 18px 0;
+      font-size: 0.93rem;
+    }
+
+    .callout-warning {
+      background: rgba(220, 160, 50, 0.1);
+      border: 1px solid rgba(220, 160, 50, 0.35);
+      color: #e8d090;
+    }
+    .callout-warning strong { color: #f0d060; }
+
+    .callout-info {
+      background: rgba(7, 121, 190, 0.1);
+      border: 1px solid rgba(7, 121, 190, 0.3);
+      color: #a0c8e0;
+    }
+    .callout-info strong { color: #60b0e0; }
+
+    .callout-danger {
+      background: rgba(220, 70, 70, 0.1);
+      border: 1px solid rgba(220, 70, 70, 0.35);
+      color: #f0b0b0;
+    }
+    .callout-danger strong { color: #ff8888; }
+
+    /* Diagram */
+    .diagram-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 18px 0;
+      text-align: center;
+    }
+
+    .diagram-box svg { max-width: 100%; height: auto; }
+
+    .diagram-caption {
+      font-size: 0.82rem;
+      color: #5a7d9e;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    /* Resource cards */
+    .resource-card {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin: 16px 0;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .resource-card:hover {
+      border-color: #0779be;
+      background: rgba(7, 121, 190, 0.08);
+      transform: translateX(4px);
+    }
+
+    .resource-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(7, 121, 190, 0.2);
+      border: 1px solid rgba(7, 121, 190, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .resource-card:hover .resource-icon {
+      background: rgba(7, 121, 190, 0.35);
+    }
+
+    .resource-body h3 {
+      font-size: 1rem;
+      margin: 0 0 6px;
+      color: #ffffff;
+    }
+
+    .resource-body p {
+      font-size: 0.88rem;
+      color: #8aacc8;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .resource-body .url-hint {
+      font-size: 0.78rem;
+      color: #0779be;
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* Ordered steps */
+    .step-list {
+      counter-reset: step-counter;
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      position: relative;
+      padding-left: 32px;
+      margin-bottom: 10px;
+      font-size: 0.93rem;
+      color: #b0c4de;
+      line-height: 1.6;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(7, 121, 190, 0.2);
+      border: 1px solid rgba(7, 121, 190, 0.4);
+      color: #0779be;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    /* Comparison table */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 0.9rem;
+    }
+
+    .compare-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: rgba(7, 121, 190, 0.15);
+      color: #e8eef5;
+      font-weight: 600;
+      border-bottom: 2px solid rgba(7, 121, 190, 0.3);
+    }
+
+    .compare-table td {
+      padding: 10px 14px;
+      color: #b0c4de;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .compare-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: #5a7d9e;
+      font-size: 0.85rem;
+      animation: fadeIn 0.6s ease-out 0.5s both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .hero { padding: 24px 16px 20px; }
+      .hero-logo { flex-direction: column; gap: 12px; }
+      .hero-logo svg { width: 72px; height: 72px; }
+      .hero-logo-text { text-align: center; }
+      .hero-logo-text .brand { font-size: 1.6rem; }
+      .section { padding: 20px 16px; }
+      h2 { font-size: 1.25rem; }
+      .resource-card { flex-direction: column; gap: 12px; }
+      .compare-table { font-size: 0.82rem; }
+      .compare-table th, .compare-table td { padding: 8px 10px; }
+    }
+    @media (max-width: 768px) and (min-width: 481px) {
+      .hero { padding: 30px 24px 26px; }
+      .hero-logo svg { width: 85px; height: 85px; }
+      .hero-logo-text .brand { font-size: 1.9rem; }
+      .section { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <a class="back-link" href="module1-tutorials.html">&#8592; Back to Module 1 Tutorials</a>
+
+    <!-- ====== Hero ====== -->
+    <div class="hero">
+      <div class="hero-logo">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Dendrogram tree structure -->
+          <!-- Leaf nodes at bottom -->
+          <circle cx="15" cy="105" r="4" fill="#60b0e0" opacity="0.8"/>
+          <circle cx="35" cy="105" r="4" fill="#60b0e0" opacity="0.8"/>
+          <circle cx="55" cy="105" r="4" fill="#0779be" opacity="0.8"/>
+          <circle cx="75" cy="105" r="4" fill="#0779be" opacity="0.8"/>
+          <circle cx="95" cy="105" r="4" fill="#d4a030" opacity="0.8"/>
+          <circle cx="110" cy="105" r="4" fill="#d4a030" opacity="0.8"/>
+
+          <!-- Level 1 merges -->
+          <line x1="15" y1="101" x2="15" y2="80" stroke="#2a6496" stroke-width="2"/>
+          <line x1="35" y1="101" x2="35" y2="80" stroke="#2a6496" stroke-width="2"/>
+          <line x1="15" y1="80" x2="35" y2="80" stroke="#2a6496" stroke-width="2"/>
+
+          <line x1="55" y1="101" x2="55" y2="75" stroke="#2a6496" stroke-width="2"/>
+          <line x1="75" y1="101" x2="75" y2="75" stroke="#2a6496" stroke-width="2"/>
+          <line x1="55" y1="75" x2="75" y2="75" stroke="#2a6496" stroke-width="2"/>
+
+          <line x1="95" y1="101" x2="95" y2="82" stroke="#2a6496" stroke-width="2"/>
+          <line x1="110" y1="101" x2="110" y2="82" stroke="#2a6496" stroke-width="2"/>
+          <line x1="95" y1="82" x2="110" y2="82" stroke="#2a6496" stroke-width="2"/>
+
+          <!-- Level 2 merges -->
+          <line x1="25" y1="80" x2="25" y2="50" stroke="#0779be" stroke-width="2.5"/>
+          <line x1="65" y1="75" x2="65" y2="50" stroke="#0779be" stroke-width="2.5"/>
+          <line x1="25" y1="50" x2="65" y2="50" stroke="#0779be" stroke-width="2.5"/>
+
+          <!-- Level 3 merge -->
+          <line x1="102.5" y1="82" x2="102.5" y2="30" stroke="#d4a030" stroke-width="2.5"/>
+          <line x1="45" y1="50" x2="45" y2="30" stroke="#0779be" stroke-width="2.5"/>
+          <line x1="45" y1="30" x2="102.5" y2="30" stroke="#d4a030" stroke-width="2.5" opacity="0.7"/>
+
+          <!-- Root -->
+          <line x1="73.75" y1="30" x2="73.75" y2="12" stroke="#d4a030" stroke-width="3" opacity="0.6"/>
+          <circle cx="73.75" cy="12" r="3" fill="#d4a030" opacity="0.5"/>
+        </svg>
+        <div class="hero-logo-text">
+          <div class="overline">Hierarchical</div>
+          <div class="brand">Clustering</div>
+          <div class="tagline">Dendrograms &amp; Clustergrams</div>
+        </div>
+      </div>
+      <h1>Grouping Brain Regions by Similarity Using Tree-Based Algorithms</h1>
+      <div class="subtitle-line"></div>
+    </div>
+
+    <!-- ====== What Is Hierarchical Clustering? ====== -->
+    <div class="section">
+      <div class="section-label">Overview</div>
+      <h2>What Is Hierarchical Clustering?</h2>
+      <p>Hierarchical clustering is a method that organizes data points into a nested tree of groups based on how similar they are to each other. In the context of brain data, each "data point" is a brain region described by its gene expression profile, structural connectivity pattern, or functional activation signature. The algorithm repeatedly merges the two most similar items (or groups) until all data points belong to a single cluster, building a tree called a <strong>dendrogram</strong> along the way.</p>
+      <p>The dendrogram records the entire history of merges. At the bottom, each brain region is its own leaf. Moving up the tree, leaves join into small clusters, and small clusters merge into larger ones. The height at which two branches join indicates how dissimilar the merged groups were &mdash; lower merges mean more similar, higher merges mean more different. You can "cut" the dendrogram at any height to produce a specific number of clusters.</p>
+      <p>When a dendrogram is displayed alongside a heatmap of the underlying data, the combined visualization is called a <strong>clustergram</strong>. Clustergrams are especially powerful because they simultaneously show you which brain regions group together and which specific variables (genes, connections, or functions) drive those groupings.</p>
+    </div>
+
+    <!-- ====== The Algorithm ====== -->
+    <div class="section">
+      <div class="section-label">How It Works</div>
+      <h2>The Agglomerative Algorithm</h2>
+      <p>The most common form of hierarchical clustering is <strong>agglomerative</strong> (bottom-up). It proceeds as follows:</p>
+
+      <ol class="step-list">
+        <li><strong>Start with every data point as its own cluster.</strong> If you have 50 brain regions, you begin with 50 clusters of size 1.</li>
+        <li><strong>Compute the distance between all pairs of clusters.</strong> This requires a distance metric (how to measure dissimilarity between two brain regions) and a linkage criterion (how to measure dissimilarity between two groups of brain regions).</li>
+        <li><strong>Merge the two closest clusters into one.</strong> Now you have 49 clusters. Record the merge and the distance at which it occurred.</li>
+        <li><strong>Repeat steps 2 and 3</strong> until all data points are in a single cluster. Each merge adds one more branch to the dendrogram.</li>
+      </ol>
+
+      <p>The result is a complete hierarchy: a tree that encodes every possible grouping from "each region alone" to "all regions together." You choose how many groups are meaningful by examining the structure of the tree.</p>
+    </div>
+
+    <!-- ====== Distance Metrics ====== -->
+    <div class="section">
+      <div class="section-label">Core Concepts</div>
+      <h2>Distance Metrics</h2>
+      <p>The distance metric determines how you measure dissimilarity between two individual brain regions. The choice of metric matters enormously because it defines what "similar" means.</p>
+
+      <h3>Euclidean distance</h3>
+      <p>The straight-line distance between two points in the original feature space. Two brain regions with very similar gene expression values across all genes will have a small Euclidean distance. This is the most intuitive metric and works well when you care about the <strong>magnitude</strong> of differences between variables. However, it is sensitive to the scale of the data &mdash; variables with large ranges will dominate the distance calculation unless the data is normalized first.</p>
+
+      <h3>Correlation distance</h3>
+      <p>Measures how similarly two brain regions' profiles <strong>vary across variables</strong>, regardless of their absolute levels. Two regions could have very different mean gene expression but still have a correlation distance near zero if their expression rises and falls across genes in the same pattern. Correlation distance is often preferred in transcriptomic studies because it captures the <em>shape</em> of the expression profile rather than its overall level.</p>
+
+      <h3>Cosine distance</h3>
+      <p>Related to correlation distance, cosine distance measures the angle between two data vectors. It ignores the magnitude of the vectors entirely and focuses on their direction. In practice, on z-score normalized data, correlation distance and cosine distance produce very similar results.</p>
+
+      <div class="callout callout-info">
+        <strong>Which metric should you use?</strong> For z-score normalized brain data, Euclidean and correlation distance often produce similar results. If you are working with raw (non-normalized) data, correlation distance is usually safer because it is naturally invariant to scaling. The analysis page in this course uses Euclidean distance on z-score normalized data, which combines the benefits of both approaches.
+      </div>
+    </div>
+
+    <!-- ====== Linkage Methods ====== -->
+    <div class="section">
+      <div class="section-label">Core Concepts</div>
+      <h2>Linkage Methods</h2>
+      <p>Once you know the distance between individual brain regions, you need a rule for computing the distance between <em>clusters</em> (groups of regions). This rule is the linkage method.</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>How It Works</th>
+            <th>Character</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Ward's</strong></td>
+            <td>Merges the two clusters that cause the smallest increase in total within-cluster variance.</td>
+            <td>Tends to produce compact, roughly equal-sized clusters. The most commonly used method in neuroscience.</td>
+          </tr>
+          <tr>
+            <td><strong>Average</strong></td>
+            <td>Uses the mean distance between all pairs of points across the two clusters.</td>
+            <td>A balanced compromise: not too sensitive to outliers, not too aggressive in forcing equal sizes.</td>
+          </tr>
+          <tr>
+            <td><strong>Complete</strong></td>
+            <td>Uses the maximum distance between any pair of points across the two clusters.</td>
+            <td>Conservative: clusters are only merged when even their most dissimilar members are reasonably close. Produces tight, well-separated groups.</td>
+          </tr>
+          <tr>
+            <td><strong>Single</strong></td>
+            <td>Uses the minimum distance between any pair of points across the two clusters.</td>
+            <td>Aggressive: will merge clusters if just one pair of members is close. Can produce long, chain-like clusters. Rarely used for brain data.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-info">
+        <strong>Recommendation for brain data:</strong> Ward's linkage with Euclidean distance on z-score normalized data is the most common choice in neuroimaging and transcriptomic studies. It tends to produce biologically interpretable clusters that correspond to known anatomical or functional groupings.
+      </div>
+    </div>
+
+    <!-- ====== Reading a Dendrogram ====== -->
+    <div class="section">
+      <div class="section-label">Interpretation Guide</div>
+      <h2>How to Read a Dendrogram</h2>
+
+      <ol class="step-list">
+        <li><strong>Start at the leaves.</strong> Each leaf is a single brain region (or gene, depending on which axis you are reading). Leaves that merge at the lowest branch point are the most similar pair in the dataset.</li>
+        <li><strong>Read upward to trace the merge history.</strong> As you move up the tree, clusters grow larger by incorporating more regions. The height of each horizontal bar indicates the distance (dissimilarity) at which that merge occurred.</li>
+        <li><strong>Look for long vertical gaps.</strong> A large jump in merge height between two successive levels suggests a natural boundary between clusters. These gaps indicate that the groups on either side are substantially more different from each other than the items within each group.</li>
+        <li><strong>Choose the number of clusters by cutting the tree.</strong> Draw an imaginary horizontal line across the dendrogram. The number of vertical lines it crosses equals the number of clusters at that level. Place the cut where you see the largest gap.</li>
+        <li><strong>Identify biologically coherent groups.</strong> Check whether the clusters contain brain regions that share anatomical location, developmental origin, or functional role. Clusters that make biological sense are more likely to reflect genuine organization rather than statistical artifacts.</li>
+        <li><strong>Cross-reference with the heatmap.</strong> In a clustergram, look at the colored blocks in the heatmap next to each cluster. Consistent color patterns within a cluster confirm that those brain regions truly share similar profiles across the measured variables.</li>
+      </ol>
+    </div>
+
+    <!-- ====== Common Misinterpretations ====== -->
+    <div class="section">
+      <div class="section-label">Critical Caveats</div>
+      <h2>Common Misinterpretations to Avoid</h2>
+
+      <div class="callout callout-danger">
+        <strong>The horizontal order of leaves is partially arbitrary.</strong> At every branch point in a dendrogram, the two child branches can be swapped left-to-right without changing the tree's meaning. Two brain regions that appear next to each other in the leaf order are not necessarily the most similar pair &mdash; they may simply happen to be in the same branch. Always use the merge <em>height</em>, not the horizontal position, to judge similarity.
+      </div>
+
+      <div class="callout callout-danger">
+        <strong>Hierarchical clustering always produces a tree, even from random data.</strong> The algorithm will find clusters in pure noise. A dendrogram by itself does not prove that meaningful structure exists. You need to assess whether the clusters are significantly tighter than expected by chance, for example by comparing to permuted data or by checking stability across subsamples.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Different linkage methods can produce very different trees from the same data.</strong> A cluster that appears with Ward's linkage may not appear with average or single linkage. If a grouping is only visible with one specific method, treat it with more caution than one that is robust across methods.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Hierarchical clustering forces a strict tree structure.</strong> It assumes that every data point belongs to exactly one branch at each level. In reality, some brain regions may have mixed identities &mdash; they might be intermediate between two clusters rather than clearly belonging to either. The dendrogram will assign them to one side, but their true nature is ambiguous.
+      </div>
+
+      <div class="callout callout-info">
+        <strong>Always triangulate.</strong> The most reliable groupings are those that appear across multiple methods: in the dendrogram, in a UMAP plot, in a PCA scatter plot, and ideally with some independent biological validation. A cluster that is consistent across all approaches is very likely to reflect genuine biology.
+      </div>
+    </div>
+
+    <!-- ====== Clustergrams ====== -->
+    <div class="section">
+      <div class="section-label">Advanced Concept</div>
+      <h2>Clustergrams: The Full Picture</h2>
+      <p>A clustergram combines two dendrograms with a heatmap. One dendrogram clusters the <strong>rows</strong> (typically brain regions) and the other clusters the <strong>columns</strong> (typically genes, connections, or functional activations). Both the rows and columns are reordered so that similar items are adjacent, and the heatmap cell colors represent the value of each variable for each data point.</p>
+
+      <p>The power of the clustergram is that it reveals <strong>block structure</strong>: rectangular blocks of consistent color indicate that a group of brain regions shares a similar pattern across a group of variables. These co-clustered blocks are often the most biologically interpretable patterns in the data, pointing to sets of genes that are coordinately regulated in specific brain systems.</p>
+
+      <p>In the Module 1 practicum, the clustergram on the analysis page lets you see both the brain region groupings and the gene or connectivity feature groupings simultaneously. Look for bright or dark blocks that stand out from the background &mdash; these represent the strongest signals in the data.</p>
+    </div>
+
+    <!-- ====== Video Guide ====== -->
+    <div class="section">
+      <div class="section-label">Video Guide</div>
+      <h2>Hierarchical Clustering Video Walkthrough</h2>
+      <p>This video explains how hierarchical clustering works, what the dendrogram encodes, and how to interpret clustergrams in the context of brain organization data.</p>
+      <div style="max-width: 640px; margin: 16px auto 0;">
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <iframe src="https://drive.google.com/file/d/1mXHKjJEYRFncIpMcKEzSwrj1QkdPIWsj/preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+        <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 8px; text-align: center;">The Biological Personality Test: Hierarchical Clustering &amp; Clustergrams</p>
+      </div>
+    </div>
+
+    <!-- ====== Further Reading ====== -->
+    <div class="section">
+      <div class="section-label">Reference</div>
+      <h2>Further Reading</h2>
+      <p>Murtagh, F., &amp; Contreras, P. (2012). Algorithms for hierarchical clustering: an overview. <em>WIREs Data Mining and Knowledge Discovery</em>, 2(1), 86&ndash;97. A thorough review of the algorithmic foundations, covering the major linkage methods, their computational complexity, and practical considerations for choosing among them.</p>
+      <p>Eisen, M. B., Spellman, P. T., Brown, P. O., &amp; Botstein, D. (1998). Cluster analysis and display of genome-wide expression patterns. <em>Proceedings of the National Academy of Sciences</em>, 95(25), 14863&ndash;14868. The landmark paper that introduced the clustergram to genomics, demonstrating how hierarchical clustering of gene expression data reveals functionally related gene groups. The same approach applies directly to brain region clustering.</p>
+    </div>
+
+    <footer>
+      PSYCH 332 &mdash; University of Washington
+    </footer>
+
+  </div>
+</body>
+</html>
