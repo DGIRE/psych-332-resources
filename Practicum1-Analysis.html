@@ -3612,8 +3612,18 @@
                 <tr><td>Brain Map ID</td><td>${region['Brain Map ID-1']}</td></tr>
             </table>`;
 
-            // Brain map
-            html += `<canvas id="structureBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
+            // Brain area image from PNG
+            const imgFile = encodeURIComponent(region.Name + '.png');
+            html += `<div style="margin-top: 20px; text-align: center;">
+                <img id="structureBrainImg"
+                     src="Data/area-selection/${imgFile}"
+                     alt="Brain area: ${region.Name}"
+                     style="width: 100%; max-width: 800px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #fff;"
+                     onerror="this.style.display='none'; document.getElementById('structureImgFallback').style.display='block';">
+                <div id="structureImgFallback" style="display:none; padding: 20px; color: #8aacc8; font-size: 13px;">
+                    <canvas id="structureBrainMap" style="width: 100%; max-width: 800px;"></canvas>
+                </div>
+            </div>`;
             html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
 
             // Gene expression bar plot
@@ -3622,8 +3632,17 @@
 
             document.getElementById('structureContent').innerHTML = html;
 
-            // Draw brain map with region name
-            drawRegionOnBrainMap('structureBrainMap', region['Brain Map ID-1'], region.Name);
+            // If PNG fails to load, fall back to the canvas brain map
+            const img = document.getElementById('structureBrainImg');
+            if (img) {
+                img.addEventListener('error', function() {
+                    const fallback = document.getElementById('structureImgFallback');
+                    if (fallback) {
+                        fallback.style.display = 'block';
+                        drawRegionOnBrainMap('structureBrainMap', region['Brain Map ID-1'], region.Name);
+                    }
+                });
+            }
 
             // Gene bar plot — sort ascending so strongest genes appear at top of horizontal bar chart
             const genes = metadata.gene_names;
