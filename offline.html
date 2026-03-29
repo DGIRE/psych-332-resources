@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Offline — PSYCH 332</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f1d2d 0%, #163e65 100%);
+      color: #e8eef5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .offline-card {
+      text-align: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 48px 40px;
+      max-width: 480px;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .offline-card::before {
+      content: "";
+      display: block;
+      height: 3px;
+      margin: -48px -40px 32px;
+      border-radius: 16px 16px 0 0;
+      background: linear-gradient(90deg, transparent, #3b82c4, transparent);
+    }
+
+    .offline-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .offline-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #e8eef5 0%, #7db4e0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .offline-message {
+      font-size: 0.95rem;
+      color: #a0b4cc;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .offline-hint {
+      font-size: 0.8rem;
+      color: #8aa4c0;
+      line-height: 1.5;
+      margin-bottom: 32px;
+      padding: 16px;
+      background: rgba(59,130,196,0.08);
+      border-left: 3px solid #3b82c4;
+      border-radius: 8px;
+      text-align: left;
+    }
+
+    .offline-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid rgba(59,130,196,0.3);
+      background: rgba(59,130,196,0.1);
+      color: #a0b4cc;
+      transition: all 0.3s ease;
+    }
+
+    .offline-button:hover {
+      border-color: rgba(59,130,196,0.5);
+      background: rgba(59,130,196,0.18);
+      color: #e8eef5;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @media (max-width: 480px) {
+      .offline-card { padding: 32px 24px; }
+      .offline-card::before { margin: -32px -24px 24px; }
+      .offline-title { font-size: 1.25rem; }
+      .offline-message { font-size: 0.88rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="offline-card">
+    <div class="offline-icon">📡</div>
+    <h1 class="offline-title">You're Offline</h1>
+    <p class="offline-message">
+      Your internet connection is currently unavailable. However, you can still access previously visited pages using the navigation below.
+    </p>
+    <div class="offline-hint">
+      <strong>Cached Content Available:</strong><br>
+      Click the link below to view previously visited pages, tutorials, and resources from your cache.
+    </div>
+    <a href="/" class="offline-button">
+      <span>Return to Home</span>
+    </a>
+  </div>
+
+  <script>
+    window.addEventListener('online', () => {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(59,130,196,0.9);
+        color: #e8eef5;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-family: Inter, sans-serif;
+        z-index: 2000;
+        animation: fadeIn 0.3s ease-out;
+      `;
+      notification.textContent = 'Connection restored!';
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
+    });
+  </script>
+</body>
+</html>
