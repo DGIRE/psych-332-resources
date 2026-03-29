@@ -3729,7 +3729,7 @@
                     <canvas id="geneBrainMap" style="width: 100%; max-width: 800px;"></canvas>
                 </div>
             </div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('geneBrainMap', 'gene_map_${safeName}')">&#128190; Save Brain Map as PNG</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('geneBrainMap', 'gene_map_${safeName}')">&#128190; Save Brain Map as PNG</button><button class="export-btn" onclick="saveImageAsJPG('geneBrainImg', 'gene_map_${safeName}')">&#128247; Save as JPG</button></div>`;
 
             document.getElementById('geneContent').innerHTML = html;
 
@@ -3808,7 +3808,7 @@
                     <canvas id="dtiBrainMap" style="width: 100%; max-width: 800px;"></canvas>
                 </div>
             </div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('dtiBrainMap', 'dti_map_${safeName}')">&#128190; Save Brain Map as PNG</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('dtiBrainMap', 'dti_map_${safeName}')">&#128190; Save Brain Map as PNG</button><button class="export-btn" onclick="saveImageAsJPG('dtiBrainImg', 'dti_map_${safeName}')">&#128247; Save as JPG</button></div>`;
 
             document.getElementById('dtiContent').innerHTML = html;
 
@@ -3888,7 +3888,7 @@
                     <canvas id="fmriBrainMap" style="width: 100%; max-width: 800px;"></canvas>
                 </div>
             </div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('fmriBrainMap', 'fmri_map_${safeName}')">&#128190; Save Brain Map as PNG</button></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('fmriBrainMap', 'fmri_map_${safeName}')">&#128190; Save Brain Map as PNG</button><button class="export-btn" onclick="saveImageAsJPG('fmriBrainImg', 'fmri_map_${safeName}')">&#128247; Save as JPG</button></div>`;
 
             document.getElementById('fmriContent').innerHTML = html;
 
@@ -3929,6 +3929,33 @@
             link.download = filename + '.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
+        }
+
+        function saveImageAsJPG(imgId, filename) {
+            const img = document.getElementById(imgId);
+            if (!img || !img.src) { alert('No image to save'); return; }
+            const canvas = document.createElement('canvas');
+            const tmpImg = new Image();
+            tmpImg.crossOrigin = 'anonymous';
+            tmpImg.onload = function() {
+                canvas.width = tmpImg.naturalWidth;
+                canvas.height = tmpImg.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(tmpImg, 0, 0);
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = (filename || 'brain_map') + '.jpg';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 'image/jpeg', 0.92);
+            };
+            tmpImg.src = img.src;
         }
 
         // Export a Plotly chart as JPG with white background and enhanced lines/text.
