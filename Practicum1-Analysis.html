@@ -3624,7 +3624,6 @@
                     <canvas id="structureBrainMap" style="width: 100%; max-width: 800px;"></canvas>
                 </div>
             </div>`;
-            html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
 
             // Gene expression bar plot
             html += `<div id="structureGeneBar" class="chart-container"></div>`;
@@ -3720,15 +3719,31 @@
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('geneHistogram', 'gene_histogram_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('geneHistogram', 'gene_histogram_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<div id="geneBarPlot" class="chart-container"></div>`;
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('geneBarPlot', 'gene_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('geneBarPlot', 'gene_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
-            html += `<canvas id="geneBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
-            html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
+            html += `<div style="margin-top: 20px; text-align: center;">
+                <img id="geneBrainImg"
+                     src="Data/gene-maps/${safeName}_expression_map.png"
+                     alt="Gene expression map: ${geneName}"
+                     style="width: 100%; max-width: 800px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #fff;"
+                     onerror="this.style.display='none'; document.getElementById('geneBrainMapFallback').style.display='block';">
+                <div id="geneBrainMapFallback" style="display:none;">
+                    <canvas id="geneBrainMap" style="width: 100%; max-width: 800px;"></canvas>
+                </div>
+            </div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('geneBrainMap', 'gene_map_${safeName}')">&#128190; Save Brain Map as PNG</button></div>`;
 
             document.getElementById('geneContent').innerHTML = html;
 
             Plotly.newPlot('geneHistogram', [trace1], layout1, PLOTLY_CONFIG);
             Plotly.newPlot('geneBarPlot', [trace2], layout2, PLOTLY_CONFIG);
 
-            drawGeneOnBrainMap('geneBrainMap', geneName);
+            // Draw canvas fallback in case PNG is missing
+            const geneImg = document.getElementById('geneBrainImg');
+            if (geneImg) {
+                geneImg.addEventListener('error', function() {
+                    document.getElementById('geneBrainMapFallback').style.display = 'block';
+                    drawGeneOnBrainMap('geneBrainMap', geneName);
+                });
+            }
         }
 
         // ========== DTI EXPLORER ==========
@@ -3783,15 +3798,31 @@
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('dtiHistogram', 'dti_histogram_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('dtiHistogram', 'dti_histogram_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<div id="dtiBarPlot" class="chart-container"></div>`;
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('dtiBarPlot', 'dti_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('dtiBarPlot', 'dti_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
-            html += `<canvas id="dtiBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
-            html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
+            html += `<div style="margin-top: 20px; text-align: center;">
+                <img id="dtiBrainImg"
+                     src="Data/dti-maps/${safeName}_expression_map.png"
+                     alt="DTI connectivity map: ${targetRegion}"
+                     style="width: 100%; max-width: 800px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #fff;"
+                     onerror="this.style.display='none'; document.getElementById('dtiBrainMapFallback').style.display='block';">
+                <div id="dtiBrainMapFallback" style="display:none;">
+                    <canvas id="dtiBrainMap" style="width: 100%; max-width: 800px;"></canvas>
+                </div>
+            </div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('dtiBrainMap', 'dti_map_${safeName}')">&#128190; Save Brain Map as PNG</button></div>`;
 
             document.getElementById('dtiContent').innerHTML = html;
 
             Plotly.newPlot('dtiHistogram', [trace1], layout1, PLOTLY_CONFIG);
             Plotly.newPlot('dtiBarPlot', [trace2], layout2, PLOTLY_CONFIG);
 
-            drawDTIOnBrainMap('dtiBrainMap', targetRegion);
+            // Draw canvas fallback in case PNG is missing
+            const dtiImg = document.getElementById('dtiBrainImg');
+            if (dtiImg) {
+                dtiImg.addEventListener('error', function() {
+                    document.getElementById('dtiBrainMapFallback').style.display = 'block';
+                    drawDTIOnBrainMap('dtiBrainMap', targetRegion);
+                });
+            }
         }
 
         // ========== fMRI EXPLORER ==========
@@ -3847,15 +3878,31 @@
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('fmriHistogram', 'fmri_histogram_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('fmriHistogram', 'fmri_histogram_${safeName}')">&#128247; Save as JPG</button></div>`;
             html += `<div id="fmriBarPlot" class="chart-container"></div>`;
             html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('fmriBarPlot', 'fmri_barplot_${safeName}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('fmriBarPlot', 'fmri_barplot_${safeName}')">&#128247; Save as JPG</button></div>`;
-            html += `<canvas id="fmriBrainMap" style="width: 100%; max-width: 800px; margin-top: 20px;"></canvas>`;
-            html += `<div style="margin-top: 10px;"><a href="https://colab.research.google.com/drive/1PX-TrtbAzrfvXyQ74LFzgw3EKzt8XfBO" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(7, 121, 190, 0.12); border: 1px solid rgba(7, 121, 190, 0.3); border-radius: 6px; color: #5bb8f5; font-size: 13px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(7,121,190,0.25)'" onmouseout="this.style.background='rgba(7,121,190,0.12)'"><img src="https://colab.research.google.com/img/colab_favicon_256px.png" width="16" height="16" style="vertical-align: middle;" alt="Colab"> Explore this brain map interactively in Google Colab</a></div>`;
+            html += `<div style="margin-top: 20px; text-align: center;">
+                <img id="fmriBrainImg"
+                     src="Data/fmri-maps/${safeName}_expression_map.png"
+                     alt="fMRI function map: ${funcName}"
+                     style="width: 100%; max-width: 800px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #fff;"
+                     onerror="this.style.display='none'; document.getElementById('fmriBrainMapFallback').style.display='block';">
+                <div id="fmriBrainMapFallback" style="display:none;">
+                    <canvas id="fmriBrainMap" style="width: 100%; max-width: 800px;"></canvas>
+                </div>
+            </div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="saveCanvasAsPNG('fmriBrainMap', 'fmri_map_${safeName}')">&#128190; Save Brain Map as PNG</button></div>`;
 
             document.getElementById('fmriContent').innerHTML = html;
 
             Plotly.newPlot('fmriHistogram', [trace1], layout1, PLOTLY_CONFIG);
             Plotly.newPlot('fmriBarPlot', [trace2], layout2, PLOTLY_CONFIG);
 
-            drawFMRIOnBrainMap('fmriBrainMap', funcName);
+            // Draw canvas fallback in case PNG is missing
+            const fmriImg = document.getElementById('fmriBrainImg');
+            if (fmriImg) {
+                fmriImg.addEventListener('error', function() {
+                    document.getElementById('fmriBrainMapFallback').style.display = 'block';
+                    drawFMRIOnBrainMap('fmriBrainMap', funcName);
+                });
+            }
         }
 
         // ========== BRAIN MAP RENDERING ==========
@@ -4176,15 +4223,7 @@
             ctx.fillText(colorbarLabel || '', 0, 0);
             ctx.restore();
 
-            // Semi-transparent "See Colab Code" overlay
-            ctx.save();
-            ctx.globalAlpha = 0.35;
-            ctx.font = 'bold 100px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#333333';
-            ctx.fillText('See Colab Code', bmW / 2, titleH + bmH / 2);
-            ctx.restore();
+            // Brain map rendering complete (PNG is primary, canvas is fallback)
         }
 
         function drawRegionOnBrainMap(canvasId, brainMapIds, regionName) {

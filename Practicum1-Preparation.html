@@ -827,7 +827,7 @@
       <h3>Figure Construction</h3>
       <ul>
         <li><strong>Use labeled panels (A, B, C, D&hellip;).</strong> Put a clear letter label in the corner of each sub-image so your caption can reference them.</li>
-        <li><strong>Mix data types.</strong> A strong figure might pair a brain map from the Colab notebook (panel A) with a bar chart of expression data (panel B) and a diagram from a published paper (panel C).</li>
+        <li><strong>Mix data types.</strong> A strong figure might pair a brain map from the Module 1 Analysis page (panel A) with a bar chart of expression data (panel B) and a diagram from a published paper (panel C).</li>
         <li><strong>Annotate directly on the figure.</strong> Add arrows, labels, and color highlights to draw the reader&rsquo;s eye to the key finding.</li>
         <li><strong>Use colored borders or background tints</strong> to visually group related panels.</li>
       </ul>
@@ -858,7 +858,7 @@
           <li>How can this area vary across individuals?</li>
           <li>What are the implications of its connections for its function?</li>
         </ul>
-        <div class="tip"><strong>Strong approach:</strong> Pair a brain map showing the region (from the Colab notebook) with a published DSI or DTI image showing its white matter tracts, then discuss how those connections support cognition.</div>
+        <div class="tip"><strong>Strong approach:</strong> Pair a brain map showing the region (from the analysis page) with a published DSI or DTI image showing its white matter tracts, then discuss how those connections support cognition.</div>
       </div>
 
       <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 2 &mdash; Receptor Gene Expression</button>
@@ -870,7 +870,7 @@
           <li>Are there drugs (pharmaceutical or recreational) that target these receptors?</li>
           <li>How does your region&rsquo;s expression compare to neighboring regions?</li>
         </ul>
-        <div class="tip"><strong>Strong approach:</strong> Use the gene expression bar chart from the Colab, annotate the high/low genes with color-coded arrows, and pair with a published figure showing the receptor&rsquo;s mechanism of action.</div>
+        <div class="tip"><strong>Strong approach:</strong> Use the gene expression bar chart from the analysis page, annotate the high/low genes with color-coded arrows, and pair with a published figure showing the receptor&rsquo;s mechanism of action.</div>
       </div>
 
       <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 3 &mdash; Cognitive Function &amp; fMRI</button>
@@ -903,7 +903,7 @@
       <div class="accordion-content">
         <p>Create an fMRI brain map of your function and analyze which regions drive it.</p>
         <ul>
-          <li>Which regions show the highest activation? Use the bar plot and brain map from the Colab.</li>
+          <li>Which regions show the highest activation? Use the bar plot and brain map from the analysis page.</li>
           <li>How do different brain areas coordinate to produce this function?</li>
           <li>What neurological disorders affect this function, and how does that appear in fMRI data?</li>
         </ul>
@@ -937,7 +937,7 @@
       <button class="accordion-toggle" onclick="toggleAccordion(this)"><span class="arrow">&#9654;</span> Subsection 2 &mdash; Brain-Wide Expression</button>
       <div class="accordion-content">
         <ul>
-          <li>Use the Colab notebook to map where the receptor is expressed across the brain.</li>
+          <li>Use the analysis page to map where the receptor is expressed across the brain.</li>
           <li>Which regions show high vs. low expression? Does the pattern correlate with evolutionary age of structures?</li>
           <li>Does expression overlap with regions associated with known neurological disorders?</li>
           <li>Are there other family members with similar patterns?</li>
@@ -1113,16 +1113,16 @@
 
       // ----- Figure caption examples -----
       figureCaptions: [
-        "Figure X: Structural connectivity of REGION. (A) Brain map highlighting REGION in sagittal view (Allen Brain Atlas). (B) DTI tractography showing major white matter pathways connecting REGION to adjacent cortical areas (generated from Colab notebook). (C) Published diffusion spectrum imaging of the arcuate fasciculus (adapted from Author et al., Year). Collectively, these panels reveal that REGION serves as a hub linking sensory and association areas.",
-        "Figure X: Receptor expression profile of REGION. (A) Horizontal bar chart of receptor gene expression z-scores in REGION, with GENE highlighted in red (Colab data). (B) Brain-wide heatmap of GENE expression across all Allen Atlas regions, with REGION indicated by an arrow. (C) Molecular diagram of the GENE receptor showing ligand-binding domain (adapted from Author et al., Year). High GENE expression in REGION suggests a prominent role for this signaling pathway in the region's function.",
-        "Figure X: Functional activation for FUNCTION. (A) Neurosynth meta-analytic activation map for 'FUNCTION' overlaid on a standard MNI template (neurosynth.org). (B) Bar plot of FUNCTION activation scores by region from the Colab fMRI dataset, with the top five regions labeled. (C) Schematic of a typical fMRI experimental paradigm used to study FUNCTION (adapted from Author et al., Year). The convergence of activation in REGION across panels A and B supports its central role in FUNCTION.",
-        "Figure X: Comparative expression of GENE family members. (A) Clustergram of receptor gene expression across brain regions with GENE's column highlighted (Colab data). (B) Allen Brain Atlas in-situ hybridization image for GENE in coronal section. (C) Phylogenetic tree of the GENE family showing evolutionary conservation (adapted from Author et al., Year). The distinct expression pattern of GENE relative to its family members suggests functional specialization.",
-        "Figure X: Cross-modal analysis of REGION. (A) DTI connectivity matrix row for REGION showing strongest structural connections (Colab data). (B) Neurosynth activation map for FUNCTION with REGION circled. (C) Scatter plot comparing DTI connectivity strength vs. fMRI co-activation for REGION's top connected areas (generated from combined datasets). This multi-modal approach reveals that structural and functional connectivity are correlated for REGION's primary network.",
-        "Figure X: Pharmacological relevance of GENE in REGION. (A) Brain map showing GENE expression intensity across regions with REGION labeled (Colab data). (B) Dose-response curve for a GENE agonist in a behavioral assay (adapted from Author et al., Year). (C) PET scan showing GENE receptor occupancy following drug administration (adapted from Author et al., Year). These panels illustrate the translational relevance of GENE expression patterns to pharmacotherapy.",
-        "Figure X: Network analysis of FUNCTION. (A) Neurosynth co-activation map for FUNCTION showing the distributed network of involved regions. (B) t-SNE embedding of brain regions colored by FUNCTION activation score (Colab data), revealing clusters of co-activated areas. (C) Published resting-state connectivity diagram for the FUNCTION network (adapted from Author et al., Year). The spatial overlap between task-based activation and resting-state networks supports the existence of a dedicated FUNCTION circuit.",
-        "Figure X: Developmental trajectory of REGION. (A) Allen Brain Atlas expression of GENE across developmental stages (BrainSpan data). (B) Structural MRI volumetric data showing REGION maturation from childhood to adulthood (adapted from Author et al., Year). (C) Brain map of REGION from the Colab notebook with age-related annotation. GENE expression peaks during adolescence, paralleling the structural maturation window of REGION.",
-        "Figure X: Pathological implications for REGION. (A) Comparison of GENE expression in REGION between healthy controls and patients with DISORDER (adapted from Author et al., Year). (B) Brain map of REGION from the Colab with lesion overlay. (C) Bar chart of symptom severity correlated with REGION volume (adapted from Author et al., Year). Reduced GENE expression in REGION may contribute to the DISORDER phenotype.",
-        "Figure X: Evolutionary perspective on GENE expression. (A) Cross-species comparison of GENE expression in homologous brain regions (adapted from Author et al., Year). (B) Brain-wide GENE expression heatmap from the Colab data. (C) Cladogram showing GENE conservation across vertebrates (adapted from Author et al., Year). The high conservation of GENE in REGION across species suggests an ancient and essential functional role."
+        "Figure X: Structural connectivity of REGION. (A) Brain map highlighting REGION in sagittal view (Allen Brain Atlas). (B) DTI tractography showing major white matter pathways connecting REGION to adjacent cortical areas (generated from the analysis page). (C) Published diffusion spectrum imaging of the arcuate fasciculus (adapted from Author et al., Year). Collectively, these panels reveal that REGION serves as a hub linking sensory and association areas.",
+        "Figure X: Receptor expression profile of REGION. (A) Horizontal bar chart of receptor gene expression z-scores in REGION, with GENE highlighted in red (analysis page data). (B) Brain-wide heatmap of GENE expression across all Allen Atlas regions, with REGION indicated by an arrow. (C) Molecular diagram of the GENE receptor showing ligand-binding domain (adapted from Author et al., Year). High GENE expression in REGION suggests a prominent role for this signaling pathway in the region's function.",
+        "Figure X: Functional activation for FUNCTION. (A) Neurosynth meta-analytic activation map for 'FUNCTION' overlaid on a standard MNI template (neurosynth.org). (B) Bar plot of FUNCTION activation scores by region from the analysis page fMRI dataset, with the top five regions labeled. (C) Schematic of a typical fMRI experimental paradigm used to study FUNCTION (adapted from Author et al., Year). The convergence of activation in REGION across panels A and B supports its central role in FUNCTION.",
+        "Figure X: Comparative expression of GENE family members. (A) Clustergram of receptor gene expression across brain regions with GENE's column highlighted (analysis page data). (B) Allen Brain Atlas in-situ hybridization image for GENE in coronal section. (C) Phylogenetic tree of the GENE family showing evolutionary conservation (adapted from Author et al., Year). The distinct expression pattern of GENE relative to its family members suggests functional specialization.",
+        "Figure X: Cross-modal analysis of REGION. (A) DTI connectivity matrix row for REGION showing strongest structural connections (analysis page data). (B) Neurosynth activation map for FUNCTION with REGION circled. (C) Scatter plot comparing DTI connectivity strength vs. fMRI co-activation for REGION's top connected areas (generated from combined datasets). This multi-modal approach reveals that structural and functional connectivity are correlated for REGION's primary network.",
+        "Figure X: Pharmacological relevance of GENE in REGION. (A) Brain map showing GENE expression intensity across regions with REGION labeled (analysis page data). (B) Dose-response curve for a GENE agonist in a behavioral assay (adapted from Author et al., Year). (C) PET scan showing GENE receptor occupancy following drug administration (adapted from Author et al., Year). These panels illustrate the translational relevance of GENE expression patterns to pharmacotherapy.",
+        "Figure X: Network analysis of FUNCTION. (A) Neurosynth co-activation map for FUNCTION showing the distributed network of involved regions. (B) t-SNE embedding of brain regions colored by FUNCTION activation score (analysis page data), revealing clusters of co-activated areas. (C) Published resting-state connectivity diagram for the FUNCTION network (adapted from Author et al., Year). The spatial overlap between task-based activation and resting-state networks supports the existence of a dedicated FUNCTION circuit.",
+        "Figure X: Developmental trajectory of REGION. (A) Allen Brain Atlas expression of GENE across developmental stages (BrainSpan data). (B) Structural MRI volumetric data showing REGION maturation from childhood to adulthood (adapted from Author et al., Year). (C) Brain map of REGION from the analysis page with age-related annotation. GENE expression peaks during adolescence, paralleling the structural maturation window of REGION.",
+        "Figure X: Pathological implications for REGION. (A) Comparison of GENE expression in REGION between healthy controls and patients with DISORDER (adapted from Author et al., Year). (B) Brain map of REGION from the analysis page with lesion overlay. (C) Bar chart of symptom severity correlated with REGION volume (adapted from Author et al., Year). Reduced GENE expression in REGION may contribute to the DISORDER phenotype.",
+        "Figure X: Evolutionary perspective on GENE expression. (A) Cross-species comparison of GENE expression in homologous brain regions (adapted from Author et al., Year). (B) Brain-wide GENE expression heatmap from the analysis page data. (C) Cladogram showing GENE conservation across vertebrates (adapted from Author et al., Year). The high conservation of GENE in REGION across species suggests an ancient and essential functional role."
       ],
 
       // ----- Strong opening sentences for subsections -----
@@ -1803,10 +1803,10 @@
           <p>Your brain area is part of the <strong>${regionSystem || 'brain'}</strong> system. Here are angles that could strengthen each subsection:</p>
           <ul>${regionHints.map(h => `<li>${h}</li>`).join('')}</ul>
 
-          <div class="tip"><strong>For Subsection 1 (Anatomy):</strong> Use the DTI connectivity map from the Colab to identify which regions ${region || 'your region'} connects to. Look for published DSI or tractography images of these pathways.</div>
+          <div class="tip"><strong>For Subsection 1 (Anatomy):</strong> Use the DTI connectivity map from the analysis page to identify which regions ${region || 'your region'} connects to. Look for published DSI or tractography images of these pathways.</div>
           ${anatomyTips.map(t => `<div class="tip"><strong>Anatomy tip:</strong> ${t}</div>`).join('')}
 
-          <div class="tip"><strong>For Subsection 2 (Gene Expression):</strong> In the Colab, look at the gene expression bar chart for ${region || 'your region'}. Identify the 2&ndash;3 highest and lowest expressed genes and research their roles. You selected <strong>${gene || '[no gene]'}</strong>&mdash;check whether it is notably expressed in ${region || 'your region'} and discuss why.</div>
+          <div class="tip"><strong>For Subsection 2 (Gene Expression):</strong> On the analysis page, look at the gene expression bar chart for ${region || 'your region'}. Identify the 2&ndash;3 highest and lowest expressed genes and research their roles. You selected <strong>${gene || '[no gene]'}</strong>&mdash;check whether it is notably expressed in ${region || 'your region'} and discuss why.</div>
           ${geneExpTips.map(t => `<div class="tip"><strong>Gene expression tip:</strong> ${t}</div>`).join('')}
 
           <div class="tip"><strong>For Subsection 3 (Cognition):</strong> Use Neurosynth fMRI keyword maps related to ${region || 'your region'}'s known functions. You selected <strong>${func || '[no function]'}</strong>&mdash;consider whether ${region || 'your region'} appears in that function's brain map.</div>
@@ -1816,7 +1816,7 @@
           <p>For your fMRI function, explore how &ldquo;${func || '[function]'}&rdquo; is represented brain-wide:</p>
           <ul>
             <li>Visit <a href="https://neurosynth.org/analyses/terms/${encodeURIComponent((func || '').toLowerCase())}/" target="_blank" style="color:#0779be">neurosynth.org</a> and note how many studies contribute to this term&rsquo;s meta-analysis.</li>
-            <li>Look at which brain areas activate most strongly for &ldquo;${func || '[function]'}&rdquo; in the fMRI bar plot from the Colab.</li>
+            <li>Look at which brain areas activate most strongly for &ldquo;${func || '[function]'}&rdquo; in the fMRI bar plot from the analysis page.</li>
             <li>For the transcriptomic cross-analysis (Subsection 3), check whether high-activation regions share similar receptor expression profiles. This is where <strong>${gene || '[gene]'}</strong> could be a connecting thread.</li>
           </ul>
 
