@@ -1380,6 +1380,13 @@
                     <label for="structureSelect">Select Brain Region:</label>
                     <select id="structureSelect"></select>
                 </div>
+                <div class="control-group" id="structureRankTypeGroup" style="display:none;">
+                    <label for="structureRankType">Rank Ordered Plot:</label>
+                    <select id="structureRankType" onchange="if(window._activeStructureRegion) updateStructureView(window._activeStructureRegion)">
+                        <option value="genes">Genes</option>
+                        <option value="functions">Functions</option>
+                    </select>
+                </div>
                 <div id="structureContent"></div>
             </section>
 
@@ -3605,6 +3612,13 @@
             const geneRow = geneExpressionData.find(r => r.Name === regionName);
             if (!geneRow) return;
 
+            // Track region for re-render when rank type dropdown changes
+            window._activeStructureRegion = regionName;
+            document.getElementById('structureRankTypeGroup').style.display = '';
+
+            const rankType = document.getElementById('structureRankType').value;
+            const safeRegion = region.Name.replace(/\s+/g, '_');
+
             let html = `<table class="info-table">
                 <tr><td>Name</td><td>${region.Name}</td></tr>
                 <tr><td>Abbreviation</td><td>${region.structure_abbreviation}</td></tr>
@@ -3625,9 +3639,9 @@
                 </div>
             </div>`;
 
-            // Gene expression bar plot
-            html += `<div id="structureGeneBar" class="chart-container"></div>`;
-            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('structureGeneBar', 'gene_bar_${region.Name.replace(/\s+/g, '_')}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('structureGeneBar', 'gene_bar_${region.Name.replace(/\s+/g, '_')}')">&#128247; Save as JPG</button></div>`;
+            // Rank-ordered bar plot container
+            html += `<div id="structureRankBar" class="chart-container"></div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="savePlotlyAsPNG('structureRankBar', 'rank_bar_${safeRegion}')">&#128190; Save as PNG</button><button class="export-btn" onclick="savePlotlyAsJPG('structureRankBar', 'rank_bar_${safeRegion}')">&#128247; Save as JPG</button></div>`;
 
             document.getElementById('structureContent').innerHTML = html;
 
@@ -3643,29 +3657,63 @@
                 });
             }
 
-            // Gene bar plot — sort ascending so strongest genes appear at top of horizontal bar chart
-            const genes = metadata.gene_names;
-            const values = genes.map(gene => geneRow[gene] || 0);
-            const sorted = genes.map((gene, i) => ({ gene, value: values[i] })).sort((a, b) => a.value - b.value);
+            if (rankType === 'functions') {
+                // fMRI functions ranked for this region — sort ascending so highest value appears at top
+                const fmriRow = fmriData.find(row => row.Row === regionName);
+                if (!fmriRow) {
+                    document.getElementById('structureRankBar').innerHTML =
+                        '<p style="color:#8aacc8; padding:30px; text-align:center; font-size:13px;">No function data available for this region.</p>';
+                } else {
+                    const funcs = metadata.fmri_functions;
+                    const fvals = funcs.map(f => fmriRow[f] || 0);
+                    const sortedF = funcs.map((func, i) => ({ func, value: fvals[i] }))
+                        .sort((a, b) => a.value - b.value);
 
-            const trace = {
-                y: sorted.map(d => d.gene),
-                x: sorted.map(d => d.value),
-                type: 'bar',
-                orientation: 'h',
-                marker: { color: '#0779be' },
-                hovertemplate: '<b>%{y}</b><br>Expression: %{x:.2f}<extra></extra>'
-            };
+                    const traceF = {
+                        y: sortedF.map(d => d.func),
+                        x: sortedF.map(d => d.value),
+                        type: 'bar',
+                        orientation: 'h',
+                        marker: { color: '#3498db' },
+                        hovertemplate: '<b>%{y}</b><br>Value: %{x:.2f}<extra></extra>'
+                    };
 
-            const layout = {
-                ...PLOTLY_DARK_LAYOUT,
-                height: 800,
-                dragmode: 'zoom',
-                margin: { l: 150, r: 50, t: 30, b: 50 },
-                xaxis: { title: 'Expression Level', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
-            };
+                    const layoutF = {
+                        ...PLOTLY_DARK_LAYOUT,
+                        height: 800,
+                        dragmode: 'zoom',
+                        margin: { l: 200, r: 50, t: 30, b: 50 },
+                        xaxis: { title: 'Function Value', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
+                    };
 
-            Plotly.newPlot('structureGeneBar', [trace], layout, PLOTLY_CONFIG);
+                    Plotly.newPlot('structureRankBar', [traceF], layoutF, PLOTLY_CONFIG);
+                }
+            } else {
+                // Gene expression ranked — sort ascending so strongest genes appear at top
+                const genes = metadata.gene_names;
+                const gvals = genes.map(gene => geneRow[gene] || 0);
+                const sortedG = genes.map((gene, i) => ({ gene, value: gvals[i] }))
+                    .sort((a, b) => a.value - b.value);
+
+                const traceG = {
+                    y: sortedG.map(d => d.gene),
+                    x: sortedG.map(d => d.value),
+                    type: 'bar',
+                    orientation: 'h',
+                    marker: { color: '#0779be' },
+                    hovertemplate: '<b>%{y}</b><br>Expression: %{x:.2f}<extra></extra>'
+                };
+
+                const layoutG = {
+                    ...PLOTLY_DARK_LAYOUT,
+                    height: 800,
+                    dragmode: 'zoom',
+                    margin: { l: 150, r: 50, t: 30, b: 50 },
+                    xaxis: { title: 'Expression Level', gridcolor: 'rgba(255,255,255,0.1)', zerolinecolor: 'rgba(255,255,255,0.1)' }
+                };
+
+                Plotly.newPlot('structureRankBar', [traceG], layoutG, PLOTLY_CONFIG);
+            }
         }
 
         // ========== GENE EXPLORER ==========
