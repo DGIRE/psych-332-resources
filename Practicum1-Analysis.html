@@ -3638,6 +3638,7 @@
                     <canvas id="structureBrainMap" style="width: 100%; max-width: 800px;"></canvas>
                 </div>
             </div>`;
+            html += `<div class="export-group"><button class="export-btn" onclick="saveStructureMapAsPNG('area_map_${safeRegion}')">&#128190; Save Brain Map as PNG</button><button class="export-btn" onclick="saveImageAsJPG('structureBrainImg', 'area_map_${safeRegion}')">&#128247; Save as JPG</button></div>`;
 
             // Rank-ordered bar plot container
             html += `<div id="structureRankBar" class="chart-container"></div>`;
@@ -4004,6 +4005,44 @@
                 }, 'image/jpeg', 0.92);
             };
             tmpImg.src = img.src;
+        }
+
+        function saveImageAsPNG(imgId, filename) {
+            const img = document.getElementById(imgId);
+            if (!img || !img.src) { alert('No image to save'); return; }
+            const canvas = document.createElement('canvas');
+            const tmpImg = new Image();
+            tmpImg.crossOrigin = 'anonymous';
+            tmpImg.onload = function() {
+                canvas.width = tmpImg.naturalWidth;
+                canvas.height = tmpImg.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(tmpImg, 0, 0);
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = (filename || 'brain_map') + '.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            };
+            tmpImg.src = img.src;
+        }
+
+        // Save the structure brain map — uses the canvas fallback if the PNG failed to load,
+        // otherwise saves the loaded <img> as PNG.
+        function saveStructureMapAsPNG(filename) {
+            const fallback = document.getElementById('structureImgFallback');
+            if (fallback && fallback.style.display !== 'none') {
+                saveCanvasAsPNG('structureBrainMap', filename);
+            } else {
+                saveImageAsPNG('structureBrainImg', filename);
+            }
         }
 
         // Export a Plotly chart as JPG with white background and enhanced lines/text.

@@ -766,6 +766,31 @@
       display: none;
     }
 
+    .notebooklm-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 28px;
+      height: 36px;
+      background: rgba(26, 115, 232, 0.12);
+      border: 1px solid rgba(26, 115, 232, 0.35);
+      border-radius: 4px;
+      color: #7ab4f5;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .notebooklm-btn:hover {
+      background: rgba(26, 115, 232, 0.22);
+      border-color: rgba(26, 115, 232, 0.6);
+      color: #afd3ff;
+    }
+
     .export-section {
       margin-top: 18px;
     }
@@ -1393,6 +1418,7 @@
           <div class="slot">
             <div class="slot-label">Brain Area</div>
             <div class="slot-row">
+              <a class="notebooklm-btn" href="https://notebooklm.google.com/notebook/a22526b5-2269-429b-b044-7e29bfe3bf7c" target="_blank" rel="noopener" title="Open Brain Area NotebookLM">NB</a>
               <input type="text" class="slot-input" id="slotRegion" placeholder="Type or save a region" data-slottype="region">
               <button class="slot-clear hidden" id="clearRegion" onclick="clearSlot('region')">✕</button>
             </div>
@@ -1407,6 +1433,7 @@
           <div class="slot">
             <div class="slot-label">Gene</div>
             <div class="slot-row">
+              <a class="notebooklm-btn" href="https://notebooklm.google.com/notebook/61f4a8c7-c99e-416d-80ef-6b424eb6ba7a" target="_blank" rel="noopener" title="Open Gene NotebookLM">NB</a>
               <input type="text" class="slot-input" id="slotGene" placeholder="Type or save a gene" data-slottype="gene">
               <button class="slot-clear hidden" id="clearGene" onclick="clearSlot('gene')">✕</button>
             </div>
