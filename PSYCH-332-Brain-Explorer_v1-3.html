@@ -2234,8 +2234,8 @@
           return;
         }
 
-        // Check aliases (medium priority: +5 points)
-        const aliases = item.aliases || [];
+        // Check aliases + Brodmann areas (medium priority: +5 points)
+        const aliases = [...(item.aliases || []), ...(item.brodmann || [])];
         const aliasMatch = aliases.some(term => {
           const termLower = term.toLowerCase().replace(/['']/g, '');
           if (isCompound) return termLower.includes(tokenSpaced) || tokenSpaced.includes(termLower);
@@ -2683,6 +2683,58 @@
       r.aliases.forEach(a => { ALL_REGION_ALIASES[a.toLowerCase()] = r.name; });
     });
 
+    // Brodmann area → primary course region mapping.
+    // When a BA spans multiple regions the most canonically cited region is used.
+    const BA_REGION_MAP = {
+      "ba 1":  "Postcentral Gyrus",
+      "ba 2":  "Postcentral Gyrus",
+      "ba 3":  "Postcentral Gyrus",
+      "ba 4":  "Precentral Gyrus",
+      "ba 5":  "Superior Parietal Lobule",
+      "ba 6":  "Premotor Cortex",
+      "ba 7":  "Superior Parietal Lobule",
+      "ba 8":  "Middle Frontal Gyrus",
+      "ba 9":  "Dorsolateral Prefrontal Cortex",
+      "ba 10": "Frontal Pole",
+      "ba 11": "Orbitofrontal Cortex - Medial",
+      "ba 12": "Orbitofrontal Cortex - Medial",
+      "ba 13": "Anterior Insula",
+      "ba 17": "Calcarine Sulcus",
+      "ba 18": "Cuneus",
+      "ba 19": "Lateral Occipital Cortex",
+      "ba 20": "Inferior Temporal Gyrus",
+      "ba 21": "Middle Temporal Gyrus",
+      "ba 22": "Superior Temporal Gyrus",
+      "ba 23": "Posterior Cingulate Cortex",
+      "ba 24": "Anterior Cingulate Cortex - Dorsal",
+      "ba 25": "Anterior Cingulate Cortex - Subgenual",
+      "ba 28": "Entorhinal Cortex",
+      "ba 31": "Precuneus",
+      "ba 32": "Anterior Cingulate Cortex - Dorsal",
+      "ba 34": "Parahippocampal Gyrus",
+      "ba 35": "Parahippocampal Gyrus",
+      "ba 36": "Parahippocampal Gyrus",
+      "ba 37": "Fusiform Gyrus",
+      "ba 38": "Temporal Pole",
+      "ba 39": "Angular Gyrus",
+      "ba 40": "Supramarginal Gyrus",
+      "ba 41": "Transverse Temporal Gyrus",
+      "ba 42": "Transverse Temporal Gyrus",
+      "ba 44": "Inferior Frontal Gyrus - Pars Opercularis",
+      "ba 45": "Inferior Frontal Gyrus - Pars Triangularis",
+      "ba 46": "Dorsolateral Prefrontal Cortex",
+      "ba 47": "Inferior Frontal Gyrus - Pars Orbitalis",
+    };
+    // Register each BA in ALL_REGION_ALIASES under several input variants so
+    // that typing any of "BA 4", "BA4", "Brodmann 4", or "Brodmann area 4" resolves correctly.
+    for (const [ba, region] of Object.entries(BA_REGION_MAP)) {
+      const num = ba.split(' ')[1];
+      ALL_REGION_ALIASES[ba] = region;                            // "ba 4"
+      ALL_REGION_ALIASES[ba.replace(' ', '')] = region;           // "ba4"
+      ALL_REGION_ALIASES[`brodmann ${num}`] = region;             // "brodmann 4"
+      ALL_REGION_ALIASES[`brodmann area ${num}`] = region;        // "brodmann area 4"
+    }
+
     const ALL_FUNCTION_NAMES = new Set(FUNCTIONS.map(f => f.name.toLowerCase()));
     const ALL_FUNCTION_ALIASES = {};
     FUNCTIONS.forEach(f => {
@@ -3018,10 +3070,20 @@
         return;
       }
 
-      // Accept the typed value directly into the slot
-      if (slotType === 'region') selections.region = toDataRegionName(val);
-      else if (slotType === 'func') selections.func = val;
-      else if (slotType === 'gene') selections.gene = val;
+      // Accept the typed value directly into the slot.
+      // For regions, run through categorizeTerm first so that aliases and Brodmann
+      // area inputs (e.g. "BA 4") resolve to the canonical Explorer name before
+      // the data-convention mapping is applied.
+      if (slotType === 'region') {
+        const resolved = categorizeTerm(val);
+        selections.region = toDataRegionName(
+          (resolved && resolved.type === 'region') ? resolved.canonical : val
+        );
+      } else if (slotType === 'func') {
+        selections.func = val;
+      } else if (slotType === 'gene') {
+        selections.gene = val;
+      }
 
       updateSlotUI();
     }
