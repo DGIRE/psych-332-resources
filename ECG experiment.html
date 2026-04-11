@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECG Explorer</title>
+
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React + ReactDOM (UMD builds, no bundler required) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+  <!-- Babel Standalone — transforms JSX in the browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* -------------------------------------------------------
+       Custom animation utilities (replaces tailwindcss-animate
+       plugin, which is not included in the Play CDN by default)
+    ------------------------------------------------------- */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes slideInFromBottom {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1);    }
+    }
+
+    .animate-in { animation-fill-mode: both; }
+    .fade-in                { animation-name: fadeIn;            animation-duration: 500ms; }
+    .slide-in-from-bottom-4 { animation-name: slideInFromBottom; animation-duration: 500ms; }
+    .zoom-in                { animation-name: zoomIn;            animation-duration: 500ms; }
+    .duration-300           { animation-duration: 300ms !important; }
+    .duration-500           { animation-duration: 500ms !important; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- type="text/babel" tells Babel Standalone to transpile this block -->
+  <script type="text/babel">
+    const { useState } = React;
+
+    /* =========================================
+       INLINE SVG ICON COMPONENTS
+       (Replaces lucide-react imports, which
+        require a bundler and are not available
+        as a plain browser CDN import)
+    ========================================= */
+
+    const HeartPulse = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+        <path d="M3.22 12H9.5l1.5-3 2 6 1.5-4 1.5 3h5.26"/>
+      </svg>
+    );
+
+    const Activity = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    );
+
+    const Zap = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    );
+
+    const Brain = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+        <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+        <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+        <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
+        <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/>
+        <path d="M3.477 10.896a4 4 0 0 1 .585-.396"/>
+        <path d="M19.938 10.5a4 4 0 0 1 .585.396"/>
+        <path d="M6 18a4 4 0 0 1-1.967-.516"/>
+        <path d="M19.967 17.484A4 4 0 0 1 18 18"/>
+        <line x1="12" y1="5" x2="12" y2="18"/>
+      </svg>
+    );
+
+    const Cable = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <path d="M4 9a2 2 0 0 1-2-2V5h6v2a2 2 0 0 1-2 2Z"/>
+        <path d="M3 5V3"/>
+        <path d="M7 5V3"/>
+        <path d="M19 15V6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 0 1-7 0V9"/>
+        <path d="M17 21v-2"/>
+        <path d="M21 21v-2"/>
+        <path d="M22 19h-6v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2Z"/>
+      </svg>
+    );
+
+    const CheckCircle2 = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <circle cx="12" cy="12" r="10"/>
+        <path d="m9 12 2 2 4-4"/>
+      </svg>
+    );
+
+    const Circle = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <circle cx="12" cy="12" r="10"/>
+      </svg>
+    );
+
+    const AlertTriangle = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+        <path d="M12 9v4"/>
+        <path d="M12 17h.01"/>
+      </svg>
+    );
+
+    const Play = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+    );
+
+    const Settings = ({ size = 24, className = '' }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+           className={className}>
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    );
+
+    /* =========================================
+       APP — export default removed; React.render
+       mounts directly below
+    ========================================= */
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('science');
+
+      return (
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-red-200">
+          {/* Header */}
+          <header className="bg-white shadow-sm sticky top-0 z-50">
+            <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-red-500 p-2 rounded-lg text-white">
+                  <HeartPulse size={28} />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-slate-900 leading-tight">ECG Explorer</h1>
+                  <p className="text-xs text-slate-500 font-medium tracking-wide uppercase">Powered by Backyard Brains</p>
+                </div>
+              </div>
+              <nav className="hidden md:flex gap-2 bg-slate-100 p-1 rounded-lg">
+                <TabButton active={activeTab === 'science'} onClick={() => setActiveTab('science')} icon={<Zap size={16}/>}>The Science</TabButton>
+                <TabButton active={activeTab === 'setup'} onClick={() => setActiveTab('setup')} icon={<Cable size={16}/>}>Equipment Setup</TabButton>
+                <TabButton active={activeTab === 'experiment'} onClick={() => setActiveTab('experiment')} icon={<Activity size={16}/>}>The Experiment</TabButton>
+              </nav>
+            </div>
+            {/* Mobile Navigation */}
+            <div className="md:hidden flex overflow-x-auto border-t border-slate-100 p-2 gap-2 bg-slate-50">
+              <TabButton active={activeTab === 'science'} onClick={() => setActiveTab('science')} icon={<Zap size={16}/>}>Science</TabButton>
+              <TabButton active={activeTab === 'setup'} onClick={() => setActiveTab('setup')} icon={<Cable size={16}/>}>Setup</TabButton>
+              <TabButton active={activeTab === 'experiment'} onClick={() => setActiveTab('experiment')} icon={<Activity size={16}/>}>Experiment</TabButton>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="max-w-5xl mx-auto px-4 py-8">
+            {activeTab === 'science'    && <ScienceSection />}
+            {activeTab === 'setup'      && <SetupSection />}
+            {activeTab === 'experiment' && <ExperimentSection />}
+          </main>
+        </div>
+      );
+    }
+
+    /* =========================================
+       COMPONENTS
+    ========================================= */
+
+    function TabButton({ active, onClick, children, icon }) {
+      return (
+        <button
+          onClick={onClick}
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+            active
+              ? 'bg-white text-red-600 shadow-sm ring-1 ring-slate-200'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200'
+          }`}
+        >
+          {icon}
+          {children}
+        </button>
+      );
+    }
+
+    /* --- 1. The Science Section --- */
+    function ScienceSection() {
+      const [activeWave, setActiveWave] = useState(null);
+
+      const waveInfo = {
+        p: {
+          title: "P Wave",
+          description: "Represents the depolarization of the atria. Specialized pacemaker cells (the SA node) fire, sending an electrical signal that spreads across the upper chambers of the heart, causing them to contract and push blood down into the ventricles."
+        },
+        qrs: {
+          title: "QRS Complex",
+          description: "Represents the rapid depolarization of the right and left ventricles. Because the ventricles have a much larger muscle mass than the atria, this electrical spike is much larger. This signal coordinates the powerful contraction that pumps blood to your lungs and body."
+        },
+        t: {
+          title: "T Wave",
+          description: "Represents the repolarization (resetting) of the ventricles. The heart muscle cells return to their resting electrical state so they are ready for the next heartbeat."
+        }
+      };
+
+      return (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="text-center mb-10 max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">The Heart's Electrical System</h2>
+            <p className="text-slate-600 text-lg">
+              Our hearts beat continuously to power our circulatory system. If we look closely with an Electrocardiogram (EKG/ECG), we can see the electrical impulses driving each contraction.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+            <div className="p-6 bg-slate-900 text-white text-center">
+              <h3 className="text-xl font-semibold mb-2 flex items-center justify-center gap-2">
+                <Zap className="text-yellow-400" /> Interactive Waveform Explorer
+              </h3>
+              <p className="text-slate-400 text-sm">Click on the different parts of the ECG wave below to learn what they mean.</p>
+            </div>
+
+            {/* Interactive SVG Canvas */}
+            <div className="w-full overflow-x-auto p-8 relative"
+                 style={{ backgroundImage: 'linear-gradient(to right, #f1f5f9 1px, transparent 1px), linear-gradient(to bottom, #f1f5f9 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+              <svg viewBox="0 0 800 300" className="w-full h-auto max-h-80 drop-shadow-md">
+                {/* Grid highlight line */}
+                <line x1="0" y1="150" x2="800" y2="150" stroke="#e2e8f0" strokeWidth="2" />
+
+                {/* P Wave */}
+                <path
+                  d="M 50 150 L 100 150 Q 140 100 180 150"
+                  fill="none"
+                  stroke={activeWave === 'p' ? '#ef4444' : '#1e293b'}
+                  strokeWidth={activeWave === 'p' ? '8' : '4'}
+                  strokeLinecap="round"
+                  className="cursor-pointer transition-all duration-300 hover:stroke-red-400"
+                  onClick={() => setActiveWave('p')}
+                />
+                {/* PR Segment */}
+                <path d="M 180 150 L 220 150" fill="none" stroke="#1e293b" strokeWidth="4" />
+
+                {/* QRS Complex */}
+                <path
+                  d="M 220 150 L 235 180 L 260 20 L 285 190 L 300 150"
+                  fill="none"
+                  stroke={activeWave === 'qrs' ? '#3b82f6' : '#1e293b'}
+                  strokeWidth={activeWave === 'qrs' ? '8' : '4'}
+                  strokeLinejoin="round"
+                  className="cursor-pointer transition-all duration-300 hover:stroke-blue-400"
+                  onClick={() => setActiveWave('qrs')}
+                />
+
+                {/* ST Segment */}
+                <path d="M 300 150 L 360 150" fill="none" stroke="#1e293b" strokeWidth="4" />
+
+                {/* T Wave */}
+                <path
+                  d="M 360 150 Q 420 80 480 150"
+                  fill="none"
+                  stroke={activeWave === 't' ? '#10b981' : '#1e293b'}
+                  strokeWidth={activeWave === 't' ? '8' : '4'}
+                  strokeLinecap="round"
+                  className="cursor-pointer transition-all duration-300 hover:stroke-emerald-400"
+                  onClick={() => setActiveWave('t')}
+                />
+
+                {/* Rest of baseline */}
+                <path d="M 480 150 L 800 150" fill="none" stroke="#1e293b" strokeWidth="4" />
+
+                {/* Transparent clickable overlay areas */}
+                <circle cx="140" cy="130" r="40" fill="transparent" className="cursor-pointer" onClick={() => setActiveWave('p')} />
+                <polygon points="210,180 260,0 310,180" fill="transparent" className="cursor-pointer" onClick={() => setActiveWave('qrs')} />
+                <circle cx="420" cy="120" r="50" fill="transparent" className="cursor-pointer" onClick={() => setActiveWave('t')} />
+              </svg>
+            </div>
+
+            {/* Info Box */}
+            <div className="p-6 bg-slate-50 border-t border-slate-200 min-h-[160px]">
+              {activeWave ? (
+                <div className="animate-in fade-in duration-300">
+                  <h4 className={`text-2xl font-bold mb-2 flex items-center gap-2
+                    ${activeWave === 'p'   ? 'text-red-600'     : ''}
+                    ${activeWave === 'qrs' ? 'text-blue-600'    : ''}
+                    ${activeWave === 't'   ? 'text-emerald-600' : ''}
+                  `}>
+                    {waveInfo[activeWave].title}
+                  </h4>
+                  <p className="text-slate-700 text-lg leading-relaxed">
+                    {waveInfo[activeWave].description}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                  <Activity size={48} className="mb-2 opacity-20" />
+                  <p>Select a part of the wave above to view details.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* --- 2. The Setup Section --- */
+    function SetupSection() {
+      const [checkedItems, setCheckedItems] = useState({});
+
+      const toggleCheck = (id) => {
+        setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+      };
+
+      const steps = [
+        {
+          id: 'step1',
+          title: 'Place Electrodes',
+          description: "Place one patch electrode on your inner right wrist, another on your inner left wrist, and a third (the ground) on the back of your left hand.",
+          note: "Tip: For a cleaner signal, try placing the red electrodes above and below your heart on your left chest, and the black ground on your upper right chest!"
+        },
+        {
+          id: 'step2',
+          title: 'Connect the Alligator Clips',
+          description: "Using the orange interface cable: Attach the two RED alligator clips to the electrodes on your inner wrists (or chest). Attach the BLACK alligator clip to the ground electrode on the back of your hand.",
+          note: "If your signal looks upside down later, just swap the two red clips!"
+        },
+        {
+          id: 'step3',
+          title: 'Plug into the SpikerBox',
+          description: "Plug the orange cable into the orange port on the front of your Heart and Brain SpikerShield or SpikerBox Classic."
+        },
+        {
+          id: 'step4',
+          title: 'Connect to Computer/Smartphone',
+          description: "Use the USB cable to connect the SpikerBox to your computer. (Alternatively, use the green smartphone cable for tablets/phones, or the blue cable for laptops with separate mic/headphone jacks)."
+        },
+        {
+          id: 'step5',
+          title: 'Open SpikeRecorder',
+          description: "Turn on the SpikerBox (using the 9V battery switch). Open the SpikeRecorder app. Click the Config gear icon, select the 'ECG' filter setting, and connect via USB."
+        }
+      ];
+
+      const allChecked = steps.every(step => checkedItems[step.id]);
+
+      return (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Equipment Setup Guide</h2>
+            <p className="text-slate-600 text-lg">
+              Follow these steps to connect your Backyard Brains gear and start recording your own electrocardiogram.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+            <div className="space-y-6">
+              {steps.map((step, index) => (
+                <div
+                  key={step.id}
+                  className={`flex gap-4 p-4 rounded-xl transition-all duration-300 ${
+                    checkedItems[step.id]
+                      ? 'bg-emerald-50 border border-emerald-100'
+                      : 'bg-slate-50 border border-slate-100 hover:border-slate-300'
+                  }`}
+                >
+                  <button
+                    onClick={() => toggleCheck(step.id)}
+                    className="mt-1 flex-shrink-0 focus:outline-none"
+                  >
+                    {checkedItems[step.id]
+                      ? <CheckCircle2 className="text-emerald-500 w-8 h-8" />
+                      : <Circle className="text-slate-300 w-8 h-8 hover:text-slate-400" />
+                    }
+                  </button>
+                  <div>
+                    <h4 className={`text-lg font-bold mb-1 ${checkedItems[step.id] ? 'text-emerald-800' : 'text-slate-800'}`}>
+                      Step {index + 1}: {step.title}
+                    </h4>
+                    <p className={`mb-2 ${checkedItems[step.id] ? 'text-emerald-700' : 'text-slate-600'}`}>
+                      {step.description}
+                    </p>
+                    {step.note && (
+                      <div className="flex items-start gap-2 bg-white/60 p-3 rounded-lg border border-slate-200/50 mt-3">
+                        <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-slate-700 italic">{step.note}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {allChecked && (
+              <div className="mt-8 p-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl text-white text-center animate-in zoom-in duration-500 shadow-lg">
+                <Activity className="w-12 h-12 mx-auto mb-3 opacity-90 animate-pulse" />
+                <h3 className="text-2xl font-bold mb-2">Setup Complete!</h3>
+                <p className="text-green-50">You are ready to observe the waveforms behind each beat. Keep your arms relaxed to reduce muscle noise!</p>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    /* --- 3. The Experiment Section --- */
+    function ExperimentSection() {
+      return (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="text-center mb-10 max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Experiment: Heart Action Potentials</h2>
+            <p className="text-slate-600 text-lg">
+              How does your brain regulate your heart rate? Let's test the response of your nervous system to exercise!
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+
+            {/* Background Info */}
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+              <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-6">
+                <Brain size={24} />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">The Brain Connection</h3>
+              <p className="text-slate-700 mb-4 leading-relaxed">
+                Your heart can beat on its own thanks to pacemaker cells, but the <strong>medulla oblongata</strong> in your brain serves as the control center, influencing how fast it beats.
+              </p>
+              <p className="text-slate-700 leading-relaxed">
+                When you exercise, your body demands more oxygen. The medulla oblongata senses this and instructs the heart's pacemaker cells to fire faster. When you relax, it tells the heart to return to its baseline rate.
+              </p>
+            </div>
+
+            {/* The Procedure */}
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+              <div className="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center mb-6">
+                <Play size={24} />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">The Procedure</h3>
+              <ol className="space-y-4 text-slate-700 list-decimal list-inside marker:text-red-500 marker:font-bold">
+                <li><strong>Record Baseline:</strong> Sit still and record your resting EKG for 1–2 minutes. Click the heart icon in SpikeRecorder to calculate your Beats Per Minute (BPM). Usually this is 70–80 BPM.</li>
+                <li><strong>Disconnect:</strong> Safely unclip the cables from the electrodes (leave the sticky electrodes on your skin).</li>
+                <li><strong>Exercise:</strong> Go for a quick jog or do jumping jacks for 2 minutes to increase your oxygen demand.</li>
+                <li><strong>Record Again:</strong> Immediately reconnect the clips and watch the screen. Measure your new BPM. You might see it jump to 120–130 BPM!</li>
+                <li><strong>Recovery:</strong> Watch the signal over the next few minutes as the medulla oblongata slows your heart back down.</li>
+              </ol>
+            </div>
+          </div>
+
+          {/* Discussion Box */}
+          <div className="bg-slate-900 text-white p-8 rounded-2xl shadow-lg border border-slate-800">
+            <div className="flex flex-col md:flex-row gap-8 items-center">
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold mb-3">Discussion Questions</h3>
+                <ul className="space-y-3 text-slate-300">
+                  <li className="flex gap-3">
+                    <span className="text-red-400 font-bold">1.</span>
+                    What differences did you notice between the resting EKG and the post-exercise EKG (aside from the speed)? Did the amplitude change?
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-red-400 font-bold">2.</span>
+                    How might factors like caffeine, adrenaline, or feeling stressed affect the waveforms you see on the screen?
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-red-400 font-bold">3.</span>
+                    If your signal is very noisy, why does holding your arms perfectly still (or moving electrodes to the chest) help improve the "Signal-to-Noise Ratio"?
+                  </li>
+                </ul>
+              </div>
+              <div className="w-full md:w-1/3 bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+                <Settings className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                <h4 className="font-bold text-lg mb-2">SpikeRecorder Tip</h4>
+                <p className="text-sm text-slate-400">
+                  Use the "Signal Average" tool in SpikeRecorder. It overlays multiple beats to cancel out random noise, giving you a crystal clear view of the P, QRS, and T wave components!
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      );
+    }
+
+    /* =========================================
+       MOUNT
+    ========================================= */
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

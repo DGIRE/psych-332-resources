@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOG: The Electric Eye Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .gradient-bg { background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%); }
+        .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .step-inactive { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        .eye-container { perspective: 1000px; }
+        .eye-ball { transition: transform 0.3s ease-out; transform-style: preserve-3d; }
+        nav { position: sticky; top: 0; z-index: 50; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-5xl mx-auto px-6 py-3 flex justify-between items-center">
+            <span class="font-bold text-blue-900 tracking-tight">EOG Guide</span>
+            <div class="flex gap-4 md:gap-8 text-sm font-semibold text-gray-600">
+                <a href="#science" class="hover:text-blue-600 transition">Science</a>
+                <a href="#equipment" class="hover:text-blue-600 transition">Equipment</a>
+                <a href="#setup" class="hover:text-blue-600 transition">Setup</a>
+                <a href="#tips" class="hover:text-blue-600 transition">Tips</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-10 px-6 text-center">
+        <h1 class="text-3xl md:text-5xl font-bold mb-4">Electrooculography (EOG)</h1>
+        <p class="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">Learn to record eye signals using high-quality patch electrodes and Backyard Brains technology.</p>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-12">
+        
+        <!-- Section 1: The Science -->
+        <section id="science" class="mb-20 scroll-mt-20">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl font-bold mb-6 text-blue-900">The Eye as a Dipole</h2>
+                    <p class="text-lg text-gray-700 mb-4">
+                        The eye is effectively a biological battery. The front (the <strong>cornea</strong>) is more positively charged than the back (the <strong>retina</strong>).
+                    </p>
+                    <p class="text-lg text-gray-700 mb-6">
+                        This creates an <strong>electric dipole</strong>. When you move your eyes, you rotate this dipole, shifting the electric field around your head. Adhesive patch electrodes allow us to capture these subtle voltage changes.
+                    </p>
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 italic text-sm">
+                        "EOG measures the corneo-retinal standing potential. This signal typically ranges from 0.01 to 0.1 mV."
+                    </div>
+                </div>
+                
+                <!-- Interactive Eye Model -->
+                <div class="md:w-1/2 bg-white p-8 rounded-2xl card-shadow text-center">
+                    <h3 class="font-semibold mb-4 text-gray-400 uppercase tracking-widest text-xs">interactive simulator</h3>
+                    <div class="eye-container h-40 flex justify-center items-center mb-6">
+                        <div id="interactiveEye" class="eye-ball w-28 h-28 bg-white border-4 border-gray-800 rounded-full relative shadow-inner flex items-center justify-center">
+                            <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center">
+                                <div class="w-7 h-7 bg-gray-900 rounded-full"></div>
+                            </div>
+                            <div class="absolute -top-6 text-[10px] font-bold text-red-500">+ CORNEA</div>
+                            <div class="absolute -bottom-6 text-[10px] font-bold text-blue-500">- RETINA</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center gap-2">
+                        <button onclick="moveEye('left')" class="px-3 py-1.5 bg-gray-800 text-white text-sm rounded hover:bg-gray-700 transition">Look Left</button>
+                        <button onclick="moveEye('center')" class="px-3 py-1.5 bg-gray-200 text-gray-800 text-sm rounded hover:bg-gray-300 transition">Center</button>
+                        <button onclick="moveEye('right')" class="px-3 py-1.5 bg-gray-800 text-white text-sm rounded hover:bg-gray-700 transition">Look Right</button>
+                    </div>
+                    <p id="dipoleEffect" class="mt-4 text-xs font-medium text-blue-600 min-h-[32px]">Move the eye to see the dipole rotation!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Equipment -->
+        <section id="equipment" class="mb-20 bg-white p-8 rounded-2xl card-shadow scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-8 text-center text-blue-900">Required Gear</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-4 border rounded-xl hover:bg-gray-50 transition">
+                    <div class="text-3xl mb-2">🧠</div>
+                    <span class="font-semibold text-sm">H&B SpikerBox</span>
+                </div>
+                <div class="p-4 border rounded-xl hover:bg-gray-50 transition">
+                    <div class="text-3xl mb-2">➰</div>
+                    <span class="font-semibold text-sm">Interface Cable</span>
+                </div>
+                <div class="p-4 border rounded-xl hover:bg-gray-50 transition">
+                    <div class="text-3xl mb-2">🩹</div>
+                    <span class="font-semibold text-sm">3x Patch Electrodes</span>
+                </div>
+                <div class="p-4 border rounded-xl hover:bg-gray-50 transition">
+                    <div class="text-3xl mb-2">💻</div>
+                    <span class="font-semibold text-sm">SpikeRecorder</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Setup -->
+        <section id="setup" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-10 text-center text-blue-900">Setup Walkthrough</h2>
+            
+            <div class="space-y-4">
+                <!-- Step 1 -->
+                <div id="step-1" class="bg-white p-6 rounded-xl border-l-8 border-blue-500 shadow-sm transition-all duration-500">
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase mb-2 inline-block">Step 1</span>
+                            <h3 class="text-lg font-bold mb-1">Lateral Electrode Placement</h3>
+                            <p class="text-gray-600 text-sm">Stick two adhesive patch electrodes on the outer temples, one on the left side and one on the right side of your eyes.</p>
+                        </div>
+                        <button onclick="nextStep(2)" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-blue-700">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div id="step-2" class="step-inactive bg-white p-6 rounded-xl border-l-8 border-blue-500 shadow-sm transition-all duration-500">
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase mb-2 inline-block">Step 2</span>
+                            <h3 class="text-lg font-bold mb-1">Place the Ground</h3>
+                            <p class="text-gray-600 text-sm">Place the third patch electrode on the <strong>mastoid process</strong>—the bony bump directly behind your ear.</p>
+                        </div>
+                        <button onclick="nextStep(3)" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-blue-700">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div id="step-3" class="step-inactive bg-white p-6 rounded-xl border-l-8 border-blue-500 shadow-sm transition-all duration-500">
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase mb-2 inline-block">Step 3</span>
+                            <h3 class="text-lg font-bold mb-1">Connect Alligator Clips</h3>
+                            <p class="text-gray-600 text-sm">Clip the two <strong>red</strong> alligator clips to the electrodes by your eyes. Clip the <strong>black</strong> cable to the ground electrode behind your ear.</p>
+                        </div>
+                        <button onclick="nextStep(4)" class="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-700">Finish</button>
+                    </div>
+                </div>
+
+                <!-- Final Message -->
+                <div id="completion" class="hidden bg-green-50 p-8 rounded-xl border-2 border-green-200 text-center">
+                    <h3 class="text-xl font-bold text-green-800 mb-1">System Active! 🚀</h3>
+                    <p class="text-green-700 text-sm mb-4">Connect via USB in SpikeRecorder. Look far left, then far right to see the signal deflect.</p>
+                    <button onclick="resetSteps()" class="text-xs text-green-600 underline hover:text-green-800">Reset setup</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Tips -->
+        <section id="tips" class="mt-20 scroll-mt-20">
+            <h2 class="text-2xl font-bold mb-6 text-blue-900">Expert Troubleshooting</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-amber-50 p-6 rounded-xl border border-amber-200">
+                    <h4 class="font-bold text-amber-800 mb-2">⚡ Signal Noise</h4>
+                    <ul class="text-xs text-amber-700 list-disc ml-5 space-y-2">
+                        <li><strong>Unplug your laptop:</strong> Run on battery to eliminate 60Hz wall interference.</li>
+                        <li><strong>Skin Prep:</strong> Ensure the skin is clean and dry before applying patches.</li>
+                        <li><strong>Notch Filter:</strong> Use the 60 Hz filter (Americas) or 50 Hz (Europe) in SpikeRecorder.</li>
+                    </ul>
+                </div>
+                <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200">
+                    <h4 class="font-bold text-indigo-800 mb-2">👁️ Vertical Eye Movements</h4>
+                    <p class="text-xs text-indigo-700">
+                        To measure up/down movements or blinks, place one patch <strong>above</strong> the eye and one <strong>below</strong>. Note that blinks will show up as very sharp spikes because of the muscle activity in your eyelids.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-8 px-6 mt-12 text-center text-xs opacity-60">
+        <p>Backyard Brains Neuroscience Guide</p>
+    </footer>
+
+    <script>
+        function moveEye(direction) {
+            const eye = document.getElementById('interactiveEye');
+            const message = document.getElementById('dipoleEffect');
+            
+            if (direction === 'left') {
+                eye.style.transform = 'rotateY(-30deg)';
+                message.innerText = "Look Left: Cornea (+) moves away from the right electrode, causing a negative deflection.";
+            } else if (direction === 'right') {
+                eye.style.transform = 'rotateY(30deg)';
+                message.innerText = "Look Right: Cornea (+) moves toward the right electrode, causing a positive deflection.";
+            } else {
+                eye.style.transform = 'rotateY(0deg)';
+                message.innerText = "Center Position: Potential is balanced between electrodes.";
+            }
+        }
+
+        function nextStep(stepNumber) {
+            const currentStep = document.getElementById(`step-${stepNumber - 1}`);
+            const nextStep = document.getElementById(`step-${stepNumber}`);
+            
+            if (stepNumber === 4) {
+                document.getElementById('step-3').classList.add('opacity-50');
+                document.getElementById('completion').classList.remove('hidden');
+                document.getElementById('completion').scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            if (nextStep) {
+                nextStep.classList.remove('step-inactive');
+                nextStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (currentStep) currentStep.classList.add('opacity-50');
+            }
+        }
+
+        function resetSteps() {
+            for (let i = 1; i <= 3; i++) {
+                const step = document.getElementById(`step-${i}`);
+                step.classList.add('step-inactive');
+                step.classList.remove('opacity-50');
+            }
+            document.getElementById('step-1').classList.remove('step-inactive');
+            document.getElementById('completion').classList.add('hidden');
+            window.scrollTo({ top: document.getElementById('setup').offsetTop - 100, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
