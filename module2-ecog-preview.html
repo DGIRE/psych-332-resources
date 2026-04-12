@@ -92,7 +92,6 @@ body {
 }
 .channel-info.loaded { color: #4a7090; }
 
-/* Loading state for JSON */
 #data-loading {
   display: none; font-size: 0.75rem; color: #3a5a7a;
   text-align: center; padding: 6px 0 4px;
@@ -123,7 +122,6 @@ body {
   width: 100%; height: 100%; pointer-events: none;
 }
 
-/* Loading overlay */
 #loading-overlay {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(4,5,14,0.88);
@@ -150,6 +148,14 @@ body {
   padding: 9px 14px; background: #080b18;
   border-top: 1px solid #141e36; width: 100%; flex-wrap: wrap;
 }
+/* Live controls row */
+.live-controls-bar {
+  display: none; align-items: center; gap: 8px;
+  padding: 7px 14px; background: #060810;
+  border-top: 1px solid #0e1628; width: 100%; flex-wrap: wrap;
+}
+.live-controls-bar.visible { display: flex; }
+
 .btn {
   border: 1px solid #1e3460; background: none; color: #6090c8;
   border-radius: 7px; padding: 6px 14px; font-size: 0.76rem;
@@ -161,6 +167,14 @@ body {
 .btn.zoom-reset:hover { border-color: #7a5020; color: #d09050; background: rgba(120,80,20,0.1); }
 .btn.export { border-color: #1e3820; color: #50886a; }
 .btn.export:hover { border-color: #2e5830; color: #70b890; background: rgba(40,100,60,0.1); }
+.btn.live-play { border-color: #1a4020; color: #508860; }
+.btn.live-play:hover { border-color: #2a6030; color: #70c080; background: rgba(40,120,60,0.1); }
+.btn.live-play.active { border-color: #2a8040; color: #80e0a0; background: rgba(40,160,80,0.15); }
+.btn.live-stop { border-color: #3a1010; color: #805050; }
+.btn.live-stop:hover { border-color: #6a2020; color: #c08080; background: rgba(120,40,40,0.1); }
+.btn.live-mode { border-color: #2a1e48; color: #8870b8; }
+.btn.live-mode:hover { border-color: #4a3a80; color: #b0a0e0; background: rgba(80,60,160,0.1); }
+.btn.live-mode.active { border-color: #5a4a90; color: #c0b0ff; background: rgba(90,70,200,0.18); }
 
 .ctrl-div { width: 1px; height: 22px; background: #141e36; flex-shrink: 0; margin: 0 2px; }
 
@@ -182,7 +196,11 @@ body {
 .channel-display {
   margin-left: auto; font-family: 'Courier New', monospace;
   font-size: 0.78rem; color: #3a5a8a; white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis; max-width: 240px;
+  text-overflow: ellipsis; max-width: 280px;
+}
+.live-time-display {
+  font-family: 'Courier New', monospace; font-size: 0.8rem;
+  color: #608870; letter-spacing: 0.5px;
 }
 
 /* ── Info strip ──────────────────────────────── */
@@ -212,21 +230,31 @@ body {
 .band-item { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #5070a0; }
 .band-swatch { width: 20px; height: 8px; border-radius: 3px; opacity: 0.75; }
 
-/* Zoom hint */
 .zoom-hint {
-  display: none;
-  font-size: 0.69rem; color: #3a5030; letter-spacing: 0.3px;
+  display: none; font-size: 0.69rem; color: #3a5030; letter-spacing: 0.3px;
   margin-top: 5px; text-align: center;
 }
 .zoom-hint.visible { display: block; }
 
-/* Empty spectrogram placeholder */
 #empty-hint {
   display: flex; align-items: center; justify-content: center;
   width: 100%; height: 100%;
   font-size: 0.8rem; color: #1e3050; letter-spacing: 1px; text-transform: uppercase;
   pointer-events: none; position: absolute; top: 0; left: 0;
 }
+
+/* Live mode indicator */
+.live-indicator {
+  display: none; align-items: center; gap: 6px;
+  font-size: 0.7rem; letter-spacing: 1.2px; text-transform: uppercase;
+  color: #608860;
+}
+.live-indicator.visible { display: flex; }
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #40c060; animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 </style>
 </head>
 <body>
@@ -244,7 +272,7 @@ body {
 
 <div class="header">
   <h1>ECoG Data Preview</h1>
-  <p class="subtitle">Spectrogram &nbsp;·&nbsp; 0 – 100 Hz &nbsp;·&nbsp; 62 Channels</p>
+  <p class="subtitle">Spectrogram &nbsp;·&nbsp; 0 – 100 Hz &nbsp;·&nbsp; 62 Channels &nbsp;·&nbsp; 30 s</p>
 </div>
 
 <!-- Channel selector -->
@@ -291,8 +319,10 @@ body {
     <div class="time-axis-spacer-right" style="width:76px;"></div>
   </div>
 
+  <!-- Main controls bar -->
   <div class="controls-bar">
     <button class="btn active" id="viewall-btn">&#9635; VIEW ALL</button>
+    <button class="btn live-mode" id="live-btn">&#9654; LIVE VIEW</button>
     <button class="btn zoom-reset" id="zoom-reset-btn" style="display:none;">&#8635; RESET ZOOM</button>
 
     <div class="ctrl-div"></div>
@@ -325,6 +355,46 @@ body {
     <div class="channel-display" id="channel-display"></div>
   </div>
 
+  <!-- Live playback controls (shown only in live mode) -->
+  <div class="live-controls-bar" id="live-controls-bar">
+    <div class="live-indicator visible" id="live-indicator">
+      <div class="live-dot" id="live-dot" style="animation:none;background:#405060;"></div>
+      <span id="live-status-label">READY</span>
+    </div>
+
+    <div class="ctrl-div"></div>
+
+    <button class="btn live-play" id="play-btn">&#9654; PLAY</button>
+    <button class="btn live-play" id="pause-btn" style="display:none;">&#9646;&#9646; PAUSE</button>
+    <button class="btn live-stop" id="stop-btn">&#9632; STOP</button>
+
+    <div class="ctrl-div"></div>
+
+    <div class="ctrl-grp">
+      <span>Speed:</span>
+      <select id="live-speed">
+        <option value="1">1×</option>
+        <option value="2" selected>2×</option>
+        <option value="3">3×</option>
+      </select>
+    </div>
+
+    <div class="ctrl-div"></div>
+
+    <div class="ctrl-grp">
+      <span>Scroll:</span>
+      <select id="scroll-speed">
+        <option value="1">Slow</option>
+        <option value="2" selected>Normal</option>
+        <option value="3">Fast</option>
+      </select>
+    </div>
+
+    <div class="ctrl-div"></div>
+
+    <div class="live-time-display" id="live-time-display">0:00.0 / 0:30.0</div>
+  </div>
+
   <div class="info-strip">
     <div class="cursor-info" id="cursor-info"></div>
     <div class="zoom-info" id="zoom-info"></div>
@@ -351,46 +421,24 @@ body {
 <script>
 'use strict';
 
-// ── Channel area groupings ────────────────────────────────────────────────────
-// Groups match the 62-channel ECoG dataset (channel_names from meta)
+// ── ECoG area/channel groupings ───────────────────────────────────────────────
+// Area names and channel-index ranges match the ECoG Analysis Simple page.
+// Channels are displayed as 1-based local numbers within each area.
 const CHANNEL_GROUPS = [
-  { area: 'Frontal', channels: [
-    {name:'Fp1',idx:0},{name:'AF7',idx:1},{name:'AF3',idx:2},
-    {name:'F1',idx:3},{name:'F3',idx:4},{name:'F5',idx:5},{name:'F7',idx:6},
-    {name:'Fpz',idx:32},{name:'Fp2',idx:33},{name:'AF8',idx:34},{name:'AF4',idx:35},
-    {name:'AFz',idx:36},{name:'Fz',idx:37},{name:'F2',idx:38},{name:'F4',idx:39},
-    {name:'F6',idx:40},{name:'F8',idx:41}
-  ]},
-  { area: 'Frontocentral', channels: [
-    {name:'FT7',idx:7},{name:'FC5',idx:8},{name:'FC3',idx:9},{name:'FC1',idx:10},
-    {name:'FT8',idx:42},{name:'FC6',idx:43},{name:'FC4',idx:44},{name:'FC2',idx:45},{name:'FCz',idx:46}
-  ]},
-  { area: 'Central', channels: [
-    {name:'C1',idx:11},{name:'C3',idx:12},{name:'C5',idx:13},
-    {name:'Cz',idx:47},{name:'C2',idx:48},{name:'C4',idx:49},{name:'C6',idx:50}
-  ]},
-  { area: 'Temporal', channels: [
-    {name:'T7',idx:14},{name:'TP7',idx:15},{name:'T8',idx:51},{name:'TP8',idx:52}
-  ]},
-  { area: 'Centroparietal', channels: [
-    {name:'CP5',idx:16},{name:'CP3',idx:17},{name:'CP1',idx:18},
-    {name:'CPz',idx:31},{name:'CP6',idx:53},{name:'CP4',idx:54},{name:'CP2',idx:55}
-  ]},
-  { area: 'Parietal', channels: [
-    {name:'P1',idx:19},{name:'P3',idx:20},{name:'P5',idx:21},{name:'P7',idx:22},{name:'P9',idx:23},
-    {name:'PO7',idx:24},{name:'PO3',idx:25},{name:'Pz',idx:30},{name:'POz',idx:29},
-    {name:'P2',idx:56},{name:'P4',idx:57},{name:'P6',idx:58},{name:'P8',idx:59},{name:'P10',idx:60},
-    {name:'PO8',idx:61}
-  ]},
-  { area: 'Occipital', channels: [
-    {name:'O1',idx:26},{name:'Iz',idx:27},{name:'Oz',idx:28}
-  ]}
+  { area: 'Right Anterior Frontal Depth',   key: 'RAFD', indices: [0,1,2,3,4,5,6,7,8,9] },
+  { area: 'Right Posterior Frontal Depth',  key: 'RPFD', indices: [10,11,12,13,14,15,16,17,18,19] },
+  { area: 'Right Anterior Hip/Temp Depth',  key: 'RAHD', indices: [20,21,22,23,24,25,26,27,28,29,30,31] },
+  { area: 'Right Posterior Hip/Temp Depth', key: 'RPHD', indices: [32,33,34,35,36,37,38,39] },
+  { area: 'Right Anterior Frontal Surface', key: 'RAF',  indices: [40,41,42,43,44,45] },
+  { area: 'Right Anterior Temp Surface',    key: 'RAT',  indices: [46,47,48,49,50,51] },
+  { area: 'Right Inferior Temp Surface',    key: 'RIT',  indices: [52,53,54,55] },
+  { area: 'Right Posterior Temp Surface',   key: 'RPT',  indices: [56,57,58,59,60,61] },
 ];
 
 // ── Constants & Bands ─────────────────────────────────────────────────────────
-const MAX_FREQ = 100;
+const MAX_FREQ  = 100;
 const VIEW_FFT_N = 256, VIEW_HOP = 64;
-const SRATE = 256; // snippet sample rate
+const SRATE     = 256;
 
 const BANDS = [
   { lo:0.5, hi:4,   color:'rgba(48,80,220,0.17)',  border:'rgba(70,110,255,0.55)',  label:'\u03b4',  name:'\u03b4 Delta'     },
@@ -461,9 +509,7 @@ function computeFrames(samples){
     jsFft(re,im);
     for(let b=0;b<halfN;b++) frames[f*halfN+b]=Math.sqrt(re[b]*re[b]+im[b]*im[b]);
   }
-  const hopSec=VIEW_HOP/SRATE;
-  const effectiveSR=SRATE;
-  return{frames,numFrames,halfN,effectiveSR,hopSec};
+  return {frames,numFrames,halfN,effectiveSR:SRATE,hopSec:VIEW_HOP/SRATE};
 }
 
 // ── Smoothing ─────────────────────────────────────────────────────────────────
@@ -513,53 +559,80 @@ function applyZScore(frames,numFrames,halfN){
 }
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
-const areaSelect      = document.getElementById('area-select');
-const channelSelect   = document.getElementById('channel-select');
-const channelInfoEl   = document.getElementById('channel-info');
-const channelDisplay  = document.getElementById('channel-display');
-const vizContainer    = document.getElementById('viz-container');
-const viewAllBtn      = document.getElementById('viewall-btn');
-const zoomResetBtn    = document.getElementById('zoom-reset-btn');
-const exportBtn       = document.getElementById('export-btn');
-const timeSmoothEl    = document.getElementById('time-smooth');
-const freqSmoothEl    = document.getElementById('freq-smooth');
-const zscoreCb        = document.getElementById('zscore-cb');
-const cursorInfoEl    = document.getElementById('cursor-info');
-const zoomInfoEl      = document.getElementById('zoom-info');
-const zoomHintEl      = document.getElementById('zoom-hint');
-const emptyHint       = document.getElementById('empty-hint');
+const areaSelect       = document.getElementById('area-select');
+const channelSelect    = document.getElementById('channel-select');
+const channelInfoEl    = document.getElementById('channel-info');
+const channelDisplay   = document.getElementById('channel-display');
+const vizContainer     = document.getElementById('viz-container');
+const viewAllBtn       = document.getElementById('viewall-btn');
+const liveBtn          = document.getElementById('live-btn');
+const zoomResetBtn     = document.getElementById('zoom-reset-btn');
+const exportBtn        = document.getElementById('export-btn');
+const timeSmoothEl     = document.getElementById('time-smooth');
+const freqSmoothEl     = document.getElementById('freq-smooth');
+const zscoreCb         = document.getElementById('zscore-cb');
+const cursorInfoEl     = document.getElementById('cursor-info');
+const zoomInfoEl       = document.getElementById('zoom-info');
+const zoomHintEl       = document.getElementById('zoom-hint');
+const emptyHint        = document.getElementById('empty-hint');
+// Live controls
+const liveControlsBar  = document.getElementById('live-controls-bar');
+const playBtn          = document.getElementById('play-btn');
+const pauseBtn         = document.getElementById('pause-btn');
+const stopBtn          = document.getElementById('stop-btn');
+const liveSpeedSel     = document.getElementById('live-speed');
+const scrollSpeedSel   = document.getElementById('scroll-speed');
+const liveTimeDisplay  = document.getElementById('live-time-display');
+const liveDot          = document.getElementById('live-dot');
+const liveStatusLabel  = document.getElementById('live-status-label');
 
-const spectroCanvas   = document.getElementById('spectrogram-canvas');
-const spectroCtx      = spectroCanvas.getContext('2d');
-const overlayCanvas   = document.getElementById('overlay-canvas');
-const overlayCtx      = overlayCanvas.getContext('2d');
-const freqAxisCanvas  = document.getElementById('freq-axis-canvas');
-const freqAxisCtx     = freqAxisCanvas.getContext('2d');
-const bandAxisCanvas  = document.getElementById('band-axis-canvas');
-const bandAxisCtx     = bandAxisCanvas.getContext('2d');
-const colorScaleCanvas= document.getElementById('color-scale-canvas');
-const colorScaleCtx   = colorScaleCanvas.getContext('2d');
-const loadingOverlay  = document.getElementById('loading-overlay');
-const loadingFill     = document.getElementById('loading-fill');
-const loadingTextEl   = document.getElementById('loading-text');
-const timeAxisRow     = document.getElementById('time-axis-row');
-const timeAxisCanvas  = document.getElementById('time-axis-canvas');
-const timeAxisCtx     = timeAxisCanvas.getContext('2d');
-const timeAxisSpacerL = document.querySelector('.time-axis-spacer');
-const timeAxisSpacerR = document.querySelector('.time-axis-spacer-right');
+const spectroCanvas    = document.getElementById('spectrogram-canvas');
+const spectroCtx       = spectroCanvas.getContext('2d');
+const overlayCanvas    = document.getElementById('overlay-canvas');
+const overlayCtx       = overlayCanvas.getContext('2d');
+const freqAxisCanvas   = document.getElementById('freq-axis-canvas');
+const freqAxisCtx      = freqAxisCanvas.getContext('2d');
+const bandAxisCanvas   = document.getElementById('band-axis-canvas');
+const bandAxisCtx      = bandAxisCanvas.getContext('2d');
+const colorScaleCanvas = document.getElementById('color-scale-canvas');
+const colorScaleCtx    = colorScaleCanvas.getContext('2d');
+const loadingOverlay   = document.getElementById('loading-overlay');
+const loadingFill      = document.getElementById('loading-fill');
+const loadingTextEl    = document.getElementById('loading-text');
+const timeAxisRow      = document.getElementById('time-axis-row');
+const timeAxisCanvas   = document.getElementById('time-axis-canvas');
+const timeAxisCtx      = timeAxisCanvas.getContext('2d');
+const timeAxisSpacerL  = document.querySelector('.time-axis-spacer');
+const timeAxisSpacerR  = document.querySelector('.time-axis-spacer-right');
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let ecogData = null;
+let ecogData          = null;
 let currentChannelIdx = null;
-let currentAreaName = '';
-let viewAllData = null;
-let zoomState = null;
-let dragState = null;
-let totalDuration = 0;
+let currentAreaName   = '';
+let currentAreaKey    = '';
+let currentLocalCh    = 0;  // 1-based channel number within area
+let viewAllData       = null;
+let zoomState         = null;
+let dragState         = null;
+let totalDuration     = 0;
+
+// Live mode state
+let isLiveMode        = false;
+let isLivePlaying     = false;
+let livePlayTime      = 0;    // seconds into recording
+let liveTimeOffset    = 0;    // accumulated time before last pause
+let liveWallStart     = 0;    // performance.now() when last play() started
+let liveAnimFrame     = null;
+let liveNormMin       = 0;
+let liveNormMax       = 1;
+let colBuffer         = null; // 1×H ImageData for live column drawing
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function freqToY(freq,h){ return Math.round((1-Math.max(0,Math.min(freq,MAX_FREQ))/MAX_FREQ)*h); }
-function formatTime(s){ const m=Math.floor(s/60),ss=Math.floor(s%60),ms=Math.floor((s%1)*1000); return `${m}:${String(ss).padStart(2,'0')}.${String(ms).padStart(3,'0')}`; }
+function formatTime(s){
+  const m=Math.floor(s/60),ss=(s%60).toFixed(1);
+  return `${m}:${ss.indexOf('.')===1?'0'+ss:ss}`;
+}
 function tick(ms=30){ return new Promise(r=>setTimeout(r,ms)); }
 
 // ── Canvas sizing ─────────────────────────────────────────────────────────────
@@ -573,6 +646,8 @@ function resizeCanvases(){
   timeAxisSpacerL.style.width=axW+'px';
   timeAxisSpacerR.style.width=bandW+'px';
   timeAxisCanvas.width=W;
+  // Rebuild colBuffer for live mode
+  colBuffer=spectroCtx.createImageData(1, H);
 }
 
 // ── Color scale ───────────────────────────────────────────────────────────────
@@ -627,7 +702,7 @@ function drawBandAxis(){
 }
 
 // ── Overlay: band lines, cursor, drag highlight ───────────────────────────────
-function drawOverlay(){
+function drawOverlay(playFrac){
   const c=overlayCtx,w=overlayCanvas.width,h=overlayCanvas.height;
   c.clearRect(0,0,w,h);
   c.lineWidth=1;
@@ -647,8 +722,17 @@ function drawOverlay(){
   }
   c.globalAlpha=1;c.setLineDash([]);
 
+  // Playback cursor (View All mode)
+  if(playFrac!=null && !isLiveMode){
+    const x=playFrac*w;
+    c.strokeStyle='rgba(255,255,255,0.6)';
+    c.lineWidth=1.5;c.setLineDash([4,3]);
+    c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();
+    c.setLineDash([]);
+  }
+
   // Zoom drag highlight
-  if(dragState){
+  if(dragState && !isLiveMode){
     const x1=Math.min(dragState.startPx,dragState.currentPx);
     const x2=Math.max(dragState.startPx,dragState.currentPx);
     if(x2-x1>2){
@@ -663,12 +747,13 @@ function drawOverlay(){
 }
 
 // ── Time axis ─────────────────────────────────────────────────────────────────
-function drawTimeAxisRange(startSec, endSec){
+function drawTimeAxisRange(startSec,endSec){
   const c=timeAxisCtx,w=timeAxisCanvas.width,h=timeAxisCanvas.height;
   c.fillStyle='#080b14';c.fillRect(0,0,w,h);
   const dur=endSec-startSec;
   let tick=1;
-  if(dur>10) tick=2;
+  if(dur>20) tick=5;
+  else if(dur>10) tick=2;
   else if(dur>4) tick=1;
   else if(dur>2) tick=0.5;
   else           tick=0.1;
@@ -700,6 +785,7 @@ function renderViewAllCanvas(frames,numFrames,halfN,effectiveSR,isZScore){
     for(let f=0;f<numFrames;f++) for(let b=0;b<=maxBinV;b++){
       const v=frames[f*halfN+b];if(v<gMin)gMin=v;if(v>gMax)gMax=v;
     }
+    viewAllData.gMin=gMin; viewAllData.gMax=gMax;
   }
   const gRange=Math.max(1e-10,gMax-gMin);
   for(let px=0;px<w;px++){
@@ -717,15 +803,14 @@ function renderViewAllCanvas(frames,numFrames,halfN,effectiveSR,isZScore){
     }
   }
   spectroCtx.putImageData(img,0,0);
-  drawOverlay();
+  drawOverlay(null);
 }
 
 // ── Zoom ──────────────────────────────────────────────────────────────────────
 function applyZoom(startSec, endSec){
   if(!viewAllData) return;
   zoomState={startSec,endSec};
-  const {renderedFrames,numFrames,halfN,effectiveSR,isZScore}=viewAllData;
-  const hopSec=VIEW_HOP/SRATE;
+  const {renderedFrames,numFrames,halfN,effectiveSR,isZScore,hopSec}=viewAllData;
   const startFrame=Math.max(0,Math.floor(startSec/hopSec));
   const endFrame  =Math.min(numFrames-1,Math.ceil(endSec/hopSec));
   const subCount  =Math.max(1,endFrame-startFrame+1);
@@ -750,7 +835,7 @@ function resetZoom(){
   drawTimeAxisRange(0,totalDuration);
   zoomResetBtn.style.display='none';
   zoomInfoEl.classList.remove('visible');
-  drawOverlay();
+  drawOverlay(null);
 }
 
 // ── Drag-to-zoom ──────────────────────────────────────────────────────────────
@@ -763,7 +848,7 @@ function spectroXToSec(clientX){
 }
 
 spectroCanvas.addEventListener('mousedown',e=>{
-  if(!viewAllData) return;
+  if(!viewAllData||isLiveMode) return;
   const rect=spectroCanvas.getBoundingClientRect();
   const px=(e.clientX-rect.left)*(spectroCanvas.width/rect.width);
   dragState={startPx:px,currentPx:px,startSec:spectroXToSec(e.clientX)};
@@ -775,34 +860,32 @@ spectroCanvas.addEventListener('mousemove',e=>{
   const freq=MAX_FREQ*(1-y/spectroCanvas.height);
   const band=BANDS.find(b=>freq>=b.lo&&freq<b.hi);
   let txt=`${freq.toFixed(1)} Hz`+(band?`  ·  ${band.name}`:'');
-  if(viewAllData){
+  if(viewAllData && !isLiveMode){
     const tSec=spectroXToSec(e.clientX);
     txt+=`  ·  t = ${formatTime(tSec)}`;
   }
   cursorInfoEl.textContent=txt;
-  if(dragState&&viewAllData){
+  if(dragState&&viewAllData&&!isLiveMode){
     const px=(e.clientX-rect.left)*(spectroCanvas.width/rect.width);
     dragState.currentPx=px;
-    drawOverlay();
+    drawOverlay(null);
   }
 });
 
 spectroCanvas.addEventListener('mouseup',e=>{
-  if(!dragState||!viewAllData) return;
-  const rect=spectroCanvas.getBoundingClientRect();
-  const endPx=(e.clientX-rect.left)*(spectroCanvas.width/rect.width);
+  if(!dragState||!viewAllData||isLiveMode) return;
   const endSec=spectroXToSec(e.clientX);
   const startSec=dragState.startSec;
   dragState=null;
   const s=Math.min(startSec,endSec);
   const en=Math.max(startSec,endSec);
-  if(en-s<0.05){ drawOverlay(); return; }
+  if(en-s<0.05){ drawOverlay(null); return; }
   applyZoom(s,en);
 });
 
 spectroCanvas.addEventListener('mouseleave',()=>{
   cursorInfoEl.textContent='';
-  if(dragState){ dragState=null; drawOverlay(); }
+  if(dragState){ dragState=null; drawOverlay(null); }
 });
 
 // ── JPG Export ────────────────────────────────────────────────────────────────
@@ -812,8 +895,7 @@ function exportJpg(){
   const bandW=bandAxisCanvas.width;
   const specW=spectroCanvas.width;
   const specH=spectroCanvas.height;
-  const timeH=24;
-  const settingsH=54;
+  const timeH=24, settingsH=54;
   const totalW=freqW+specW+bandW;
   const totalH=specH+timeH+settingsH;
 
@@ -828,13 +910,11 @@ function exportJpg(){
   ctx.drawImage(overlayCanvas,freqW,0);
   ctx.drawImage(bandAxisCanvas,freqW+specW,0);
 
-  // Time axis
   ctx.fillStyle='#080b14';
   ctx.fillRect(0,specH,freqW,timeH);
   ctx.fillRect(freqW+specW,specH,bandW,timeH);
   ctx.drawImage(timeAxisCanvas,freqW,specH);
 
-  // Settings bar
   const sy=specH+timeH;
   ctx.fillStyle='#06080f';
   ctx.fillRect(0,sy,totalW,settingsH);
@@ -854,13 +934,11 @@ function exportJpg(){
   ctx.fillText(settingsLine,10,sy+16);
 
   ctx.fillStyle='#2a4060';
-  const areaName = currentAreaName || 'ECoG';
-  const chName   = ecogData ? ecogData.meta.channel_names[currentChannelIdx] : '';
-  let infoLine   = `Channel: ${chName}  ·  Area: ${areaName}  ·  ${totalDuration.toFixed(2)} s  ·  ${SRATE} Hz`;
+  const chLabel=`${currentAreaKey} Ch ${currentLocalCh}`;
+  let infoLine=`Channel: ${chLabel}  ·  Area: ${currentAreaName}  ·  ${totalDuration.toFixed(1)} s  ·  ${SRATE} Hz`;
   if(infoLine.length>120) infoLine=infoLine.slice(0,117)+'…';
   ctx.fillText(infoLine,10,sy+34);
 
-  // Color scale
   const scaleW=120;
   const scaleX=totalW-scaleW-90;
   ctx.drawImage(colorScaleCanvas,scaleX,sy+20,scaleW,9);
@@ -880,23 +958,27 @@ function exportJpg(){
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;
-    a.download=`ECoG_${chName}_Spectrogram.jpg`;
+    a.download=`ECoG_${currentAreaKey}_Ch${currentLocalCh}_Spectrogram.jpg`;
     a.click();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
   },'image/jpeg',0.93);
 }
 
-// ── Render channel spectrogram ────────────────────────────────────────────────
-async function renderChannel(channelIdx, areaName){
+// ── Render channel spectrogram (View All) ─────────────────────────────────────
+async function renderChannel(channelIdx, areaName, areaKey, localCh){
   if(!ecogData) return;
   currentChannelIdx = channelIdx;
   currentAreaName   = areaName;
+  currentAreaKey    = areaKey;
+  currentLocalCh    = localCh;
+
+  // Exit live mode if active
+  if(isLiveMode) exitLiveMode();
 
   const rawArray = ecogData.snippets[channelIdx];
   const samples  = new Float32Array(rawArray);
   totalDuration  = samples.length / SRATE;
 
-  // Show viz container if hidden
   vizContainer.style.display='flex';
   emptyHint.style.display='none';
   zoomState=null; dragState=null; viewAllData=null;
@@ -905,17 +987,15 @@ async function renderChannel(channelIdx, areaName){
 
   resizeCanvases();
   clearSpectrogram();
-  drawFreqAxis(); drawBandAxis(); drawOverlay(); drawColorScale();
+  drawFreqAxis(); drawBandAxis(); drawOverlay(null); drawColorScale();
 
-  const chName = ecogData.meta.channel_names[channelIdx];
-  channelDisplay.textContent = `${chName}  ·  ${areaName}  ·  ${totalDuration.toFixed(1)} s  ·  ${SRATE} Hz`;
+  channelDisplay.textContent=`${areaKey} Ch ${localCh}  ·  ${areaName}  ·  ${totalDuration.toFixed(1)} s  ·  ${SRATE} Hz`;
 
-  // Compute & render
   loadingOverlay.classList.add('visible');
   loadingTextEl.textContent='Computing spectrogram…'; loadingFill.style.width='0%';
   await tick();
 
-  const result = computeFrames(samples);
+  const result=computeFrames(samples);
   loadingFill.style.width='35%'; loadingTextEl.textContent='Smoothing…'; await tick();
 
   const tSec=parseFloat(timeSmoothEl.value)||0;
@@ -934,7 +1014,9 @@ async function renderChannel(channelIdx, areaName){
     numFrames: result.numFrames,
     halfN: result.halfN,
     effectiveSR: result.effectiveSR,
-    isZScore: zscoreCb.checked
+    hopSec: result.hopSec,
+    isZScore: zscoreCb.checked,
+    gMin: 0, gMax: 1
   };
 
   renderViewAllCanvas(frames,result.numFrames,result.halfN,result.effectiveSR,zscoreCb.checked);
@@ -945,8 +1027,203 @@ async function renderChannel(channelIdx, areaName){
   timeAxisRow.classList.add('visible');
   zoomHintEl.classList.add('visible');
 
+  viewAllBtn.classList.add('active');
+  liveBtn.classList.remove('active');
+
   await tick(60);
   loadingOverlay.classList.remove('visible');
+}
+
+// ── LIVE MODE ─────────────────────────────────────────────────────────────────
+
+function enterLiveMode(){
+  if(!viewAllData) return;
+  isLiveMode=true;
+
+  // Cache normalization range
+  if(!viewAllData.isZScore){
+    liveNormMin = viewAllData.gMin||0;
+    liveNormMax = viewAllData.gMax||1;
+  }
+
+  // Reset live state
+  livePlayTime=0; liveTimeOffset=0;
+  isLivePlaying=false;
+
+  // Update UI
+  viewAllBtn.classList.remove('active');
+  liveBtn.classList.add('active');
+  liveControlsBar.classList.add('visible');
+  timeAxisRow.classList.remove('visible');
+  zoomHintEl.classList.remove('visible');
+  zoomResetBtn.style.display='none';
+  zoomInfoEl.classList.remove('visible');
+  zoomState=null; dragState=null;
+
+  setLiveStatus('ready');
+  updateLiveTimeDisplay(0);
+
+  clearSpectrogram();
+  drawOverlay(null);
+
+  // Draw a ghost of the full spectrogram faintly (optional: skip for clean live look)
+  // We start clean: blank canvas
+}
+
+function exitLiveMode(){
+  isLiveMode=false;
+  isLivePlaying=false;
+  if(liveAnimFrame){ cancelAnimationFrame(liveAnimFrame); liveAnimFrame=null; }
+
+  liveBtn.classList.remove('active');
+  viewAllBtn.classList.add('active');
+  liveControlsBar.classList.remove('visible');
+  timeAxisRow.classList.add('visible');
+  zoomHintEl.classList.add('visible');
+
+  playBtn.style.display='';
+  pauseBtn.style.display='none';
+
+  if(viewAllData){
+    const {renderedFrames,numFrames,halfN,effectiveSR,isZScore}=viewAllData;
+    renderViewAllCanvas(renderedFrames,numFrames,halfN,effectiveSR,isZScore);
+    timeAxisCanvas.width=spectroCanvas.width;
+    drawTimeAxisRange(0,totalDuration);
+  }
+}
+
+function setLiveStatus(state){
+  // state: 'ready' | 'playing' | 'paused' | 'ended'
+  const dot=liveDot, lbl=liveStatusLabel;
+  if(state==='playing'){
+    dot.style.background='#40c060';
+    dot.style.animation='pulse 1.2s ease-in-out infinite';
+    lbl.textContent='LIVE';
+  } else if(state==='paused'){
+    dot.style.background='#a07030';
+    dot.style.animation='none';
+    lbl.textContent='PAUSED';
+  } else if(state==='ended'){
+    dot.style.background='#405060';
+    dot.style.animation='none';
+    lbl.textContent='ENDED';
+  } else {
+    dot.style.background='#405060';
+    dot.style.animation='none';
+    lbl.textContent='READY';
+  }
+}
+
+function updateLiveTimeDisplay(t){
+  liveTimeDisplay.textContent=`${formatTime(t)} / ${formatTime(totalDuration)}`;
+}
+
+// Get interpolated column data at fractional frame index
+function getLiveColumn(frameExact){
+  const {renderedFrames,numFrames,halfN,isZScore}=viewAllData;
+  const f0=Math.max(0,Math.min(numFrames-1,Math.floor(frameExact)));
+  const f1=Math.min(numFrames-1,f0+1);
+  const frac=frameExact-f0;
+  const h=spectroCanvas.height;
+  const {effectiveSR}=viewAllData;
+  const fpbV=(effectiveSR/2)/halfN;
+  const gRange=Math.max(1e-10,liveNormMax-liveNormMin);
+  const cd=colBuffer.data;
+  for(let y=0;y<h;y++){
+    const freq=MAX_FREQ*(1-y/h);
+    const bin=Math.min(Math.round(freq/fpbV),halfN-1);
+    const v0=renderedFrames[f0*halfN+bin];
+    const v1=renderedFrames[f1*halfN+bin];
+    const v=v0+(v1-v0)*frac;
+    let amp;
+    if(isZScore) amp=(v+3)/6;
+    else amp=(v-liveNormMin)/gRange;
+    amp=Math.max(0,Math.min(1,amp));
+    const [r,g,b]=COLOR_LUT[Math.round(amp*255)];
+    const i=y*4;
+    cd[i]=r;cd[i+1]=g;cd[i+2]=b;cd[i+3]=255;
+  }
+}
+
+function liveLoop(){
+  liveAnimFrame=requestAnimationFrame(liveLoop);
+  if(!isLivePlaying||!viewAllData) return;
+
+  const speedMul=parseFloat(liveSpeedSel.value)||1;
+  const elapsed=(performance.now()-liveWallStart)/1000*speedMul;
+  livePlayTime=liveTimeOffset+elapsed;
+
+  if(livePlayTime>=totalDuration){
+    livePlayTime=totalDuration;
+    updateLiveTimeDisplay(livePlayTime);
+    isLivePlaying=false;
+    cancelAnimationFrame(liveAnimFrame); liveAnimFrame=null;
+    playBtn.style.display='';
+    pauseBtn.style.display='none';
+    setLiveStatus('ended');
+    return;
+  }
+
+  updateLiveTimeDisplay(livePlayTime);
+
+  // Scroll canvas left
+  const scrollPx=parseInt(scrollSpeedSel.value,10)||2;
+  const w=spectroCanvas.width;
+  spectroCtx.drawImage(spectroCanvas,-scrollPx,0);
+
+  // Draw new column(s) at right edge
+  const hopSec=viewAllData.hopSec;
+  const frameExact=livePlayTime/hopSec;
+
+  if(!colBuffer||colBuffer.height!==spectroCanvas.height){
+    colBuffer=spectroCtx.createImageData(1,spectroCanvas.height);
+  }
+  getLiveColumn(frameExact);
+  for(let px=0;px<scrollPx;px++){
+    spectroCtx.putImageData(colBuffer,w-scrollPx+px,0);
+  }
+
+  drawOverlay(null);
+}
+
+function playLive(){
+  if(!viewAllData||isLivePlaying) return;
+  if(livePlayTime>=totalDuration){
+    // restart
+    livePlayTime=0; liveTimeOffset=0;
+    clearSpectrogram(); drawOverlay(null);
+  }
+  liveWallStart=performance.now();
+  liveTimeOffset=livePlayTime;
+  isLivePlaying=true;
+  playBtn.style.display='none';
+  pauseBtn.style.display='';
+  setLiveStatus('playing');
+  liveLoop();
+}
+
+function pauseLive(){
+  if(!isLivePlaying) return;
+  const speedMul=parseFloat(liveSpeedSel.value)||1;
+  liveTimeOffset=liveTimeOffset+(performance.now()-liveWallStart)/1000*speedMul;
+  livePlayTime=liveTimeOffset;
+  isLivePlaying=false;
+  cancelAnimationFrame(liveAnimFrame); liveAnimFrame=null;
+  playBtn.style.display='';
+  pauseBtn.style.display='none';
+  setLiveStatus('paused');
+}
+
+function stopLive(){
+  isLivePlaying=false;
+  if(liveAnimFrame){ cancelAnimationFrame(liveAnimFrame); liveAnimFrame=null; }
+  livePlayTime=0; liveTimeOffset=0;
+  playBtn.style.display='';
+  pauseBtn.style.display='none';
+  setLiveStatus('ready');
+  updateLiveTimeDisplay(0);
+  clearSpectrogram();
+  drawOverlay(null);
 }
 
 // ── Channel selection handlers ────────────────────────────────────────────────
@@ -957,13 +1234,14 @@ areaSelect.addEventListener('change', ()=>{
   if(!areaName) return;
   const group = CHANNEL_GROUPS.find(g=>g.area===areaName);
   if(!group) return;
-  for(const ch of group.channels){
+  group.indices.forEach((globalIdx, localIdx) => {
     const opt=document.createElement('option');
-    opt.value=ch.idx;
-    opt.textContent=ch.name;
+    opt.value=globalIdx;
+    opt.dataset.local=localIdx+1;
+    opt.textContent=`Channel ${localIdx+1}`;
     channelSelect.appendChild(opt);
-  }
-  channelInfoEl.textContent=`${group.channels.length} channels in ${areaName} area`;
+  });
+  channelInfoEl.textContent=`${group.indices.length} channels in ${areaName}`;
   channelInfoEl.className='channel-info loaded';
 });
 
@@ -971,15 +1249,39 @@ channelSelect.addEventListener('change', ()=>{
   const idx=parseInt(channelSelect.value,10);
   if(isNaN(idx)) return;
   const areaName = areaSelect.value;
-  channelInfoEl.textContent=`Channel ${ecogData.meta.channel_names[idx]}  ·  ${areaName}`;
-  renderChannel(idx, areaName);
+  const group = CHANNEL_GROUPS.find(g=>g.area===areaName);
+  const opt=channelSelect.selectedOptions[0];
+  const localCh=parseInt(opt.dataset.local,10)||1;
+  channelInfoEl.textContent=`${group.key} Ch ${localCh}  ·  ${areaName}`;
+  renderChannel(idx, areaName, group.key, localCh);
 });
 
-// ── VIEW ALL / Recompute button ───────────────────────────────────────────────
+// ── Mode toggle buttons ───────────────────────────────────────────────────────
 viewAllBtn.addEventListener('click', ()=>{
+  if(isLiveMode){
+    exitLiveMode();
+    return;
+  }
   if(currentChannelIdx===null) return;
-  renderChannel(currentChannelIdx, currentAreaName);
+  const group=CHANNEL_GROUPS.find(g=>g.area===currentAreaName);
+  renderChannel(currentChannelIdx, currentAreaName, currentAreaKey, currentLocalCh);
 });
+
+liveBtn.addEventListener('click', ()=>{
+  if(!viewAllData){
+    // Need to compute first — trigger render then enter live mode
+    if(currentChannelIdx===null) return;
+    renderChannel(currentChannelIdx, currentAreaName, currentAreaKey, currentLocalCh).then(()=>enterLiveMode());
+    return;
+  }
+  if(isLiveMode){ exitLiveMode(); return; }
+  enterLiveMode();
+});
+
+// ── Live controls ─────────────────────────────────────────────────────────────
+playBtn.addEventListener('click',  playLive);
+pauseBtn.addEventListener('click', pauseLive);
+stopBtn.addEventListener('click',  stopLive);
 
 // ── Controls ──────────────────────────────────────────────────────────────────
 zoomResetBtn.addEventListener('click', resetZoom);
@@ -989,7 +1291,9 @@ exportBtn.addEventListener('click', exportJpg);
 window.addEventListener('resize',()=>{
   if(vizContainer.style.display!=='none'){
     resizeCanvases();
-    if(viewAllData){
+    if(isLiveMode){
+      clearSpectrogram(); drawOverlay(null);
+    } else if(viewAllData){
       if(zoomState){
         applyZoom(zoomState.startSec,zoomState.endSec);
       } else {
@@ -997,11 +1301,10 @@ window.addEventListener('resize',()=>{
         renderViewAllCanvas(renderedFrames,numFrames,halfN,effectiveSR,isZScore);
         timeAxisCanvas.width=spectroCanvas.width;
         drawTimeAxisRange(0,totalDuration);
-        drawOverlay();
       }
       drawFreqAxis(); drawBandAxis();
     } else {
-      clearSpectrogram(); drawOverlay();
+      clearSpectrogram(); drawOverlay(null);
       drawFreqAxis(); drawBandAxis();
     }
   }
@@ -1018,26 +1321,26 @@ async function loadData(){
     if(!resp.ok) throw new Error('HTTP '+resp.status);
     ecogData=await resp.json();
 
-    // Populate area dropdown
+    // Populate area dropdown from CHANNEL_GROUPS
     for(const group of CHANNEL_GROUPS){
       const opt=document.createElement('option');
       opt.value=group.area;
-      opt.textContent=group.area+' ('+group.channels.length+')';
+      opt.textContent=`${group.area}  (${group.indices.length} ch)`;
       areaSelect.appendChild(opt);
     }
     areaSelect.disabled=false;
     loadingEl.style.display='none';
 
     const meta=ecogData.meta;
+    const dur=meta.duration_s||meta.n_samples/meta.srate_snippet||30;
     channelInfoEl.textContent=
-      `Dataset ready  ·  ${meta.n_channels} channels  ·  ${(meta.duration_s||10).toFixed(1)} s  ·  ${SRATE} Hz snippet rate`;
+      `Dataset ready  ·  ${meta.n_channels} channels  ·  ${dur.toFixed(0)} s  ·  ${meta.srate_snippet} Hz`;
     channelInfoEl.className='channel-info loaded';
 
-    // Show viz skeleton
     vizContainer.style.display='flex';
     resizeCanvases();
     clearSpectrogram();
-    drawFreqAxis(); drawBandAxis(); drawOverlay(); drawColorScale();
+    drawFreqAxis(); drawBandAxis(); drawOverlay(null); drawColorScale();
     emptyHint.style.display='flex';
   } catch(err){
     loadingEl.style.display='none';
