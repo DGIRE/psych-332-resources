@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontal Lobe EEG Guide - Backyard Brains</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .eeg-canvas {
+            background-color: #0a0a0a;
+            border-radius: 8px 8px 0 0;
+            width: 100%;
+            height: 180px;
+            display: block;
+        }
+
+        .spectrogram-canvas {
+            background-color: #000;
+            border-radius: 0 0 8px 8px;
+            width: 100%;
+            height: 120px;
+            border-top: 1px solid #1e293b;
+            display: block;
+        }
+
+        .step-card:hover {
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+
+        .electrode-dot {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .electrode-dot:hover {
+            fill: #ef4444;
+            r: 8;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .sim-btn {
+            background-color: #1f2937;
+            color: #9ca3af;
+            border: 1px solid #374151;
+            transition: all 0.2s ease;
+        }
+
+        .sim-btn.active {
+            background-color: #f97316 !important;
+            color: white !important;
+            border-color: #fb923c !important;
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-orange-600 text-white py-8 px-4 shadow-lg">
+        <div class="max-w-5xl mx-auto">
+            <h1 class="text-4xl font-bold mb-2">Exploring the Frontal Lobe</h1>
+            <p class="text-xl opacity-90">Basics of EEG and Fp1/Fp2 Recording with Backyard Brains</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 space-y-16">
+
+        <!-- Navigation Tabs -->
+        <nav class="flex space-x-4 border-b border-gray-200 sticky top-0 bg-gray-50 z-10 py-4">
+            <button onclick="showTab('theory')" class="tab-btn px-4 py-2 font-semibold text-orange-600 border-b-2 border-orange-600">The Basics</button>
+            <button onclick="showTab('setup')" class="tab-btn px-4 py-2 font-semibold text-gray-500 hover:text-orange-600">Setup Guide</button>
+            <button onclick="showTab('simulator')" class="tab-btn px-4 py-2 font-semibold text-gray-500 hover:text-orange-600">EEG Simulator</button>
+        </nav>
+
+        <!-- Section: Theory -->
+        <section id="theory" class="tab-content active space-y-8">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-4">What is an EEG?</h2>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        Electroencephalography (EEG) measures the electrical activity of your brain. When neurons fire, they create tiny electrical impulses. By placing electrodes on the scalp, we can detect the <strong>synchronized</strong> activity of millions of neurons.
+                    </p>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                        <p class="text-blue-700 italic">"The signal we measure is in the range of 10s of microvolts (&mu;V). That's 100 times smaller than your heart signal (EKG)!"</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md flex flex-col items-center">
+                    <h3 class="font-bold mb-4 text-center">The 10/20 System (Frontal Focus)</h3>
+                    <svg viewBox="0 0 200 200" class="w-64 h-64">
+                        <!-- Head Outline -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#374151" stroke-width="2"/>
+                        <path d="M100 20 L95 10 L105 10 Z" fill="#374151"/> <!-- Nose -->
+
+                        <!-- Reference Lines -->
+                        <line x1="100" y1="20" x2="100" y2="180" stroke="#cbd5e1" stroke-dasharray="4"/>
+                        <line x1="20" y1="100" x2="180" y2="100" stroke="#cbd5e1" stroke-dasharray="4"/>
+
+                        <!-- Electrodes -->
+                        <circle cx="70" cy="45" r="5" fill="#ef4444" class="electrode-dot" id="dot-fp1" onclick="updateInfo('Fp1')"/>
+                        <text x="56" y="38" font-size="10" class="font-bold">Fp1</text>
+
+                        <circle cx="130" cy="45" r="5" fill="#ef4444" class="electrode-dot" id="dot-fp2" onclick="updateInfo('Fp2')"/>
+                        <text x="126" y="38" font-size="10" class="font-bold">Fp2</text>
+
+                        <circle cx="100" cy="30" r="4" fill="#94a3b8" class="electrode-dot"/>
+                        <text x="94" y="25" font-size="8">Fpz</text>
+                    </svg>
+                    <div id="info-box" class="mt-4 text-center p-3 bg-gray-100 rounded w-full min-h-[64px] flex items-center justify-center">
+                        <p class="text-sm font-semibold text-gray-500 italic">Click an electrode (Fp1 or Fp2)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-2xl font-bold mb-4">Why Fp1 and Fp2?</h3>
+                <p class="text-gray-700 mb-4">The <strong>Frontal Pole (Fp)</strong> electrodes sit directly over your prefrontal cortex. This area is responsible for:</p>
+                <ul class="grid md:grid-cols-3 gap-4">
+                    <li class="p-4 bg-orange-50 rounded-lg text-orange-800 font-medium text-center">Executive Function</li>
+                    <li class="p-4 bg-orange-50 rounded-lg text-orange-800 font-medium text-center">Blinking/Eye Movement</li>
+                    <li class="p-4 bg-orange-50 rounded-lg text-orange-800 font-medium text-center">Concentration</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section: Setup -->
+        <section id="setup" class="tab-content space-y-12">
+            <h2 class="text-3xl font-bold text-center">Setup: Backyard Brains Heart & Brain SpikerBox</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto">We will be using adhesive electrode patches on the forehead. This provides a cleaner signal than the headband for frontal lobe recordings.</p>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="step-card bg-white p-6 rounded-xl shadow border-t-4 border-orange-500">
+                    <div class="text-orange-500 font-bold text-lg mb-2">Step 1</div>
+                    <h4 class="font-bold mb-2">Clean the Forehead</h4>
+                    <p class="text-sm text-gray-600">Use an alcohol wipe or soapy water to clean the skin over your eyebrows. Skin oils are "insulators" and will block the signal!</p>
+                </div>
+                <div class="step-card bg-white p-6 rounded-xl shadow border-t-4 border-orange-500">
+                    <div class="text-orange-500 font-bold text-lg mb-2">Step 2</div>
+                    <h4 class="font-bold mb-2">Placement (Fp1/Fp2)</h4>
+                    <p class="text-sm text-gray-600">Place two adhesive electrodes on your forehead, approximately 1 inch above the center of each eyebrow. These are your active channels.</p>
+                </div>
+                <div class="step-card bg-white p-6 rounded-xl shadow border-t-4 border-orange-500">
+                    <div class="text-orange-500 font-bold text-lg mb-2">Step 3</div>
+                    <h4 class="font-bold mb-2">The Ground</h4>
+                    <p class="text-sm text-gray-600">Place the third electrode on the <strong>Mastoid Process</strong> (the bony part behind either ear). This is critical to reduce electrical noise.</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 text-white p-8 rounded-2xl overflow-hidden relative">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold mb-4">Connecting the Leads</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <span class="w-4 h-4 rounded-full bg-red-500"></span>
+                            <p><strong>Red Clips:</strong> Attach to the two electrodes on your forehead (Fp1 & Fp2).</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="w-4 h-4 rounded-full bg-black border border-white"></span>
+                            <p><strong>Black Clip:</strong> Attach to the electrode behind your ear (Ground).</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="w-4 h-4 rounded-full bg-orange-500"></span>
+                            <p><strong>Orange Cable:</strong> Plug into the orange port on the SpikerBox.</p>
+                        </div>
+                    </div>
+                </div>
+                <svg class="absolute right-0 top-0 h-full opacity-20 hidden md:block" viewBox="0 0 200 200">
+                    <rect x="50" y="120" width="100" height="60" rx="5" fill="white"/>
+                    <circle cx="100" cy="140" r="5" fill="#f97316"/>
+                    <path d="M100 140 Q100 80 50 40" stroke="white" fill="none" stroke-width="2"/>
+                    <path d="M100 140 Q100 80 150 40" stroke="white" fill="none" stroke-width="2"/>
+                </svg>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6">
+                <h4 class="font-bold text-yellow-800 mb-2">Troubleshooting Noise</h4>
+                <ul class="list-disc list-inside text-yellow-700 space-y-1 text-sm">
+                    <li><strong>No Signal?</strong> Make sure the SpikerBox is turned ON (red switch) and the 9V battery is fresh.</li>
+                    <li><strong>60Hz Hum?</strong> If the signal looks like a thick solid wall of noise, turn on the 60Hz Notch Filter in settings.</li>
+                    <li><strong>Muscle Artifact?</strong> Relax your face! Jaw clenching creates massive EMG signals.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section: Simulator -->
+        <section id="simulator" class="tab-content space-y-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold mb-2">Interactive EEG Simulator</h2>
+                <p class="text-gray-600">Select an activity to see how frontal lobe signals (Fp1/Fp2) change in real-time.</p>
+            </div>
+
+            <div class="bg-gray-900 p-6 rounded-2xl shadow-2xl">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <div class="flex space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400 text-xs font-mono uppercase">Status: Live Data</span>
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        </div>
+                        <div id="channel-display" class="text-gray-400 text-xs font-mono">Channel: Fp1</div>
+                    </div>
+                    <div class="text-gray-400 text-xs font-mono">Voltage: &plusmn;50&mu;V</div>
+                </div>
+
+                <div class="relative overflow-hidden bg-black rounded-lg">
+                    <canvas id="eegCanvas" class="eeg-canvas"></canvas>
+                    <canvas id="spectrogramCanvas" class="spectrogram-canvas"></canvas>
+
+                    <!-- Labels -->
+                    <div class="absolute left-1 top-2 text-[10px] text-gray-500 font-mono bg-black bg-opacity-50 px-1">Raw EEG Trace</div>
+                    <div class="absolute left-1 bottom-1 text-[10px] text-gray-500 font-mono bg-black bg-opacity-50 px-1">Spectrogram</div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                    <button id="btn-normal" onclick="setSimulation('normal')" class="sim-btn p-3 rounded font-bold">Relaxed</button>
+                    <button id="btn-blink" onclick="setSimulation('blink')" class="sim-btn p-3 rounded font-bold">Blink Loop</button>
+                    <button id="btn-concentrate" onclick="setSimulation('concentrate')" class="sim-btn p-3 rounded font-bold">Focusing</button>
+                    <button id="btn-jaw" onclick="setSimulation('jaw')" class="sim-btn p-3 rounded font-bold">Muscle (EMG)</button>
+                </div>
+            </div>
+
+            <div id="sim-explanation" class="bg-white p-6 rounded-xl border border-gray-200">
+                <h4 class="font-bold mb-2 text-lg" id="sim-title">Relaxed State</h4>
+                <p id="sim-text" class="text-gray-700 leading-relaxed">Normal resting EEG showing low amplitude oscillations. The spectrogram is relatively dark, showing power mostly in the lower (Theta/Alpha) ranges.</p>
+                <div class="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-100 flex items-start space-x-3">
+                    <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <p class="text-sm text-orange-800 italic"><strong>Observation:</strong> Watch how "Muscle" activity turns the spectrogram into a wall of solid color. This is why researchers ask subjects to remain perfectly still.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-100 py-12 border-t border-gray-200">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <p class="text-gray-500 text-sm font-medium">Fp1/Fp2 Frontal Lobe Interactive Training • Backyard Brains Educational Tool</p>
+        </div>
+    </footer>
+
+    <script>
+        // Tab Management
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-orange-600', 'border-b-2', 'border-orange-600');
+                btn.classList.add('text-gray-500');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.innerText.toLowerCase().includes(tabId === 'theory' ? 'basics' : tabId));
+            if (activeBtn) {
+                activeBtn.classList.add('text-orange-600', 'border-b-2', 'border-orange-600');
+                activeBtn.classList.remove('text-gray-500');
+            }
+            if(tabId === 'simulator') {
+                // Force a resize check when tab becomes visible
+                setTimeout(resizeCanvas, 50);
+            }
+        }
+
+        // Info Box Update
+        function updateInfo(loc) {
+            const box = document.getElementById('info-box');
+            if (loc === 'Fp1') {
+                box.innerHTML = `<div class="text-left"><p class="text-sm font-bold text-orange-600 mb-1">Fp1: Frontal Pole Left</p><p class="text-xs text-gray-600 leading-tight">Sits above the left eyebrow. Good for measuring attention and eye blink artifacts.</p></div>`;
+            } else if (loc === 'Fp2') {
+                box.innerHTML = `<div class="text-left"><p class="text-sm font-bold text-orange-600 mb-1">Fp2: Frontal Pole Right</p><p class="text-xs text-gray-600 leading-tight">Sits above the right eyebrow. Symmetric to Fp1; used to check for hemispheric balance.</p></div>`;
+            }
+        }
+
+        // --- Simulator Core ---
+        const eegCanvas = document.getElementById('eegCanvas');
+        const specCanvas = document.getElementById('spectrogramCanvas');
+        const eegCtx = eegCanvas.getContext('2d');
+        const specCtx = specCanvas.getContext('2d');
+
+        let points = [];
+        let specData = [];
+        let time = 0;
+        let simMode = 'normal';
+
+        function resizeCanvas() {
+            const container = eegCanvas.parentElement;
+            if (!container) return;
+
+            const rect = container.getBoundingClientRect();
+            const width = Math.max(rect.width, 300); // Ensure non-zero
+
+            // Only update if width actually changed to avoid flickering
+            if (eegCanvas.width !== width) {
+                eegCanvas.width = width;
+                specCanvas.width = width;
+                points = []; // Reset buffers to align with new width
+                specData = [];
+            }
+            eegCanvas.height = 180;
+            specCanvas.height = 120;
+        }
+
+        function setSimulation(mode) {
+            simMode = mode;
+            document.querySelectorAll('.sim-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('btn-' + mode);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const text = document.getElementById('sim-text');
+            const title = document.getElementById('sim-title');
+
+            switch(mode) {
+                case 'normal':
+                    title.innerText = "Relaxed State";
+                    text.innerText = "Normal resting EEG. Notice the small, irregular oscillations and dark spectrogram.";
+                    break;
+                case 'blink':
+                    title.innerText = "Eye Blink Patterns";
+                    text.innerText = "Deflections caused by blinks. These appear as vertical broadband spikes in the spectrogram.";
+                    break;
+                case 'concentrate':
+                    title.innerText = "Cognitive Concentration";
+                    text.innerText = "Increased Beta activity (13-30 Hz). The trace looks busier/sharper.";
+                    break;
+                case 'jaw':
+                    title.innerText = "EMG Noise (Jaw Clench)";
+                    text.innerText = "Muscle activity drowning out the brain signal. The spectrogram is fully saturated.";
+                    break;
+            }
+        }
+
+        function getSpectralColumn() {
+            const bins = 60;
+            const col = new Array(bins).fill(0);
+
+            if (simMode === 'normal') {
+                col[8] = 0.4 + Math.random() * 0.2;
+                col[5] = 0.3;
+            } else if (simMode === 'concentrate') {
+                for(let i=25; i<50; i++) col[i] = 0.5 + Math.random() * 0.4;
+            } else if (simMode === 'blink') {
+                if (Math.sin(time * 0.08) > 0.94) {
+                    for(let i=0; i<bins; i++) col[i] = 0.9;
+                } else {
+                    col[8] = 0.4;
+                }
+            } else if (simMode === 'jaw') {
+                for(let i=0; i<bins; i++) col[i] = 0.8 + Math.random() * 0.2;
+            }
+
+            return col.map(v => v + Math.random() * 0.08);
+        }
+
+        function drawLoop() {
+            // Check dimensions inside loop in case they change or start at zero
+            if (eegCanvas.width === 0) {
+                resizeCanvas();
+            }
+
+            const width = eegCanvas.width;
+            const height = eegCanvas.height;
+            const centerY = height / 2;
+
+            // 1. SIGNAL GENERATION
+            let val = 0;
+            let noise = (Math.random() - 0.5) * 6;
+
+            if (simMode === 'normal') {
+                val = Math.sin(time * 0.1) * 15 + Math.sin(time * 0.04) * 8 + noise;
+            } else if (simMode === 'concentrate') {
+                val = Math.sin(time * 0.7) * 12 + Math.sin(time * 1.8) * 4 + noise;
+            } else if (simMode === 'blink') {
+                let blinkTrigger = Math.sin(time * 0.08) > 0.94 ? -80 : 0;
+                val = Math.sin(time * 0.15) * 10 + blinkTrigger + noise;
+            } else if (simMode === 'jaw') {
+                val = (Math.random() - 0.5) * 120;
+            }
+
+            points.push(centerY + val);
+            if (points.length > width) points.shift();
+
+            // 2. DRAW EEG TRACE
+            eegCtx.fillStyle = '#0a0a0a';
+            eegCtx.fillRect(0, 0, width, height);
+
+            eegCtx.strokeStyle = '#1e293b';
+            eegCtx.lineWidth = 1;
+            for(let i=0; i<width; i+=50) {
+                eegCtx.beginPath(); eegCtx.moveTo(i, 0); eegCtx.lineTo(i, height); eegCtx.stroke();
+            }
+
+            eegCtx.strokeStyle = '#f97316';
+            eegCtx.lineWidth = 2;
+            eegCtx.beginPath();
+            for(let i=0; i<points.length; i++) {
+                if (i===0) eegCtx.moveTo(i, points[i]);
+                else eegCtx.lineTo(i, points[i]);
+            }
+            eegCtx.stroke();
+
+            // 3. DRAW SPECTROGRAM
+            // Push one spectral column every frame — same rate as the raw trace —
+            // so the leading edges of both displays stay aligned in time.
+            specData.push(getSpectralColumn());
+            if (specData.length > width) specData.shift();
+
+            specCtx.fillStyle = '#000';
+            specCtx.fillRect(0, 0, specCanvas.width, specCanvas.height);
+
+            const binH = specCanvas.height / 60;
+            specData.forEach((col, x) => {
+                col.forEach((v, b) => {
+                    let r = 0, g = 0, bl = 0;
+                    if (v < 0.2) { bl = v * 1275; }
+                    else if (v < 0.6) { r = (v-0.2)*637; bl = 255; }
+                    else { r = 255; g = (v-0.6)*637; bl = 255 - (v-0.6)*637; }
+
+                    specCtx.fillStyle = `rgb(${r},${g},${bl})`;
+                    specCtx.fillRect(x, specCanvas.height - (b * binH), 1, binH);
+                });
+            });
+
+            time++;
+            requestAnimationFrame(drawLoop);
+        }
+
+        window.onload = () => {
+            resizeCanvas();
+            setSimulation('normal');
+            drawLoop();
+        };
+        window.addEventListener('resize', resizeCanvas);
+    </script>
+</body>
+</html>
