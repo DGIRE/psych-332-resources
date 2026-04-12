@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECoG Data Preview – PSYCH 332</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Site nav ─────────────────────────────────── */
+.site-nav {
+  width: 100%;
+  background: rgba(10,18,35,0.97);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.78rem;
+  position: sticky;
+  top: 0;
+  z-index: 500;
+}
+.site-nav a { color: #5a7d9e; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.site-nav a:hover { color: #0779be; }
+.site-nav .bc-sep { color: rgba(255,255,255,0.15); font-size: 0.7rem; }
+.site-nav .bc-current { color: #b0c4de; font-weight: 600; }
+
+body {
+  background: #0a0c14;
+  color: #c8d8f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Header ─────────────────────────────────── */
+.header {
+  text-align: center;
+  margin: 28px 0 20px;
+  padding: 0 20px;
+}
+.header h1 {
+  font-size: 1.6rem; font-weight: 300; letter-spacing: 3px;
+  color: #90b8e8; text-transform: uppercase; margin-bottom: 5px;
+  font-family: -apple-system, sans-serif;
+}
+.header .subtitle { font-size: 0.8rem; color: #4060a0; letter-spacing: 1.5px; text-transform: uppercase; }
+
+/* ── Channel selector ─────────────────────────── */
+#selector-panel {
+  width: 560px; max-width: calc(100vw - 40px);
+  background: rgba(14,26,56,0.70);
+  border: 1px solid #1e3460;
+  border-radius: 14px;
+  padding: 22px 26px 18px;
+  margin-bottom: 24px;
+}
+.selector-row {
+  display: flex; gap: 14px; align-items: flex-end; margin-bottom: 14px;
+}
+.selector-group {
+  flex: 1; display: flex; flex-direction: column; gap: 6px;
+}
+.selector-group label {
+  font-size: 0.69rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1px; color: #4060a0;
+}
+.selector-group select {
+  background: #0c1220; border: 1px solid #1e3460; color: #6090c8;
+  border-radius: 7px; padding: 8px 10px; font-size: 0.82rem;
+  font-family: inherit; cursor: pointer; transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234060a0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+.selector-group select:hover { border-color: #3a6ab8; }
+.selector-group select:focus { outline: none; border-color: #3a6ab8; }
+.selector-group select:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.channel-info {
+  font-size: 0.72rem; color: #3a5070;
+  font-family: 'Courier New', monospace;
+  min-height: 1.1em;
+  padding-top: 2px;
+}
+.channel-info.loaded { color: #4a7090; }
+
+/* Loading state for JSON */
+#data-loading {
+  display: none; font-size: 0.75rem; color: #3a5a7a;
+  text-align: center; padding: 6px 0 4px;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+
+/* ── Viz container ───────────────────────────── */
+#viz-container {
+  display: none; flex-direction: column; align-items: center;
+  width: 100%; max-width: 1100px; padding: 0 20px 40px;
+}
+
+/* ── Spectrogram layout ──────────────────────── */
+.specto-layout {
+  display: flex; align-items: stretch; width: 100%;
+  border-radius: 10px 10px 0 0; overflow: hidden;
+}
+#freq-axis-canvas { flex-shrink: 0; background: #080b14; display: block; }
+#band-axis-canvas { flex-shrink: 0; background: #080b14; display: block; }
+
+.specto-wrap {
+  position: relative; flex: 1; min-width: 0; background: #04050e;
+  cursor: crosshair;
+}
+#spectrogram-canvas { display: block; width: 100%; height: 100%; background: #04050e; }
+#overlay-canvas {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%; pointer-events: none;
+}
+
+/* Loading overlay */
+#loading-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(4,5,14,0.88);
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column; gap: 14px; z-index: 10;
+}
+#loading-overlay.visible { display: flex; }
+.loading-text { font-size: 0.95rem; color: #6090c8; letter-spacing: 2px; }
+.loading-bar { width: 220px; height: 3px; background: #141e36; border-radius: 2px; overflow: hidden; }
+#loading-fill { height: 100%; background: #3a6ab8; border-radius: 2px; width: 0%; transition: width 0.15s; }
+
+/* ── Time axis ───────────────────────────────── */
+.time-axis-row {
+  display: none; width: 100%; align-items: stretch;
+}
+.time-axis-row.visible { display: flex; }
+.time-axis-spacer { background: #080b14; flex-shrink: 0; }
+.time-axis-spacer-right { background: #080b14; flex-shrink: 0; }
+#time-axis-canvas { flex: 1; display: block; background: #080b14; }
+
+/* ── Controls bar ────────────────────────────── */
+.controls-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px; background: #080b18;
+  border-top: 1px solid #141e36; width: 100%; flex-wrap: wrap;
+}
+.btn {
+  border: 1px solid #1e3460; background: none; color: #6090c8;
+  border-radius: 7px; padding: 6px 14px; font-size: 0.76rem;
+  letter-spacing: 1px; cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.btn:hover { border-color: #3a6ab8; color: #90c0f0; background: rgba(40,80,180,0.1); }
+.btn.active { border-color: #3a6ab8; color: #a0d0ff; background: rgba(40,80,180,0.18); }
+.btn.zoom-reset { border-color: #4a3010; color: #a07040; }
+.btn.zoom-reset:hover { border-color: #7a5020; color: #d09050; background: rgba(120,80,20,0.1); }
+.btn.export { border-color: #1e3820; color: #50886a; }
+.btn.export:hover { border-color: #2e5830; color: #70b890; background: rgba(40,100,60,0.1); }
+
+.ctrl-div { width: 1px; height: 22px; background: #141e36; flex-shrink: 0; margin: 0 2px; }
+
+.ctrl-grp {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.73rem; color: #3a5070;
+}
+.ctrl-grp select {
+  background: #0c1220; border: 1px solid #1e3460; color: #6090c8;
+  border-radius: 5px; padding: 4px 6px; font-size: 0.73rem;
+}
+.ctrl-grp input[type=number] {
+  background: #0c1220; border: 1px solid #1e3460; color: #6090c8;
+  border-radius: 5px; padding: 4px 6px; font-size: 0.73rem; width: 54px;
+}
+.ctrl-grp input[type=checkbox] { accent-color: #3a6ab8; cursor: pointer; width: 13px; height: 13px; }
+.ctrl-grp label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+
+.channel-display {
+  margin-left: auto; font-family: 'Courier New', monospace;
+  font-size: 0.78rem; color: #3a5a8a; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 240px;
+}
+
+/* ── Info strip ──────────────────────────────── */
+.info-strip {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 7px 14px; background: #06080f;
+  border-top: 1px solid #0e1628;
+  border-radius: 0 0 10px 10px; flex-wrap: wrap; gap: 8px;
+}
+.cursor-info {
+  font-size: 0.73rem; color: #4a6a9a;
+  font-family: 'Courier New', monospace; min-height: 1.1em; min-width: 240px;
+}
+.zoom-info {
+  font-size: 0.72rem; color: #a07040;
+  font-family: 'Courier New', monospace; display: none;
+}
+.zoom-info.visible { display: block; }
+.color-scale-wrap { display: flex; align-items: center; gap: 7px; font-size: 0.69rem; color: #344a70; }
+#color-scale-canvas { width: 130px; height: 9px; border-radius: 4px; display: block; }
+
+/* ── Band legend ─────────────────────────────── */
+.band-legend {
+  display: flex; gap: 10px; margin-top: 14px;
+  flex-wrap: wrap; justify-content: center;
+}
+.band-item { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #5070a0; }
+.band-swatch { width: 20px; height: 8px; border-radius: 3px; opacity: 0.75; }
+
+/* Zoom hint */
+.zoom-hint {
+  display: none;
+  font-size: 0.69rem; color: #3a5030; letter-spacing: 0.3px;
+  margin-top: 5px; text-align: center;
+}
+.zoom-hint.visible { display: block; }
+
+/* Empty spectrogram placeholder */
+#empty-hint {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  font-size: 0.8rem; color: #1e3050; letter-spacing: 1px; text-transform: uppercase;
+  pointer-events: none; position: absolute; top: 0; left: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- Site nav -->
+<nav class="site-nav">
+  <a href="index.html">Home</a>
+  <span class="bc-sep">›</span>
+  <a href="module2-practicum.html">Module 2 Practicum</a>
+  <span class="bc-sep">›</span>
+  <a href="module2-signal-processing.html">Step 2: Signal Processing</a>
+  <span class="bc-sep">›</span>
+  <span class="bc-current">ECoG Data Preview</span>
+</nav>
+
+<div class="header">
+  <h1>ECoG Data Preview</h1>
+  <p class="subtitle">Spectrogram &nbsp;·&nbsp; 0 – 100 Hz &nbsp;·&nbsp; 62 Channels</p>
+</div>
+
+<!-- Channel selector -->
+<div id="selector-panel">
+  <div id="data-loading">Loading channel data…</div>
+  <div class="selector-row">
+    <div class="selector-group">
+      <label>Brain Area</label>
+      <select id="area-select" disabled>
+        <option value="">— Select area —</option>
+      </select>
+    </div>
+    <div class="selector-group">
+      <label>Channel</label>
+      <select id="channel-select" disabled>
+        <option value="">— Select channel —</option>
+      </select>
+    </div>
+  </div>
+  <div class="channel-info" id="channel-info">Loading ECoG dataset…</div>
+</div>
+
+<!-- Visualization -->
+<div id="viz-container">
+
+  <div class="specto-layout">
+    <canvas id="freq-axis-canvas" width="68" height="500"></canvas>
+    <div class="specto-wrap" id="specto-wrap">
+      <canvas id="spectrogram-canvas" height="500"></canvas>
+      <canvas id="overlay-canvas"     height="500"></canvas>
+      <div id="empty-hint">Select a channel above</div>
+      <div id="loading-overlay">
+        <span class="loading-text" id="loading-text">Processing…</span>
+        <div class="loading-bar"><div id="loading-fill"></div></div>
+      </div>
+    </div>
+    <canvas id="band-axis-canvas" width="76" height="500"></canvas>
+  </div>
+
+  <!-- Time axis -->
+  <div class="time-axis-row" id="time-axis-row">
+    <div class="time-axis-spacer" style="width:68px;"></div>
+    <canvas id="time-axis-canvas" height="24"></canvas>
+    <div class="time-axis-spacer-right" style="width:76px;"></div>
+  </div>
+
+  <div class="controls-bar">
+    <button class="btn active" id="viewall-btn">&#9635; VIEW ALL</button>
+    <button class="btn zoom-reset" id="zoom-reset-btn" style="display:none;">&#8635; RESET ZOOM</button>
+
+    <div class="ctrl-div"></div>
+
+    <div class="ctrl-grp">
+      <span>Time smooth:</span>
+      <input type="number" id="time-smooth" value="0" min="0" max="5" step="0.05">
+      <span>s</span>
+    </div>
+
+    <div class="ctrl-grp">
+      <span>Freq smooth:</span>
+      <input type="number" id="freq-smooth" value="0" min="0" max="20" step="0.5">
+      <span>Hz</span>
+    </div>
+
+    <div class="ctrl-div"></div>
+
+    <div class="ctrl-grp">
+      <label>
+        <input type="checkbox" id="zscore-cb">
+        <span>Z-score / band</span>
+      </label>
+    </div>
+
+    <div class="ctrl-div"></div>
+
+    <button class="btn export" id="export-btn">&#8681; EXPORT JPG</button>
+
+    <div class="channel-display" id="channel-display"></div>
+  </div>
+
+  <div class="info-strip">
+    <div class="cursor-info" id="cursor-info"></div>
+    <div class="zoom-info" id="zoom-info"></div>
+    <div class="color-scale-wrap">
+      <span>Low</span>
+      <canvas id="color-scale-canvas" width="130" height="9"></canvas>
+      <span>High power</span>
+    </div>
+  </div>
+
+  <p class="zoom-hint" id="zoom-hint">Click and drag on the spectrogram to zoom into a time range</p>
+
+  <div class="band-legend">
+    <div class="band-item"><div class="band-swatch" style="background:#3050c0"></div><span>&delta; Delta (0.5–4 Hz)</span></div>
+    <div class="band-item"><div class="band-swatch" style="background:#10a0c0"></div><span>&theta; Theta (4–8 Hz)</span></div>
+    <div class="band-item"><div class="band-swatch" style="background:#10b860"></div><span>&alpha; Alpha (8–13 Hz)</span></div>
+    <div class="band-item"><div class="band-swatch" style="background:#b8b800"></div><span>&beta; Beta (13–30 Hz)</span></div>
+    <div class="band-item"><div class="band-swatch" style="background:#c86010"></div><span>&gamma; Low Gamma (30–70 Hz)</span></div>
+    <div class="band-item"><div class="band-swatch" style="background:#c02020"></div><span>&gamma; High Gamma (70–100 Hz)</span></div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+// ── Channel area groupings ────────────────────────────────────────────────────
+// Groups match the 62-channel ECoG dataset (channel_names from meta)
+const CHANNEL_GROUPS = [
+  { area: 'Frontal', channels: [
+    {name:'Fp1',idx:0},{name:'AF7',idx:1},{name:'AF3',idx:2},
+    {name:'F1',idx:3},{name:'F3',idx:4},{name:'F5',idx:5},{name:'F7',idx:6},
+    {name:'Fpz',idx:32},{name:'Fp2',idx:33},{name:'AF8',idx:34},{name:'AF4',idx:35},
+    {name:'AFz',idx:36},{name:'Fz',idx:37},{name:'F2',idx:38},{name:'F4',idx:39},
+    {name:'F6',idx:40},{name:'F8',idx:41}
+  ]},
+  { area: 'Frontocentral', channels: [
+    {name:'FT7',idx:7},{name:'FC5',idx:8},{name:'FC3',idx:9},{name:'FC1',idx:10},
+    {name:'FT8',idx:42},{name:'FC6',idx:43},{name:'FC4',idx:44},{name:'FC2',idx:45},{name:'FCz',idx:46}
+  ]},
+  { area: 'Central', channels: [
+    {name:'C1',idx:11},{name:'C3',idx:12},{name:'C5',idx:13},
+    {name:'Cz',idx:47},{name:'C2',idx:48},{name:'C4',idx:49},{name:'C6',idx:50}
+  ]},
+  { area: 'Temporal', channels: [
+    {name:'T7',idx:14},{name:'TP7',idx:15},{name:'T8',idx:51},{name:'TP8',idx:52}
+  ]},
+  { area: 'Centroparietal', channels: [
+    {name:'CP5',idx:16},{name:'CP3',idx:17},{name:'CP1',idx:18},
+    {name:'CPz',idx:31},{name:'CP6',idx:53},{name:'CP4',idx:54},{name:'CP2',idx:55}
+  ]},
+  { area: 'Parietal', channels: [
+    {name:'P1',idx:19},{name:'P3',idx:20},{name:'P5',idx:21},{name:'P7',idx:22},{name:'P9',idx:23},
+    {name:'PO7',idx:24},{name:'PO3',idx:25},{name:'Pz',idx:30},{name:'POz',idx:29},
+    {name:'P2',idx:56},{name:'P4',idx:57},{name:'P6',idx:58},{name:'P8',idx:59},{name:'P10',idx:60},
+    {name:'PO8',idx:61}
+  ]},
+  { area: 'Occipital', channels: [
+    {name:'O1',idx:26},{name:'Iz',idx:27},{name:'Oz',idx:28}
+  ]}
+];
+
+// ── Constants & Bands ─────────────────────────────────────────────────────────
+const MAX_FREQ = 100;
+const VIEW_FFT_N = 256, VIEW_HOP = 64;
+const SRATE = 256; // snippet sample rate
+
+const BANDS = [
+  { lo:0.5, hi:4,   color:'rgba(48,80,220,0.17)',  border:'rgba(70,110,255,0.55)',  label:'\u03b4',  name:'\u03b4 Delta'     },
+  { lo:4,   hi:8,   color:'rgba(10,155,195,0.16)', border:'rgba(20,195,230,0.50)',  label:'\u03b8',  name:'\u03b8 Theta'     },
+  { lo:8,   hi:13,  color:'rgba(10,175,80,0.15)',  border:'rgba(20,220,100,0.50)',  label:'\u03b1',  name:'\u03b1 Alpha'     },
+  { lo:13,  hi:30,  color:'rgba(195,205,0,0.14)',  border:'rgba(230,240,20,0.50)',  label:'\u03b2',  name:'\u03b2 Beta'      },
+  { lo:30,  hi:70,  color:'rgba(215,95,10,0.13)',  border:'rgba(250,130,20,0.50)',  label:'\u03b3L', name:'\u03b3 Low Gamma' },
+  { lo:70,  hi:100, color:'rgba(195,20,20,0.12)',  border:'rgba(240,45,45,0.50)',   label:'\u03b3H', name:'\u03b3 High Gamma'},
+];
+
+// ── Color LUT ─────────────────────────────────────────────────────────────────
+const COLOR_LUT = (() => {
+  const stops = [
+    [0.00,[4,4,16]],[0.12,[14,0,70]],[0.26,[0,28,150]],[0.42,[0,140,210]],
+    [0.57,[0,210,100]],[0.71,[185,230,0]],[0.85,[255,120,0]],[1.00,[255,25,25]],
+  ];
+  const lut = new Array(256);
+  for (let i=0;i<256;i++){
+    const t=i/255;
+    for (let s=0;s<stops.length-1;s++){
+      const [t0,c0]=stops[s],[t1,c1]=stops[s+1];
+      if(t<=t1){
+        const f=(t-t0)/(t1-t0);
+        lut[i]=[Math.round(c0[0]+f*(c1[0]-c0[0])),Math.round(c0[1]+f*(c1[1]-c0[1])),Math.round(c0[2]+f*(c1[2]-c0[2]))];
+        break;
+      }
+    }
+    if(!lut[i]) lut[i]=[255,25,25];
+  }
+  return lut;
+})();
+
+// ── JS FFT ────────────────────────────────────────────────────────────────────
+function jsFft(re,im){
+  const n=re.length;
+  for(let i=1,j=0;i<n;i++){
+    let bit=n>>1;
+    for(;j&bit;bit>>=1)j^=bit;
+    j^=bit;
+    if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}
+  }
+  for(let len=2;len<=n;len<<=1){
+    const ang=-2*Math.PI/len,ca=Math.cos(ang),sa=Math.sin(ang);
+    for(let i=0;i<n;i+=len){
+      let wr=1,wi=0;
+      for(let j=0,half=len>>1;j<half;j++){
+        const a=i+j,b=i+j+half;
+        const ur=re[a],ui=im[a];
+        const vr=re[b]*wr-im[b]*wi,vi=re[b]*wi+im[b]*wr;
+        re[a]=ur+vr;im[a]=ui+vi;re[b]=ur-vr;im[b]=ui-vi;
+        const nwr=wr*ca-wi*sa;wi=wr*sa+wi*ca;wr=nwr;
+      }
+    }
+  }
+}
+
+// ── Compute spectrogram from raw sample array ─────────────────────────────────
+function computeFrames(samples){
+  const win=new Float32Array(VIEW_FFT_N);
+  for(let i=0;i<VIEW_FFT_N;i++) win[i]=0.5-0.5*Math.cos(2*Math.PI*i/(VIEW_FFT_N-1));
+  const numFrames=Math.max(1,Math.floor((samples.length-VIEW_FFT_N)/VIEW_HOP)+1);
+  const halfN=VIEW_FFT_N>>1;
+  const frames=new Float32Array(numFrames*halfN);
+  const re=new Float32Array(VIEW_FFT_N),im=new Float32Array(VIEW_FFT_N);
+  for(let f=0;f<numFrames;f++){
+    const off=f*VIEW_HOP;
+    for(let i=0;i<VIEW_FFT_N;i++){re[i]=(off+i<samples.length?samples[off+i]:0)*win[i];im[i]=0;}
+    jsFft(re,im);
+    for(let b=0;b<halfN;b++) frames[f*halfN+b]=Math.sqrt(re[b]*re[b]+im[b]*im[b]);
+  }
+  const hopSec=VIEW_HOP/SRATE;
+  const effectiveSR=SRATE;
+  return{frames,numFrames,halfN,effectiveSR,hopSec};
+}
+
+// ── Smoothing ─────────────────────────────────────────────────────────────────
+function applySmoothing(frames,numFrames,halfN,timeSec,freqHz){
+  let res=frames;
+  const hopSec=VIEW_HOP/SRATE;
+  const tK=Math.max(1,timeSec>0?Math.round(timeSec/hopSec):1);
+  if(tK>1){
+    const out=new Float32Array(numFrames*halfN);
+    const half=tK>>1;
+    for(let f=0;f<numFrames;f++){
+      const f0=Math.max(0,f-half),f1=Math.min(numFrames-1,f+half),cnt=f1-f0+1;
+      for(let b=0;b<halfN;b++){let s=0;for(let ff=f0;ff<=f1;ff++)s+=res[ff*halfN+b];out[f*halfN+b]=s/cnt;}
+    }
+    res=out;
+  }
+  const freqPerBinV=(SRATE/2)/halfN;
+  const fK=Math.max(1,freqHz>0?Math.round(freqHz/freqPerBinV):1);
+  if(fK>1){
+    const out=new Float32Array(numFrames*halfN);
+    const half=fK>>1;
+    for(let f=0;f<numFrames;f++){
+      for(let b=0;b<halfN;b++){
+        const b0=Math.max(0,b-half),b1=Math.min(halfN-1,b+half),cnt=b1-b0+1;
+        let s=0;for(let bb=b0;bb<=b1;bb++)s+=res[f*halfN+bb];
+        out[f*halfN+b]=s/cnt;
+      }
+    }
+    res=out;
+  }
+  return res;
+}
+
+function applyZScore(frames,numFrames,halfN){
+  const out=new Float32Array(numFrames*halfN);
+  for(let b=0;b<halfN;b++){
+    let sum=0,sum2=0;
+    for(let f=0;f<numFrames;f++){const v=frames[f*halfN+b];sum+=v;sum2+=v*v;}
+    const mean=sum/numFrames;
+    const std=Math.sqrt(Math.max(0,sum2/numFrames-mean*mean));
+    for(let f=0;f<numFrames;f++){
+      const z=std<1e-10?0:(frames[f*halfN+b]-mean)/std;
+      out[f*halfN+b]=Math.max(-3,Math.min(3,z));
+    }
+  }
+  return out;
+}
+
+// ── DOM refs ──────────────────────────────────────────────────────────────────
+const areaSelect      = document.getElementById('area-select');
+const channelSelect   = document.getElementById('channel-select');
+const channelInfoEl   = document.getElementById('channel-info');
+const channelDisplay  = document.getElementById('channel-display');
+const vizContainer    = document.getElementById('viz-container');
+const viewAllBtn      = document.getElementById('viewall-btn');
+const zoomResetBtn    = document.getElementById('zoom-reset-btn');
+const exportBtn       = document.getElementById('export-btn');
+const timeSmoothEl    = document.getElementById('time-smooth');
+const freqSmoothEl    = document.getElementById('freq-smooth');
+const zscoreCb        = document.getElementById('zscore-cb');
+const cursorInfoEl    = document.getElementById('cursor-info');
+const zoomInfoEl      = document.getElementById('zoom-info');
+const zoomHintEl      = document.getElementById('zoom-hint');
+const emptyHint       = document.getElementById('empty-hint');
+
+const spectroCanvas   = document.getElementById('spectrogram-canvas');
+const spectroCtx      = spectroCanvas.getContext('2d');
+const overlayCanvas   = document.getElementById('overlay-canvas');
+const overlayCtx      = overlayCanvas.getContext('2d');
+const freqAxisCanvas  = document.getElementById('freq-axis-canvas');
+const freqAxisCtx     = freqAxisCanvas.getContext('2d');
+const bandAxisCanvas  = document.getElementById('band-axis-canvas');
+const bandAxisCtx     = bandAxisCanvas.getContext('2d');
+const colorScaleCanvas= document.getElementById('color-scale-canvas');
+const colorScaleCtx   = colorScaleCanvas.getContext('2d');
+const loadingOverlay  = document.getElementById('loading-overlay');
+const loadingFill     = document.getElementById('loading-fill');
+const loadingTextEl   = document.getElementById('loading-text');
+const timeAxisRow     = document.getElementById('time-axis-row');
+const timeAxisCanvas  = document.getElementById('time-axis-canvas');
+const timeAxisCtx     = timeAxisCanvas.getContext('2d');
+const timeAxisSpacerL = document.querySelector('.time-axis-spacer');
+const timeAxisSpacerR = document.querySelector('.time-axis-spacer-right');
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let ecogData = null;
+let currentChannelIdx = null;
+let currentAreaName = '';
+let viewAllData = null;
+let zoomState = null;
+let dragState = null;
+let totalDuration = 0;
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function freqToY(freq,h){ return Math.round((1-Math.max(0,Math.min(freq,MAX_FREQ))/MAX_FREQ)*h); }
+function formatTime(s){ const m=Math.floor(s/60),ss=Math.floor(s%60),ms=Math.floor((s%1)*1000); return `${m}:${String(ss).padStart(2,'0')}.${String(ms).padStart(3,'0')}`; }
+function tick(ms=30){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ── Canvas sizing ─────────────────────────────────────────────────────────────
+function resizeCanvases(){
+  const axW=freqAxisCanvas.width, bandW=bandAxisCanvas.width;
+  const W=Math.max(300,document.querySelector('.specto-layout').clientWidth-axW-bandW);
+  const H=spectroCanvas.height;
+  spectroCanvas.width=W;
+  overlayCanvas.width=W; overlayCanvas.height=H;
+  freqAxisCanvas.height=H; bandAxisCanvas.height=H;
+  timeAxisSpacerL.style.width=axW+'px';
+  timeAxisSpacerR.style.width=bandW+'px';
+  timeAxisCanvas.width=W;
+}
+
+// ── Color scale ───────────────────────────────────────────────────────────────
+function drawColorScale(){
+  const w=colorScaleCanvas.width,h=colorScaleCanvas.height;
+  const img=colorScaleCtx.createImageData(w,h);
+  for(let x=0;x<w;x++){
+    const [r,g,b]=COLOR_LUT[Math.round((x/w)*255)];
+    for(let y=0;y<h;y++){const i=(y*w+x)*4;img.data[i]=r;img.data[i+1]=g;img.data[i+2]=b;img.data[i+3]=255;}
+  }
+  colorScaleCtx.putImageData(img,0,0);
+}
+
+// ── Frequency axis ────────────────────────────────────────────────────────────
+function drawFreqAxis(){
+  const c=freqAxisCtx,w=freqAxisCanvas.width,h=freqAxisCanvas.height;
+  c.fillStyle='#080b14';c.fillRect(0,0,w,h);
+  for(const b of BANDS){const y1=freqToY(b.hi,h),y2=freqToY(b.lo,h);c.fillStyle=b.color;c.fillRect(0,y1,w,y2-y1);}
+  c.font='10px -apple-system,Roboto,sans-serif';c.textAlign='right';
+  for(let f=0;f<=MAX_FREQ;f+=10){
+    const y=freqToY(f,h),maj=(f%20===0);
+    c.fillStyle=maj?'#5070a0':'#283850';c.fillRect(w-(maj?10:5),y,(maj?10:5),1);
+    if(maj){c.fillStyle='#5070a0';c.fillText(f+' Hz',w-12,y+4);}
+  }
+  c.save();c.translate(11,h/2);c.rotate(-Math.PI/2);
+  c.font='10px -apple-system,Roboto,sans-serif';c.fillStyle='#304060';c.textAlign='center';
+  c.fillText('Frequency (Hz)',0,0);c.restore();
+  c.fillStyle='#141e36';c.fillRect(w-1,0,1,h);
+}
+
+// ── Band axis ─────────────────────────────────────────────────────────────────
+function drawBandAxis(){
+  const c=bandAxisCtx,w=bandAxisCanvas.width,h=bandAxisCanvas.height;
+  c.fillStyle='#080b14';c.fillRect(0,0,w,h);
+  c.fillStyle='#141e36';c.fillRect(0,0,1,h);
+  for(const b of BANDS){
+    const y1=freqToY(b.hi,h),y2=freqToY(b.lo,h),bh=y2-y1;
+    c.fillStyle=b.color;c.fillRect(1,y1,w-1,bh);
+    c.fillStyle=b.border;c.fillRect(1,y1,w-1,1);
+    if(bh>=14){
+      const midY=y1+bh/2;
+      c.font='bold 11px -apple-system,Roboto,sans-serif';
+      c.fillStyle='rgba(185,215,255,0.7)';c.textAlign='left';
+      c.fillText(b.label,6,midY+4);
+      if(bh>=34){
+        c.font='9px -apple-system,Roboto,sans-serif';
+        c.fillStyle='rgba(120,160,210,0.5)';
+        c.fillText(`${b.lo}–${b.hi}`,6,midY+16);
+      }
+    }
+  }
+}
+
+// ── Overlay: band lines, cursor, drag highlight ───────────────────────────────
+function drawOverlay(){
+  const c=overlayCtx,w=overlayCanvas.width,h=overlayCanvas.height;
+  c.clearRect(0,0,w,h);
+  c.lineWidth=1;
+  for(let i=0;i<BANDS.length;i++){
+    const b=BANDS[i];
+    const y=freqToY(b.hi,h);
+    if(b.hi>=MAX_FREQ) continue;
+    c.setLineDash([9,7]);c.strokeStyle=b.border;c.globalAlpha=0.62;
+    c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();
+    const bh=freqToY(b.lo,h)-y;
+    if(bh>16){
+      c.setLineDash([]);c.globalAlpha=0.5;
+      c.font='bold 10px -apple-system,Roboto,sans-serif';
+      c.fillStyle=b.border;c.textAlign='left';
+      c.fillText(b.label,5,y+Math.min(bh-4,13));
+    }
+  }
+  c.globalAlpha=1;c.setLineDash([]);
+
+  // Zoom drag highlight
+  if(dragState){
+    const x1=Math.min(dragState.startPx,dragState.currentPx);
+    const x2=Math.max(dragState.startPx,dragState.currentPx);
+    if(x2-x1>2){
+      c.globalAlpha=1;
+      c.fillStyle='rgba(220,210,120,0.10)';
+      c.fillRect(x1,0,x2-x1,h);
+      c.strokeStyle='rgba(220,210,100,0.55)';
+      c.lineWidth=1.5;c.setLineDash([]);
+      c.strokeRect(x1,0,x2-x1,h);
+    }
+  }
+}
+
+// ── Time axis ─────────────────────────────────────────────────────────────────
+function drawTimeAxisRange(startSec, endSec){
+  const c=timeAxisCtx,w=timeAxisCanvas.width,h=timeAxisCanvas.height;
+  c.fillStyle='#080b14';c.fillRect(0,0,w,h);
+  const dur=endSec-startSec;
+  let tick=1;
+  if(dur>10) tick=2;
+  else if(dur>4) tick=1;
+  else if(dur>2) tick=0.5;
+  else           tick=0.1;
+  c.font='10px -apple-system,Roboto,sans-serif';
+  const firstTick=Math.ceil(startSec/tick)*tick;
+  for(let t=firstTick;t<=endSec+0.001;t+=tick){
+    const x=((t-startSec)/dur)*w;
+    c.fillStyle='#3a5070';c.fillRect(x,0,1,5);
+    c.fillStyle='#4a6a9a';c.textAlign='center';
+    c.fillText(formatTime(t),x,17);
+  }
+}
+
+// ── Clear spectrogram ─────────────────────────────────────────────────────────
+function clearSpectrogram(){
+  spectroCtx.fillStyle='#04050e';
+  spectroCtx.fillRect(0,0,spectroCanvas.width,spectroCanvas.height);
+}
+
+// ── Render VIEW ALL ───────────────────────────────────────────────────────────
+function renderViewAllCanvas(frames,numFrames,halfN,effectiveSR,isZScore){
+  const w=spectroCanvas.width,h=spectroCanvas.height;
+  const fpbV=(effectiveSR/2)/halfN;
+  const img=spectroCtx.createImageData(w,h);
+  const d=img.data;
+  let gMin=Infinity,gMax=-Infinity;
+  if(!isZScore){
+    const maxBinV=Math.min(Math.ceil(MAX_FREQ/fpbV),halfN-1);
+    for(let f=0;f<numFrames;f++) for(let b=0;b<=maxBinV;b++){
+      const v=frames[f*halfN+b];if(v<gMin)gMin=v;if(v>gMax)gMax=v;
+    }
+  }
+  const gRange=Math.max(1e-10,gMax-gMin);
+  for(let px=0;px<w;px++){
+    const fIdx=Math.round((px/w)*(numFrames-1));
+    for(let y=0;y<h;y++){
+      const freq=MAX_FREQ*(1-y/h);
+      const bin=Math.min(Math.round(freq/fpbV),halfN-1);
+      const v=frames[fIdx*halfN+bin];
+      let amp;
+      if(isZScore) amp=(v+3)/6;
+      else amp=(v-gMin)/gRange;
+      amp=Math.max(0,Math.min(1,amp));
+      const [r,g,b]=COLOR_LUT[Math.round(amp*255)];
+      const i=(y*w+px)*4;d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;
+    }
+  }
+  spectroCtx.putImageData(img,0,0);
+  drawOverlay();
+}
+
+// ── Zoom ──────────────────────────────────────────────────────────────────────
+function applyZoom(startSec, endSec){
+  if(!viewAllData) return;
+  zoomState={startSec,endSec};
+  const {renderedFrames,numFrames,halfN,effectiveSR,isZScore}=viewAllData;
+  const hopSec=VIEW_HOP/SRATE;
+  const startFrame=Math.max(0,Math.floor(startSec/hopSec));
+  const endFrame  =Math.min(numFrames-1,Math.ceil(endSec/hopSec));
+  const subCount  =Math.max(1,endFrame-startFrame+1);
+  const sub=new Float32Array(subCount*halfN);
+  for(let f=0;f<subCount;f++)
+    for(let b=0;b<halfN;b++)
+      sub[f*halfN+b]=renderedFrames[(startFrame+f)*halfN+b];
+  renderViewAllCanvas(sub,subCount,halfN,effectiveSR,isZScore);
+  timeAxisCanvas.width=spectroCanvas.width;
+  drawTimeAxisRange(startSec,endSec);
+  zoomResetBtn.style.display='';
+  zoomInfoEl.textContent=`Zoom: ${formatTime(startSec)} – ${formatTime(endSec)}`;
+  zoomInfoEl.classList.add('visible');
+}
+
+function resetZoom(){
+  if(!viewAllData) return;
+  zoomState=null;
+  const {renderedFrames,numFrames,halfN,effectiveSR,isZScore}=viewAllData;
+  renderViewAllCanvas(renderedFrames,numFrames,halfN,effectiveSR,isZScore);
+  timeAxisCanvas.width=spectroCanvas.width;
+  drawTimeAxisRange(0,totalDuration);
+  zoomResetBtn.style.display='none';
+  zoomInfoEl.classList.remove('visible');
+  drawOverlay();
+}
+
+// ── Drag-to-zoom ──────────────────────────────────────────────────────────────
+function spectroXToSec(clientX){
+  const rect=spectroCanvas.getBoundingClientRect();
+  const px=(clientX-rect.left)*(spectroCanvas.width/rect.width);
+  const frac=Math.max(0,Math.min(1,px/spectroCanvas.width));
+  if(zoomState) return zoomState.startSec+frac*(zoomState.endSec-zoomState.startSec);
+  return frac*totalDuration;
+}
+
+spectroCanvas.addEventListener('mousedown',e=>{
+  if(!viewAllData) return;
+  const rect=spectroCanvas.getBoundingClientRect();
+  const px=(e.clientX-rect.left)*(spectroCanvas.width/rect.width);
+  dragState={startPx:px,currentPx:px,startSec:spectroXToSec(e.clientX)};
+});
+
+spectroCanvas.addEventListener('mousemove',e=>{
+  const rect=spectroCanvas.getBoundingClientRect();
+  const y=(e.clientY-rect.top)*(spectroCanvas.height/rect.height);
+  const freq=MAX_FREQ*(1-y/spectroCanvas.height);
+  const band=BANDS.find(b=>freq>=b.lo&&freq<b.hi);
+  let txt=`${freq.toFixed(1)} Hz`+(band?`  ·  ${band.name}`:'');
+  if(viewAllData){
+    const tSec=spectroXToSec(e.clientX);
+    txt+=`  ·  t = ${formatTime(tSec)}`;
+  }
+  cursorInfoEl.textContent=txt;
+  if(dragState&&viewAllData){
+    const px=(e.clientX-rect.left)*(spectroCanvas.width/rect.width);
+    dragState.currentPx=px;
+    drawOverlay();
+  }
+});
+
+spectroCanvas.addEventListener('mouseup',e=>{
+  if(!dragState||!viewAllData) return;
+  const rect=spectroCanvas.getBoundingClientRect();
+  const endPx=(e.clientX-rect.left)*(spectroCanvas.width/rect.width);
+  const endSec=spectroXToSec(e.clientX);
+  const startSec=dragState.startSec;
+  dragState=null;
+  const s=Math.min(startSec,endSec);
+  const en=Math.max(startSec,endSec);
+  if(en-s<0.05){ drawOverlay(); return; }
+  applyZoom(s,en);
+});
+
+spectroCanvas.addEventListener('mouseleave',()=>{
+  cursorInfoEl.textContent='';
+  if(dragState){ dragState=null; drawOverlay(); }
+});
+
+// ── JPG Export ────────────────────────────────────────────────────────────────
+function exportJpg(){
+  if(!viewAllData) return;
+  const freqW=freqAxisCanvas.width;
+  const bandW=bandAxisCanvas.width;
+  const specW=spectroCanvas.width;
+  const specH=spectroCanvas.height;
+  const timeH=24;
+  const settingsH=54;
+  const totalW=freqW+specW+bandW;
+  const totalH=specH+timeH+settingsH;
+
+  const off=document.createElement('canvas');
+  off.width=totalW; off.height=totalH;
+  const ctx=off.getContext('2d');
+
+  ctx.fillStyle='#04050e';
+  ctx.fillRect(0,0,totalW,totalH);
+  ctx.drawImage(freqAxisCanvas,0,0);
+  ctx.drawImage(spectroCanvas,freqW,0);
+  ctx.drawImage(overlayCanvas,freqW,0);
+  ctx.drawImage(bandAxisCanvas,freqW+specW,0);
+
+  // Time axis
+  ctx.fillStyle='#080b14';
+  ctx.fillRect(0,specH,freqW,timeH);
+  ctx.fillRect(freqW+specW,specH,bandW,timeH);
+  ctx.drawImage(timeAxisCanvas,freqW,specH);
+
+  // Settings bar
+  const sy=specH+timeH;
+  ctx.fillStyle='#06080f';
+  ctx.fillRect(0,sy,totalW,settingsH);
+  ctx.fillStyle='#141e36';
+  ctx.fillRect(0,sy,totalW,1);
+
+  const timeSm=parseFloat(timeSmoothEl.value)||0;
+  const freqSm=parseFloat(freqSmoothEl.value)||0;
+  const zscore=zscoreCb.checked;
+
+  ctx.font='11px "Courier New",monospace';
+  ctx.fillStyle='#4a6a9a';
+  ctx.textAlign='left';
+
+  let settingsLine=`Freq: 0–${MAX_FREQ} Hz  ·  Time smooth: ${timeSm}s  ·  Freq smooth: ${freqSm} Hz  ·  Z-score: ${zscore?'on':'off'}`;
+  if(zoomState) settingsLine+=`  ·  Zoom: ${formatTime(zoomState.startSec)} – ${formatTime(zoomState.endSec)}`;
+  ctx.fillText(settingsLine,10,sy+16);
+
+  ctx.fillStyle='#2a4060';
+  const areaName = currentAreaName || 'ECoG';
+  const chName   = ecogData ? ecogData.meta.channel_names[currentChannelIdx] : '';
+  let infoLine   = `Channel: ${chName}  ·  Area: ${areaName}  ·  ${totalDuration.toFixed(2)} s  ·  ${SRATE} Hz`;
+  if(infoLine.length>120) infoLine=infoLine.slice(0,117)+'…';
+  ctx.fillText(infoLine,10,sy+34);
+
+  // Color scale
+  const scaleW=120;
+  const scaleX=totalW-scaleW-90;
+  ctx.drawImage(colorScaleCanvas,scaleX,sy+20,scaleW,9);
+  ctx.font='10px -apple-system,Roboto,sans-serif';
+  ctx.fillStyle='#344a70';
+  ctx.textAlign='right';
+  ctx.fillText('Low',scaleX-4,sy+28);
+  ctx.textAlign='left';
+  ctx.fillText('High power',scaleX+scaleW+4,sy+28);
+
+  ctx.font='bold 10px -apple-system,Roboto,sans-serif';
+  ctx.fillStyle='#1a3050';
+  ctx.textAlign='right';
+  ctx.fillText('PSYCH 332  ·  ECoG Data Preview',totalW-8,sy+48);
+
+  off.toBlob(blob=>{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=`ECoG_${chName}_Spectrogram.jpg`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+  },'image/jpeg',0.93);
+}
+
+// ── Render channel spectrogram ────────────────────────────────────────────────
+async function renderChannel(channelIdx, areaName){
+  if(!ecogData) return;
+  currentChannelIdx = channelIdx;
+  currentAreaName   = areaName;
+
+  const rawArray = ecogData.snippets[channelIdx];
+  const samples  = new Float32Array(rawArray);
+  totalDuration  = samples.length / SRATE;
+
+  // Show viz container if hidden
+  vizContainer.style.display='flex';
+  emptyHint.style.display='none';
+  zoomState=null; dragState=null; viewAllData=null;
+  zoomResetBtn.style.display='none';
+  zoomInfoEl.classList.remove('visible');
+
+  resizeCanvases();
+  clearSpectrogram();
+  drawFreqAxis(); drawBandAxis(); drawOverlay(); drawColorScale();
+
+  const chName = ecogData.meta.channel_names[channelIdx];
+  channelDisplay.textContent = `${chName}  ·  ${areaName}  ·  ${totalDuration.toFixed(1)} s  ·  ${SRATE} Hz`;
+
+  // Compute & render
+  loadingOverlay.classList.add('visible');
+  loadingTextEl.textContent='Computing spectrogram…'; loadingFill.style.width='0%';
+  await tick();
+
+  const result = computeFrames(samples);
+  loadingFill.style.width='35%'; loadingTextEl.textContent='Smoothing…'; await tick();
+
+  const tSec=parseFloat(timeSmoothEl.value)||0;
+  const fHz =parseFloat(freqSmoothEl.value)||0;
+  let frames=applySmoothing(result.frames,result.numFrames,result.halfN,tSec,fHz);
+  loadingFill.style.width='60%';
+
+  if(zscoreCb.checked){
+    loadingTextEl.textContent='Z-scoring…'; await tick();
+    frames=applyZScore(frames,result.numFrames,result.halfN);
+  }
+  loadingFill.style.width='80%'; loadingTextEl.textContent='Rendering…'; await tick();
+
+  viewAllData={
+    renderedFrames: frames,
+    numFrames: result.numFrames,
+    halfN: result.halfN,
+    effectiveSR: result.effectiveSR,
+    isZScore: zscoreCb.checked
+  };
+
+  renderViewAllCanvas(frames,result.numFrames,result.halfN,result.effectiveSR,zscoreCb.checked);
+  loadingFill.style.width='100%';
+
+  timeAxisCanvas.width=spectroCanvas.width;
+  drawTimeAxisRange(0,totalDuration);
+  timeAxisRow.classList.add('visible');
+  zoomHintEl.classList.add('visible');
+
+  await tick(60);
+  loadingOverlay.classList.remove('visible');
+}
+
+// ── Channel selection handlers ────────────────────────────────────────────────
+areaSelect.addEventListener('change', ()=>{
+  const areaName = areaSelect.value;
+  channelSelect.innerHTML='<option value="">— Select channel —</option>';
+  channelSelect.disabled = !areaName;
+  if(!areaName) return;
+  const group = CHANNEL_GROUPS.find(g=>g.area===areaName);
+  if(!group) return;
+  for(const ch of group.channels){
+    const opt=document.createElement('option');
+    opt.value=ch.idx;
+    opt.textContent=ch.name;
+    channelSelect.appendChild(opt);
+  }
+  channelInfoEl.textContent=`${group.channels.length} channels in ${areaName} area`;
+  channelInfoEl.className='channel-info loaded';
+});
+
+channelSelect.addEventListener('change', ()=>{
+  const idx=parseInt(channelSelect.value,10);
+  if(isNaN(idx)) return;
+  const areaName = areaSelect.value;
+  channelInfoEl.textContent=`Channel ${ecogData.meta.channel_names[idx]}  ·  ${areaName}`;
+  renderChannel(idx, areaName);
+});
+
+// ── VIEW ALL / Recompute button ───────────────────────────────────────────────
+viewAllBtn.addEventListener('click', ()=>{
+  if(currentChannelIdx===null) return;
+  renderChannel(currentChannelIdx, currentAreaName);
+});
+
+// ── Controls ──────────────────────────────────────────────────────────────────
+zoomResetBtn.addEventListener('click', resetZoom);
+exportBtn.addEventListener('click', exportJpg);
+
+// ── Resize ────────────────────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{
+  if(vizContainer.style.display!=='none'){
+    resizeCanvases();
+    if(viewAllData){
+      if(zoomState){
+        applyZoom(zoomState.startSec,zoomState.endSec);
+      } else {
+        const {renderedFrames,numFrames,halfN,effectiveSR,isZScore}=viewAllData;
+        renderViewAllCanvas(renderedFrames,numFrames,halfN,effectiveSR,isZScore);
+        timeAxisCanvas.width=spectroCanvas.width;
+        drawTimeAxisRange(0,totalDuration);
+        drawOverlay();
+      }
+      drawFreqAxis(); drawBandAxis();
+    } else {
+      clearSpectrogram(); drawOverlay();
+      drawFreqAxis(); drawBandAxis();
+    }
+  }
+});
+
+// ── Load JSON data ────────────────────────────────────────────────────────────
+async function loadData(){
+  const loadingEl=document.getElementById('data-loading');
+  loadingEl.style.display='block';
+  channelInfoEl.textContent='Loading ECoG dataset…';
+
+  try{
+    const resp=await fetch('Data/ecog_data_332.json');
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    ecogData=await resp.json();
+
+    // Populate area dropdown
+    for(const group of CHANNEL_GROUPS){
+      const opt=document.createElement('option');
+      opt.value=group.area;
+      opt.textContent=group.area+' ('+group.channels.length+')';
+      areaSelect.appendChild(opt);
+    }
+    areaSelect.disabled=false;
+    loadingEl.style.display='none';
+
+    const meta=ecogData.meta;
+    channelInfoEl.textContent=
+      `Dataset ready  ·  ${meta.n_channels} channels  ·  ${(meta.duration_s||10).toFixed(1)} s  ·  ${SRATE} Hz snippet rate`;
+    channelInfoEl.className='channel-info loaded';
+
+    // Show viz skeleton
+    vizContainer.style.display='flex';
+    resizeCanvases();
+    clearSpectrogram();
+    drawFreqAxis(); drawBandAxis(); drawOverlay(); drawColorScale();
+    emptyHint.style.display='flex';
+  } catch(err){
+    loadingEl.style.display='none';
+    channelInfoEl.textContent='Error loading dataset: '+err.message;
+    channelInfoEl.style.color='#a04040';
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+drawColorScale();
+loadData();
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg=>console.log('SW registered:',reg.scope))
+    .catch(err=>console.log('SW failed:',err));
+}
+</script>
+<script src="analytics.js" defer></script>
+</body>
+</html>
